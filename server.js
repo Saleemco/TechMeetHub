@@ -12,6 +12,47 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
+// ===== DEBUG ENDPOINTS =====
+app.get('/debug-files', (req, res) => {
+  const fs = require('fs');
+  const publicDir = path.join(__dirname, 'public');
+  const files = [];
+  
+  function walkDir(dir, prefix = '') {
+    try {
+      const items = fs.readdirSync(dir);
+      for (const item of items) {
+        const fullPath = path.join(dir, item);
+        const stats = fs.statSync(fullPath);
+        if (stats.isDirectory()) {
+          walkDir(fullPath, prefix + item + '/');
+        } else {
+          files.push(prefix + item);
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+  
+  walkDir(publicDir);
+  res.json({ 
+    files: files.sort(),
+    cwd: process.cwd(),
+    publicDir: publicDir
+  });
+});
+
+app.get('/debug-check/:file(*)', (req, res) => {
+  const filePath = path.join(__dirname, 'public', req.params.file);
+  const fs = require('fs');
+  if (fs.existsSync(filePath)) {
+    res.json({ exists: true, path: filePath });
+  } else {
+    res.json({ exists: false, path: filePath });
+  }
+});
+
 // ===== DATABASE CONNECTION =====
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL || 'postgresql://localhost:5432/techmeethub',
@@ -886,6 +927,14 @@ app.delete('/api/admin/events/:id', requireAuth, requireRole(['admin']), async (
 
 // ===== SPA FALLBACK =====
 app.get('*', (req, res) => {
+  // Skip API routes
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
+  // Skip debug routes
+  if (req.path.startsWith('/debug')) {
+    return res.status(404).json({ error: 'Debug endpoint not found' });
+  }
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
@@ -895,4 +944,24 @@ const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`    participant: jordan@techmeethub.dev`);
   console.log(`    organizer:   sarah@techmeethub.dev`);
   console.log(`    admin:       maya@techmeethub.dev\n`);
+});
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.log(`  Port ${PORT} is in use, trying port ${PORT + 1}...\n`);
+    const fallbackServer = app.listen(PORT + 1, '0.0.0.0', () => {
+      console.log(`\n  TechMeetHub server running on http://localhost:${PORT + 1}\n`);
+      console.log(`  Demo accounts (password: "password"):`);
+      console.log(`    participant: jordan@techmeethub.dev`);
+      console.log(`    organizer:   sarah@techmeethub.dev`);
+      console.log(`    admin:       maya@techmeethub.dev\n`);
+    });
+    fallbackServer.on('error', (err2) => {
+      console.error(`  Failed to start server on port ${PORT + 1}:`, err2.message);
+      process.exit(1);
+    });
+  } else {
+    console.error('  Server error:', err);
+    process.exit(1);
+  }
 });

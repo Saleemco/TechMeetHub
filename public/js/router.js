@@ -22,6 +22,7 @@ const routes = {
 export class Router {
   constructor() {
     this.currentRoute = '/';
+    this.currentParams = {};
     this.container = document.getElementById('main');
     this.header = document.getElementById('header');
     this.footer = document.getElementById('footer');
@@ -53,21 +54,14 @@ export class Router {
     const user = await Auth.me();
     const { handler, params } = this.matchRoute(path);
     
-    // Render header and footer
     this.header.innerHTML = Header(user);
     this.footer.innerHTML = Footer();
-    
-    // Render the page content
-    const content = await handler(...params);
-    this.container.innerHTML = content;
-    
-    console.log(`📄 Rendered: ${path}`);
-    console.log(`📄 Page: ${path === '/login' ? 'Login Page' : path === '/register' ? 'Register Page' : 'Other'}`);
+    this.container.innerHTML = await handler(...params);
     
     this.updateActiveNav(path);
     this.currentRoute = path;
     
-    // Attach handlers after a small delay to ensure DOM is ready
+    // Attach handlers after DOM update
     setTimeout(() => {
       this.attachEventHandlers();
     }, 50);
@@ -88,93 +82,63 @@ export class Router {
   }
 
   attachEventHandlers() {
-    console.log('🔧 Attaching event handlers for:', this.currentRoute);
-    
-    // LOGIN FORM - Only attach if on login page
-    if (this.currentRoute === '/login') {
-      const loginForm = document.getElementById('login-form');
-      if (loginForm) {
-        console.log('✅ Login form found!');
+    // Login form
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+      const newForm = loginForm.cloneNode(true);
+      loginForm.parentNode.replaceChild(newForm, loginForm);
+      
+      newForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('🔐 Login form submitted');
         
-        // Remove any existing event listeners
-        const newForm = loginForm.cloneNode(true);
-        loginForm.parentNode.replaceChild(newForm, loginForm);
+        const formData = new FormData(newForm);
+        const email = formData.get('email');
+        const password = formData.get('password');
         
-        // Add submit event listener
-        newForm.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log('🔐 Login button clicked!');
-          
-          const formData = new FormData(newForm);
-          const email = formData.get('email');
-          const password = formData.get('password');
-          
-          console.log('📧 Email:', email);
-          
-          if (!email || !password) {
-            showToast('Please enter email and password', 'error');
-            return;
-          }
-          
-          try {
-            console.log('⏳ Logging in...');
-            await Auth.login(email, password);
-            console.log('✅ Login successful!');
-            const user = await Auth.me();
-            console.log('👤 User:', user);
-            showToast('Welcome back! ' + user.name, 'success');
-            this.navigateTo('/dashboard');
-          } catch (err) {
-            console.error('❌ Login error:', err);
-            showToast('Invalid email or password', 'error');
-          }
-        });
-        
-        console.log('✅ Login handler attached!');
-      } else {
-        console.log('❌ Login form NOT found on login page!');
-      }
+        try {
+          await Auth.login(email, password);
+          const user = await Auth.me();
+          console.log('✅ Logged in user:', user);
+          showToast('Welcome back!', 'success');
+          this.navigateTo('/dashboard');
+        } catch (err) {
+          console.error('❌ Login error:', err);
+          showToast('Invalid email or password', 'error');
+        }
+      });
     }
-    
-    // REGISTER FORM - Only attach if on register page
-    if (this.currentRoute === '/register') {
-      const registerForm = document.getElementById('register-form');
-      if (registerForm) {
-        console.log('✅ Register form found!');
+
+    // Register form
+    const registerForm = document.getElementById('register-form');
+    if (registerForm) {
+      const newForm = registerForm.cloneNode(true);
+      registerForm.parentNode.replaceChild(newForm, registerForm);
+      
+      newForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('📝 Register form submitted');
         
-        const newForm = registerForm.cloneNode(true);
-        registerForm.parentNode.replaceChild(newForm, registerForm);
+        const formData = new FormData(newForm);
+        const data = Object.fromEntries(formData.entries());
         
-        newForm.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log('📝 Register button clicked!');
-          
-          const formData = new FormData(newForm);
-          const data = Object.fromEntries(formData.entries());
-          
-          if (data.password !== data.confirmPassword) {
-            showToast('Passwords do not match', 'error');
-            return;
-          }
-          
-          try {
-            console.log('⏳ Registering...');
-            await Auth.register(data.name, data.email, data.password, data.role);
-            console.log('✅ Registration successful!');
-            showToast('Account created! Welcome to TechMeetHub.', 'success');
-            this.navigateTo('/dashboard');
-          } catch (err) {
-            console.error('❌ Register error:', err);
-            showToast('Email already registered', 'error');
-          }
-        });
+        if (data.password !== data.confirmPassword) {
+          showToast('Passwords do not match', 'error');
+          return;
+        }
         
-        console.log('✅ Register handler attached!');
-      } else {
-        console.log('❌ Register form NOT found on register page!');
-      }
+        try {
+          await Auth.register(data.name, data.email, data.password, data.role);
+          console.log('✅ Registration successful');
+          showToast('Account created! Welcome to TechMeetHub.', 'success');
+          this.navigateTo('/dashboard');
+        } catch (err) {
+          console.error('❌ Register error:', err);
+          showToast('Email already registered', 'error');
+        }
+      });
     }
 
     // Create event form
