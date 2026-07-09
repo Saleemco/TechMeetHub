@@ -931,10 +931,7 @@ app.get('*', (req, res) => {
   if (req.path.startsWith('/api')) {
     return res.status(404).json({ error: 'API endpoint not found' });
   }
-  // Skip debug routes
-  if (req.path.startsWith('/debug')) {
-    return res.status(404).json({ error: 'Debug endpoint not found' });
-  }
+  // All other routes - serve index.html for SPA routing
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
