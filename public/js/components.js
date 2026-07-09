@@ -114,9 +114,18 @@ export function getCategoryColor(catId) {
 export async function EventCard(event, index = 0, user = null) {
   const userId = user?.id || '';
   const userRole = user?.role || '';
-  const isAttending = userId ? event.attendees.includes(userId) : false;
-  const isOwnEvent = userId && event.organizer.id === userId;
-  const spotsLeft = event.capacity - event.attendees.length;
+  
+  // Safely handle missing organizer with fallbacks
+  const organizer = event.organizer || {
+    id: event.organizer_id || '',
+    name: event.organizer_name || 'Unknown Organizer',
+    avatar: event.organizer_avatar || '?',
+    initialsColor: event.organizer_initials_color || 'bg-gradient-to-br from-brand-500 to-violet-600'
+  };
+  
+  const isAttending = userId ? (event.attendees?.includes(userId) || false) : false;
+  const isOwnEvent = userId && organizer.id === userId;
+  const spotsLeft = (event.capacity || 0) - (event.attendees?.length || 0);
   const isFull = spotsLeft <= 0;
   const date = formatDate(event.date);
   const time = formatTime(event.time);
@@ -184,12 +193,12 @@ export async function EventCard(event, index = 0, user = null) {
           <span class="truncate">${event.location}</span>
         </div>
         <div class="flex items-center gap-2 mb-3">
-          ${event.tags.slice(0, 3).map(tag => `<span class="tag-pill">${tag}</span>`).join('')}
+          ${(event.tags || []).slice(0, 3).map(tag => `<span class="tag-pill">${tag}</span>`).join('')}
         </div>
         <div class="flex items-center justify-between pt-3 border-t border-default">
           <div class="flex items-center gap-2">
-            <div class="w-7 h-7 rounded-full ${event.organizer.initialsColor} avatar-initials text-xs">${event.organizer.avatar}</div>
-            <span class="text-xs text-secondary">${event.organizer.name}</span>
+            <div class="w-7 h-7 rounded-full ${organizer.initialsColor} avatar-initials text-xs">${organizer.avatar}</div>
+            <span class="text-xs text-secondary">${organizer.name}</span>
           </div>
           ${actionButton}
         </div>
@@ -217,6 +226,7 @@ export function EventListItem(event, isAttending = false) {
   `;
 }
 
+// ========== HEADER FUNCTION ==========
 export function Header(user = null) {
   const isLoggedIn = !!user;
   const role = user?.role || '';
@@ -537,6 +547,7 @@ export function Header(user = null) {
   `;
 }
 
+// ========== FOOTER ==========
 export function Footer() {
   return `
     <footer class="mt-16">
@@ -581,6 +592,7 @@ export function Footer() {
   `;
 }
 
+// ========== TOAST ==========
 export function showToast(message, type = 'success') {
   let container = document.getElementById('toast-container');
   if (!container) {
@@ -615,6 +627,7 @@ export function showToast(message, type = 'success') {
   }, 3000);
 }
 
+// ========== EMPTY STATE ==========
 export function EmptyState({ icon, title, message, action }) {
   return `
     <div class="flex flex-col items-center justify-center py-16 text-center">
@@ -628,6 +641,7 @@ export function EmptyState({ icon, title, message, action }) {
   `;
 }
 
+// ========== SECTION TITLE ==========
 export function SectionTitle({ title, subtitle, action }) {
   return `
     <div class="flex items-end justify-between mb-6">
@@ -640,6 +654,7 @@ export function SectionTitle({ title, subtitle, action }) {
   `;
 }
 
+// ========== STAT CARD ==========
 export function StatCard({ icon, value, label, color = 'brand' }) {
   const colorMap = {
     brand: 'text-brand-400 bg-brand-500/10',
@@ -662,6 +677,7 @@ export function StatCard({ icon, value, label, color = 'brand' }) {
   `;
 }
 
+// ========== INPUT ==========
 export function Input({ label, name, type = 'text', placeholder, value = '', required = false, rows, maxLength, min, max }) {
   const inputClass = "w-full px-4 py-2.5 input-shell placeholder-gray-500";
 
@@ -693,6 +709,7 @@ export function Input({ label, name, type = 'text', placeholder, value = '', req
   `;
 }
 
+// ========== BUTTON ==========
 export function Button({ label, type = 'button', variant = 'primary', icon, fullWidth = false, onclick, disabled = false }) {
   const variants = {
     primary: 'bg-brand-500 text-white hover:bg-brand-600',

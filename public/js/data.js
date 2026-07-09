@@ -142,12 +142,36 @@ export const Auth = {
 export const Data = {
   async getEvents() {
     const data = await apiGet('/events');
-    return data.events || [];
+    const events = data.events || [];
+    
+    // Ensure each event has an organizer object with fallbacks
+    return events.map(event => {
+      if (!event.organizer) {
+        event.organizer = {
+          id: event.organizer_id || '',
+          name: event.organizer_name || 'Unknown Organizer',
+          avatar: event.organizer_avatar || '?',
+          initialsColor: event.organizer_initials_color || 'bg-gradient-to-br from-brand-500 to-violet-600'
+        };
+      }
+      return event;
+    });
   },
 
   async getEvent(id) {
     const data = await apiGet(`/events/${id}`);
-    return data.event || null;
+    const event = data.event || null;
+    
+    if (event && !event.organizer) {
+      event.organizer = {
+        id: event.organizer_id || '',
+        name: event.organizer_name || 'Unknown Organizer',
+        avatar: event.organizer_avatar || '?',
+        initialsColor: event.organizer_initials_color || 'bg-gradient-to-br from-brand-500 to-violet-600'
+      };
+    }
+    
+    return event;
   },
 
   async createEvent(event) {

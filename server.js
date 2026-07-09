@@ -638,7 +638,19 @@ app.get('/api/events', async (req, res) => {
 
   query += ' ORDER BY date ASC';
   const result = await pool.query(query, params);
-  res.json({ events: result.rows });
+  
+  // Transform events to include organizer object with fallbacks
+  const events = result.rows.map(event => ({
+    ...event,
+    organizer: {
+      id: event.organizer_id || '',
+      name: event.organizer_name || 'Unknown Organizer',
+      avatar: event.organizer_avatar || '?',
+      initialsColor: event.organizer_initials_color || 'bg-gradient-to-br from-brand-500 to-violet-600'
+    }
+  }));
+  
+  res.json({ events });
 });
 
 app.get('/api/events/:id', async (req, res) => {
@@ -659,12 +671,12 @@ app.get('/api/events/:id', async (req, res) => {
     attendeeDetails = attendeeResult.rows;
   }
 
-  // Format organizer
+  // Format organizer with fallbacks
   const organizer = {
-    id: event.organizer_id,
-    name: event.organizer_name,
-    avatar: event.organizer_avatar,
-    initialsColor: event.organizer_initials_color,
+    id: event.organizer_id || '',
+    name: event.organizer_name || 'Unknown Organizer',
+    avatar: event.organizer_avatar || '?',
+    initialsColor: event.organizer_initials_color || 'bg-gradient-to-br from-brand-500 to-violet-600',
   };
 
   res.json({
