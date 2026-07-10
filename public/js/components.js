@@ -75,25 +75,57 @@ export function getIcon(name, size = 16) {
   return svg.replace(/width="16" height="16"/g, `width="${size}" height="${size}"`);
 }
 
+// ===== DATE AND TIME FORMATTING FUNCTIONS =====
 export function formatDate(dateStr) {
-  const date = new Date(dateStr + 'T00:00:00');
-  const options = { weekday: 'short', month: 'short', day: 'numeric' };
-  return date.toLocaleDateString('en-US', options);
+  if (!dateStr) return 'Date TBD';
+  try {
+    let date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+      date = new Date(dateStr + 'T00:00:00');
+    }
+    if (isNaN(date.getTime())) {
+      return 'Date TBD';
+    }
+    const options = { weekday: 'short', month: 'short', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+  } catch (e) {
+    return 'Date TBD';
+  }
 }
 
 export function formatFullDate(dateStr) {
-  const date = new Date(dateStr + 'T00:00:00');
-  const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
-  return date.toLocaleDateString('en-US', options);
+  if (!dateStr) return 'Date TBD';
+  try {
+    let date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+      date = new Date(dateStr + 'T00:00:00');
+    }
+    if (isNaN(date.getTime())) {
+      return 'Date TBD';
+    }
+    const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+  } catch (e) {
+    return 'Date TBD';
+  }
 }
 
 export function formatTime(timeStr) {
-  if (!timeStr) return '';
-  const [hours, minutes] = timeStr.split(':');
-  const h = parseInt(hours, 10);
-  const ampm = h >= 12 ? 'PM' : 'AM';
-  const h12 = h % 12 || 12;
-  return `${h12}:${minutes} ${ampm}`;
+  if (!timeStr) return 'TBD';
+  try {
+    if (timeStr.includes(':')) {
+      const parts = timeStr.split(':');
+      const hours = parseInt(parts[0], 10);
+      const minutes = parts[1] || '00';
+      if (isNaN(hours)) return timeStr;
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const h12 = hours % 12 || 12;
+      return `${h12}:${minutes} ${ampm}`;
+    }
+    return timeStr;
+  } catch (e) {
+    return timeStr || 'TBD';
+  }
 }
 
 export function getCategoryLabel(catId) {
@@ -111,6 +143,7 @@ export function getCategoryColor(catId) {
   return cat ? cat.color : 'category-meetup';
 }
 
+// ========== EVENT CARD ==========
 export async function EventCard(event, index = 0, user = null) {
   const userId = user?.id || '';
   const userRole = user?.role || '';
