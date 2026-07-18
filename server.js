@@ -53,298 +53,24 @@ app.get('/debug-check/:file(*)', (req, res) => {
   }
 });
 
-// ===== DATA STORE (In-Memory) =====
+// ===== DATA STORE (In-Memory) - FRESH RESET =====
 let dataStore = {
-  events: [
-    {
-      id: 'evt-1',
-      title: 'AI Builders Hackathon 2025',
-      description: 'Join 500+ developers for a 48-hour hackathon focused on building AI-powered applications. Prizes worth $50,000.',
-      date: '2025-07-15',
-      time: '09:00',
-      endTime: '2025-07-17T18:00',
-      location: 'San Francisco Convention Center, CA',
-      category: 'hackathon',
-      image: 'https://images.unsplash.com/photo-1504384308090-c54be3855833?w=800&h=400&fit=crop',
-      organizer: { id: 'user-2', name: 'Sarah Chen', avatar: 'SC', initialsColor: 'bg-gradient-to-br from-violet-500 to-purple-600' },
-      attendees: ['user-1', 'user-3', 'user-5', 'user-6'],
-      capacity: 500,
-      tags: ['AI', 'Machine Learning', 'OpenAI', 'Python', 'JavaScript'],
-      status: 'upcoming',
-      speakers: [
-        { name: 'Dr. Emily Roberts', role: 'Principal Researcher, OpenAI', topic: 'Future of LLMs' },
-        { name: 'James Liu', role: 'Senior Engineer, Google DeepMind', topic: 'Multimodal AI' },
-      ],
-      agenda: [
-        { time: '09:00', title: 'Registration & Breakfast', type: 'social' },
-        { time: '10:00', title: 'Opening Keynote', type: 'keynote' },
-        { time: '11:00', title: 'Team Formation', type: 'social' },
-        { time: '12:00', title: 'Hacking Begins!', type: 'work' },
-        { time: '18:00', title: 'Day 1 Wrap-up', type: 'social' },
-      ],
-    },
-    {
-      id: 'evt-2',
-      title: 'React Advanced Patterns Workshop',
-      description: 'Deep dive into React 19 features, Server Components, Suspense boundaries, and advanced state management patterns.',
-      date: '2025-07-08',
-      time: '14:00',
-      endTime: '2025-07-08T18:00',
-      location: 'Online (Zoom)',
-      category: 'workshop',
-      image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=400&fit=crop',
-      organizer: { id: 'user-3', name: 'Alex Rivera', avatar: 'AR', initialsColor: 'bg-gradient-to-br from-cyan-500 to-blue-600' },
-      attendees: ['user-1', 'user-6'],
-      capacity: 100,
-      tags: ['React', 'JavaScript', 'Frontend', 'TypeScript'],
-      status: 'upcoming',
-      speakers: [{ name: 'Alex Rivera', role: 'React Core Team Contributor', topic: 'React 19 Deep Dive' }],
-      agenda: [
-        { time: '14:00', title: 'React 19 Overview', type: 'keynote' },
-        { time: '15:00', title: 'Server Components Lab', type: 'work' },
-        { time: '16:30', title: 'Advanced Patterns', type: 'work' },
-        { time: '17:30', title: 'Q&A', type: 'social' },
-      ],
-    },
-    {
-      id: 'evt-3',
-      title: 'TechMeetup: Building Scalable Systems',
-      description: 'Monthly tech meetup featuring talks on distributed systems, microservices, and cloud architecture.',
-      date: '2025-07-10',
-      time: '18:30',
-      endTime: '2025-07-10T21:00',
-      location: 'WeWork Downtown, Austin, TX',
-      category: 'meetup',
-      image: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=800&h=400&fit=crop',
-      organizer: { id: 'user-4', name: 'Maya Patel', avatar: 'MP', initialsColor: 'bg-gradient-to-br from-emerald-500 to-teal-600' },
-      attendees: ['user-1', 'user-2'],
-      capacity: 80,
-      tags: ['System Design', 'Microservices', 'Cloud', 'Networking'],
-      status: 'upcoming',
-      speakers: [
-        { name: 'David Kim', role: 'Staff Engineer, Netflix', topic: 'Scaling to 200M Users' },
-        { name: 'Lisa Wong', role: 'SRE Lead, Stripe', topic: 'Incident Response at Scale' },
-      ],
-      agenda: [
-        { time: '18:30', title: 'Doors Open & Networking', type: 'social' },
-        { time: '19:00', title: 'Talk 1: Scaling to 200M Users', type: 'keynote' },
-        { time: '19:45', title: 'Talk 2: Incident Response', type: 'keynote' },
-        { time: '20:30', title: 'Open Networking', type: 'social' },
-      ],
-    },
-    {
-      id: 'evt-4',
-      title: 'DevOpsDays Global Conference',
-      description: 'The premier DevOps conference bringing together practitioners, thought leaders, and vendors.',
-      date: '2025-08-20',
-      time: '08:00',
-      endTime: '2025-08-21T18:00',
-      location: 'London ExCeL, UK',
-      category: 'conference',
-      image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=400&fit=crop',
-      organizer: { id: 'user-4', name: 'Maya Patel', avatar: 'MP', initialsColor: 'bg-gradient-to-br from-emerald-500 to-teal-600' },
-      attendees: ['user-2', 'user-5'],
-      capacity: 2000,
-      tags: ['DevOps', 'CI/CD', 'Kubernetes', 'Observability', 'Platform Engineering'],
-      status: 'upcoming',
-      speakers: [
-        { name: 'Nicole Forsgren', role: 'Partner, DORA', topic: 'State of DevOps 2025' },
-        { name: 'Kelsey Hightower', role: 'Principal Engineer, Google', topic: 'Platform Engineering Future' },
-      ],
-      agenda: [
-        { time: '08:00', title: 'Registration', type: 'social' },
-        { time: '09:00', title: 'Opening Keynote', type: 'keynote' },
-        { time: '10:30', title: 'Breakout Sessions', type: 'work' },
-        { time: '12:30', title: 'Lunch', type: 'social' },
-        { time: '14:00', title: 'Workshops', type: 'work' },
-        { time: '17:00', title: 'Closing Panel', type: 'keynote' },
-      ],
-    },
-    {
-      id: 'evt-5',
-      title: 'Intro to Web3 & Smart Contracts',
-      description: 'Learn the fundamentals of blockchain development. Build your first smart contract on Ethereum.',
-      date: '2025-07-05',
-      time: '10:00',
-      endTime: '2025-07-05T16:00',
-      location: 'Online (YouTube Live)',
-      category: 'webinar',
-      image: 'https://images.unsplash.com/photo-1593642632823-8f78536788c6?w=800&h=400&fit=crop',
-      organizer: { id: 'user-5', name: 'Ryan O\'Connor', avatar: 'RO', initialsColor: 'bg-gradient-to-br from-red-500 to-pink-600' },
-      attendees: ['user-1', 'user-3', 'user-6'],
-      capacity: 1000,
-      tags: ['Web3', 'Blockchain', 'Ethereum', 'Solidity', 'Smart Contracts'],
-      status: 'upcoming',
-      speakers: [{ name: 'Ryan O\'Connor', role: 'Blockchain Developer, Consensys', topic: 'Smart Contracts 101' }],
-      agenda: [
-        { time: '10:00', title: 'Blockchain Basics', type: 'keynote' },
-        { time: '11:30', title: 'Solidity Fundamentals', type: 'work' },
-        { time: '13:00', title: 'Lunch Break', type: 'social' },
-        { time: '14:00', title: 'Build & Deploy', type: 'work' },
-        { time: '15:30', title: 'Q&A', type: 'social' },
-      ],
-    },
-    {
-      id: 'evt-6',
-      title: 'Tech Social: Summer Mixer',
-      description: 'Unwind and connect with the tech community. Casual networking with drinks and games.',
-      date: '2025-07-12',
-      time: '19:00',
-      endTime: '2025-07-12T23:00',
-      location: 'The Rooftop, Seattle, WA',
-      category: 'social',
-      image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&h=400&fit=crop',
-      organizer: { id: 'user-6', name: 'Jasmine Lee', avatar: 'JL', initialsColor: 'bg-gradient-to-br from-pink-500 to-rose-600' },
-      attendees: ['user-2', 'user-4'],
-      capacity: 120,
-      tags: ['Networking', 'Social', 'Community', 'Drinks'],
-      status: 'upcoming',
-      speakers: [],
-      agenda: [
-        { time: '19:00', title: 'Doors Open', type: 'social' },
-        { time: '20:00', title: 'Ice Breaker Games', type: 'social' },
-        { time: '21:00', title: 'Open Networking', type: 'social' },
-        { time: '22:30', title: 'Closing Toast', type: 'social' },
-      ],
-    },
-    {
-      id: 'evt-7',
-      title: 'Fullstack TypeScript Masterclass',
-      description: 'Build a complete production-ready app with TypeScript from database to frontend.',
-      date: '2025-07-22',
-      time: '10:00',
-      endTime: '2025-07-22T17:00',
-      location: 'Online (Discord + Zoom)',
-      category: 'workshop',
-      image: 'https://images.unsplash.com/photo-1531498860502-7c67cf02f657?w=800&h=400&fit=crop',
-      organizer: { id: 'user-3', name: 'Alex Rivera', avatar: 'AR', initialsColor: 'bg-gradient-to-br from-cyan-500 to-blue-600' },
-      attendees: ['user-1', 'user-5'],
-      capacity: 50,
-      tags: ['TypeScript', 'Next.js', 'Prisma', 'tRPC', 'Fullstack'],
-      status: 'upcoming',
-      speakers: [{ name: 'Alex Rivera', role: 'Fullstack Developer', topic: 'End-to-End TypeScript' }],
-      agenda: [
-        { time: '10:00', title: 'Architecture Overview', type: 'keynote' },
-        { time: '11:00', title: 'Database & API', type: 'work' },
-        { time: '13:00', title: 'Lunch Break', type: 'social' },
-        { time: '14:00', title: 'Frontend & Deployment', type: 'work' },
-        { time: '16:00', title: 'Code Review & Feedback', type: 'social' },
-      ],
-    },
-    {
-      id: 'evt-8',
-      title: 'Cloud Native Summit 2025',
-      description: 'Explore the latest in Kubernetes, serverless, service mesh, and cloud-native observability.',
-      date: '2025-09-05',
-      time: '09:00',
-      endTime: '2025-09-06T18:00',
-      location: 'Berlin Congress Center, Germany',
-      category: 'conference',
-      image: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&h=400&fit=crop',
-      organizer: { id: 'user-4', name: 'Maya Patel', avatar: 'MP', initialsColor: 'bg-gradient-to-br from-emerald-500 to-teal-600' },
-      attendees: ['user-3', 'user-6'],
-      capacity: 1500,
-      tags: ['Kubernetes', 'Serverless', 'Cloud', 'Observability', 'Istio'],
-      status: 'upcoming',
-      speakers: [
-        { name: 'Liz Rice', role: 'Chief of Open Source, Isovalent', topic: 'eBPF Revolution' },
-        { name: 'Brendan Burns', role: 'Co-creator, Kubernetes', topic: 'K8s Future Roadmap' },
-      ],
-      agenda: [
-        { time: '09:00', title: 'Registration & Breakfast', type: 'social' },
-        { time: '10:00', title: 'Keynote', type: 'keynote' },
-        { time: '11:30', title: 'Breakout Sessions', type: 'work' },
-        { time: '13:00', title: 'Lunch', type: 'social' },
-        { time: '14:30', title: 'Hands-on Labs', type: 'work' },
-        { time: '17:00', title: 'Closing', type: 'keynote' },
-      ],
-    },
-  ],
+  events: [],
   users: [
     {
-      id: 'user-1',
-      name: 'Jordan Smith',
-      email: 'jordan@techmeethub.dev',
-      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
-      role: 'participant',
-      avatar: 'JS',
-      initialsColor: 'bg-gradient-to-br from-brand-500 to-violet-600',
-      bio: 'Fullstack developer passionate about AI and open source.',
-      skills: ['React', 'TypeScript', 'Node.js', 'Python', 'AI/ML', 'System Design'],
-      eventsAttending: ['evt-1', 'evt-2', 'evt-3', 'evt-5', 'evt-7'],
-      eventsHosting: [],
-      joinedDate: '2024-03-15',
-    },
-    {
-      id: 'user-2',
-      name: 'Sarah Chen',
-      email: 'sarah@techmeethub.dev',
-      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
-      role: 'organizer',
-      avatar: 'SC',
-      initialsColor: 'bg-gradient-to-br from-violet-500 to-purple-600',
-      bio: 'AI researcher and hackathon organizer. Building communities.',
-      skills: ['AI', 'Python', 'TensorFlow', 'Community Building'],
-      eventsAttending: ['evt-3', 'evt-4', 'evt-6'],
-      eventsHosting: ['evt-1'],
-      joinedDate: '2024-02-10',
-    },
-    {
-      id: 'user-3',
-      name: 'Alex Rivera',
-      email: 'alex@techmeethub.dev',
-      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
-      role: 'organizer',
-      avatar: 'AR',
-      initialsColor: 'bg-gradient-to-br from-cyan-500 to-blue-600',
-      bio: 'React Core Team Contributor. Teaching workshops worldwide.',
-      skills: ['React', 'TypeScript', 'Node.js', 'Next.js', 'GraphQL'],
-      eventsAttending: ['evt-1', 'evt-5', 'evt-8'],
-      eventsHosting: ['evt-2', 'evt-7'],
-      joinedDate: '2024-01-20',
-    },
-    {
-      id: 'user-4',
-      name: 'Maya Patel',
-      email: 'maya@techmeethub.dev',
-      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+      id: 'admin-1',
+      name: 'Admin User',
+      email: 'admin@gmail.com',
+      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', // "password"
       role: 'admin',
-      avatar: 'MP',
-      initialsColor: 'bg-gradient-to-br from-emerald-500 to-teal-600',
-      bio: 'Platform engineer and community admin. Keeping things running.',
-      skills: ['Kubernetes', 'DevOps', 'Go', 'Rust', 'System Design'],
-      eventsAttending: ['evt-6'],
-      eventsHosting: ['evt-3', 'evt-4', 'evt-8'],
-      joinedDate: '2023-11-05',
-    },
-    {
-      id: 'user-5',
-      name: 'Ryan O\'Connor',
-      email: 'ryan@techmeethub.dev',
-      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
-      role: 'organizer',
-      avatar: 'RO',
-      initialsColor: 'bg-gradient-to-br from-red-500 to-pink-600',
-      bio: 'Blockchain developer and Web3 educator.',
-      skills: ['Solidity', 'Ethereum', 'Web3', 'JavaScript', 'Rust'],
-      eventsAttending: ['evt-1', 'evt-4', 'evt-7'],
-      eventsHosting: ['evt-5'],
-      joinedDate: '2024-04-01',
-    },
-    {
-      id: 'user-6',
-      name: 'Jasmine Lee',
-      email: 'jasmine@techmeethub.dev',
-      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
-      role: 'participant',
-      avatar: 'JL',
-      initialsColor: 'bg-gradient-to-br from-pink-500 to-rose-600',
-      bio: 'Frontend developer who loves community events.',
-      skills: ['Vue', 'CSS', 'Design', 'Community'],
-      eventsAttending: ['evt-1', 'evt-2', 'evt-5', 'evt-8'],
-      eventsHosting: ['evt-6'],
-      joinedDate: '2024-05-15',
-    },
+      avatar: 'AU',
+      initialsColor: 'bg-gradient-to-br from-rose-500 to-pink-600',
+      bio: 'Platform Administrator',
+      skills: ['Management', 'Community', 'Tech'],
+      eventsAttending: [],
+      eventsHosting: [],
+      joinedDate: new Date().toISOString().split('T')[0],
+    }
   ],
   categories: [
     { id: 'hackathon', label: 'Hackathons', icon: 'zap', color: 'category-hackathon' },
@@ -355,6 +81,36 @@ let dataStore = {
     { id: 'social', label: 'Social', icon: 'heart', color: 'category-social' },
   ]
 };
+
+// ===== RESET ALL DATA ENDPOINT =====
+app.post('/api/reset-all', (req, res) => {
+  // Clear all events
+  dataStore.events = [];
+  
+  // Reset users - only keep admin
+  dataStore.users = [
+    {
+      id: 'admin-1',
+      name: 'Admin User',
+      email: 'admin@gmail.com',
+      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+      role: 'admin',
+      avatar: 'AU',
+      initialsColor: 'bg-gradient-to-br from-rose-500 to-pink-600',
+      bio: 'Platform Administrator',
+      skills: ['Management', 'Community', 'Tech'],
+      eventsAttending: [],
+      eventsHosting: [],
+      joinedDate: new Date().toISOString().split('T')[0],
+    }
+  ];
+  
+  res.json({ 
+    message: 'Data reset successfully!',
+    users: dataStore.users.length,
+    events: dataStore.events.length
+  });
+});
 
 // ===== DATABASE CONNECTION (Only if DATABASE_URL exists) =====
 let pool = null;
@@ -470,36 +226,8 @@ async function seedDefaultUsers() {
         console.log(`✅ Created default user: ${user.name}`);
       }
     }
-
-    // Seed default events
-    await seedDefaultEvents();
-
   } catch (error) {
     console.error('❌ Error seeding users:', error);
-  }
-}
-
-async function seedDefaultEvents() {
-  try {
-    for (const event of dataStore.events) {
-      const result = await pool.query('SELECT * FROM events WHERE id = $1', [event.id]);
-      if (result.rows.length === 0) {
-        await pool.query(
-          `INSERT INTO events (id, title, description, date, time, end_time, location, category, image, 
-            organizer_id, organizer_name, organizer_avatar, organizer_initials_color, attendees, capacity, tags, speakers, agenda, status)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
-          [
-            event.id, event.title, event.description, event.date, event.time, event.endTime,
-            event.location, event.category, event.image,
-            event.organizer.id, event.organizer.name, event.organizer.avatar, event.organizer.initialsColor,
-            event.attendees, event.capacity, event.tags, JSON.stringify(event.speakers), JSON.stringify(event.agenda), event.status
-          ]
-        );
-        console.log(`✅ Created default event: ${event.title}`);
-      }
-    }
-  } catch (error) {
-    console.error('❌ Error seeding events:', error);
   }
 }
 
@@ -602,7 +330,7 @@ app.post('/api/auth/register', async (req, res) => {
   };
 
   dataStore.users.push(newUser);
-  const token = createSession(newUser.id);
+  const token = await createSession(newUser.id);
 
   const { password: _, ...userWithoutPassword } = newUser;
   res.status(201).json({ token, user: userWithoutPassword });
@@ -902,9 +630,7 @@ app.get('*', (req, res) => {
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n  TechMeetHub server running on http://localhost:${PORT}\n`);
   console.log(`  Demo accounts (password: "password"):`);
-  console.log(`    participant: jordan@techmeethub.dev`);
-  console.log(`    organizer:   sarah@techmeethub.dev`);
-  console.log(`    admin:       maya@techmeethub.dev\n`);
+  console.log(`    admin:       admin@gmail.com\n`);
   console.log(`📊 Total Events: ${dataStore.events.length}`);
   console.log(`👥 Total Attendees: ${dataStore.events.reduce((sum, e) => sum + (e.attendees?.length || 0), 0)}`);
   console.log(`👤 Total Users: ${dataStore.users.length}\n`);
@@ -916,9 +642,7 @@ server.on('error', (err) => {
     const fallbackServer = app.listen(PORT + 1, '0.0.0.0', () => {
       console.log(`\n  TechMeetHub server running on http://localhost:${PORT + 1}\n`);
       console.log(`  Demo accounts (password: "password"):`);
-      console.log(`    participant: jordan@techmeethub.dev`);
-      console.log(`    organizer:   sarah@techmeethub.dev`);
-      console.log(`    admin:       maya@techmeethub.dev\n`);
+      console.log(`    admin:       admin@gmail.com\n`);
       console.log(`📊 Total Events: ${dataStore.events.length}`);
       console.log(`👥 Total Attendees: ${dataStore.events.reduce((sum, e) => sum + (e.attendees?.length || 0), 0)}`);
       console.log(`👤 Total Users: ${dataStore.users.length}\n`);
