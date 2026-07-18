@@ -53,6 +53,11 @@ app.get('/debug-check/:file(*)', (req, res) => {
   }
 });
 
+// ===== HASH PASSWORD FUNCTION =====
+function hashPassword(password) {
+  return crypto.createHash('sha256').update(password).digest('hex');
+}
+
 // ===== DATA STORE (In-Memory) =====
 let dataStore = {
   events: [],
@@ -69,13 +74,36 @@ let dataStore = {
 
 // ===== SEED DATA =====
 function seedData() {
+  // Clear existing data
+  dataStore.events = [];
+  dataStore.users = [];
+
+  const hashedPassword = hashPassword('password');
+  console.log('🔑 Hashed password:', hashedPassword);
+
+  // ===== ADMIN =====
+  const admin = {
+    id: 'admin-1',
+    name: 'Admin User',
+    email: 'admin@gmail.com',
+    password: hashedPassword,
+    role: 'admin',
+    avatar: 'AU',
+    initialsColor: 'bg-gradient-to-br from-rose-500 to-pink-600',
+    bio: 'Platform Administrator',
+    skills: ['Management', 'Community', 'Tech'],
+    eventsAttending: [],
+    eventsHosting: [],
+    joinedDate: new Date().toISOString().split('T')[0],
+  };
+
   // ===== 5 ORGANIZERS =====
   const organizers = [
     {
       id: 'org-1',
       name: 'Sarah Chen',
       email: 'sarah@techmeethub.dev',
-      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+      password: hashedPassword,
       role: 'organizer',
       avatar: 'SC',
       initialsColor: 'bg-gradient-to-br from-violet-500 to-purple-600',
@@ -89,7 +117,7 @@ function seedData() {
       id: 'org-2',
       name: 'Alex Rivera',
       email: 'alex@techmeethub.dev',
-      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+      password: hashedPassword,
       role: 'organizer',
       avatar: 'AR',
       initialsColor: 'bg-gradient-to-br from-cyan-500 to-blue-600',
@@ -103,7 +131,7 @@ function seedData() {
       id: 'org-3',
       name: 'Maya Patel',
       email: 'maya@techmeethub.dev',
-      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+      password: hashedPassword,
       role: 'organizer',
       avatar: 'MP',
       initialsColor: 'bg-gradient-to-br from-emerald-500 to-teal-600',
@@ -117,7 +145,7 @@ function seedData() {
       id: 'org-4',
       name: 'Ryan O\'Connor',
       email: 'ryan@techmeethub.dev',
-      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+      password: hashedPassword,
       role: 'organizer',
       avatar: 'RO',
       initialsColor: 'bg-gradient-to-br from-red-500 to-pink-600',
@@ -131,7 +159,7 @@ function seedData() {
       id: 'org-5',
       name: 'Priya Sharma',
       email: 'priya@techmeethub.dev',
-      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+      password: hashedPassword,
       role: 'organizer',
       avatar: 'PS',
       initialsColor: 'bg-gradient-to-br from-amber-500 to-orange-600',
@@ -149,7 +177,7 @@ function seedData() {
       id: 'part-1',
       name: 'Jordan Smith',
       email: 'jordan@techmeethub.dev',
-      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+      password: hashedPassword,
       role: 'participant',
       avatar: 'JS',
       initialsColor: 'bg-gradient-to-br from-brand-500 to-violet-600',
@@ -163,7 +191,7 @@ function seedData() {
       id: 'part-2',
       name: 'Jasmine Lee',
       email: 'jasmine@techmeethub.dev',
-      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+      password: hashedPassword,
       role: 'participant',
       avatar: 'JL',
       initialsColor: 'bg-gradient-to-br from-pink-500 to-rose-600',
@@ -177,7 +205,7 @@ function seedData() {
       id: 'part-3',
       name: 'David Kim',
       email: 'david@techmeethub.dev',
-      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+      password: hashedPassword,
       role: 'participant',
       avatar: 'DK',
       initialsColor: 'bg-gradient-to-br from-blue-500 to-indigo-600',
@@ -191,7 +219,7 @@ function seedData() {
       id: 'part-4',
       name: 'Lisa Wong',
       email: 'lisa@techmeethub.dev',
-      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+      password: hashedPassword,
       role: 'participant',
       avatar: 'LW',
       initialsColor: 'bg-gradient-to-br from-teal-500 to-cyan-600',
@@ -203,21 +231,8 @@ function seedData() {
     },
   ];
 
-  // ===== ADMIN USER =====
-  const admin = {
-    id: 'admin-1',
-    name: 'Admin User',
-    email: 'admin@gmail.com',
-    password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
-    role: 'admin',
-    avatar: 'AU',
-    initialsColor: 'bg-gradient-to-br from-rose-500 to-pink-600',
-    bio: 'Platform Administrator',
-    skills: ['Management', 'Community', 'Tech'],
-    eventsAttending: [],
-    eventsHosting: [],
-    joinedDate: new Date().toISOString().split('T')[0],
-  };
+  // Add all users
+  dataStore.users = [admin, ...organizers, ...participants];
 
   // ===== 25 EVENTS (5 per organizer) =====
   const getFutureDate = (daysFromNow) => {
@@ -273,9 +288,6 @@ function seedData() {
     'An immersive experience that will transform your understanding of modern technology.',
   ];
 
-  // Add all users
-  dataStore.users = [admin, ...organizers, ...participants];
-
   // Create events - 5 per organizer (25 total)
   let eventId = 0;
   const allParticipantIds = participants.map(p => p.id);
@@ -284,9 +296,8 @@ function seedData() {
     for (let i = 0; i < 5; i++) {
       const templateIndex = (orgIndex * 5 + i) % eventTemplates.length;
       const template = eventTemplates[templateIndex];
-      const daysOffset = (orgIndex * 5 + i) * 3 + 7; // Events starting 7+ days from now
+      const daysOffset = (orgIndex * 5 + i) * 3 + 7;
       
-      // Select 4 random participants for this event
       const shuffled = [...allParticipantIds].sort(() => 0.5 - Math.random());
       const eventAttendees = shuffled.slice(0, 4);
 
@@ -326,7 +337,6 @@ function seedData() {
 
       dataStore.events.push(newEvent);
 
-      // Update participants' eventsAttending
       eventAttendees.forEach(participantId => {
         const participant = dataStore.users.find(u => u.id === participantId);
         if (participant && participant.role === 'participant') {
@@ -334,13 +344,12 @@ function seedData() {
         }
       });
 
-      // Update organizer's eventsHosting
       organizer.eventsHosting.push(newEvent.id);
     }
   });
 }
 
-// Seed the data
+// ===== SEED THE DATA =====
 seedData();
 
 console.log('🌱 Seeded data:');
@@ -348,19 +357,7 @@ console.log(`   👤 ${dataStore.users.length} users (1 admin, 5 organizers, 4 p
 console.log(`   📅 ${dataStore.events.length} events (5 per organizer)`);
 console.log(`   👥 Each event has 4 participants registered`);
 
-// ===== RESET ALL DATA ENDPOINT =====
-app.post('/api/reset-all', (req, res) => {
-  dataStore.events = [];
-  dataStore.users = [];
-  seedData();
-  res.json({ 
-    message: 'Data reset successfully!',
-    users: dataStore.users.length,
-    events: dataStore.events.length
-  });
-});
-
-// ===== DATABASE CONNECTION (Only if DATABASE_URL exists) =====
+// ===== DATABASE CONNECTION =====
 let pool = null;
 let useDatabase = false;
 
@@ -491,11 +488,6 @@ async function seedDefaultUsers() {
 }
 
 // ===== AUTH UTILITIES =====
-
-function hashPassword(password) {
-  return crypto.createHash('sha256').update(password).digest('hex');
-}
-
 function generateToken() {
   return crypto.randomBytes(32).toString('hex');
 }
@@ -553,6 +545,38 @@ function requireRole(roles) {
 
 // ===== AUTH ENDPOINTS =====
 
+app.post('/api/auth/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  console.log('🔐 Login attempt:', email);
+
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password required' });
+  }
+
+  const user = dataStore.users.find(u => u.email === email.trim().toLowerCase());
+  
+  if (!user) {
+    console.log('❌ User not found:', email);
+    return res.status(401).json({ error: 'Invalid email or password' });
+  }
+
+  const hashedInput = hashPassword(password);
+  console.log('🔑 Hashed input:', hashedInput);
+  console.log('🔑 Stored hash:', user.password);
+
+  if (user.password !== hashedInput) {
+    console.log('❌ Password mismatch');
+    return res.status(401).json({ error: 'Invalid email or password' });
+  }
+
+  console.log('✅ Login successful:', user.email);
+
+  const token = await createSession(user.id);
+  const { password: _, ...userWithoutPassword } = user;
+  res.json({ token, user: userWithoutPassword });
+});
+
 app.post('/api/auth/register', async (req, res) => {
   const { name, email, password, role } = req.body;
 
@@ -589,23 +613,6 @@ app.post('/api/auth/register', async (req, res) => {
 
   const { password: _, ...userWithoutPassword } = newUser;
   res.status(201).json({ token, user: userWithoutPassword });
-});
-
-app.post('/api/auth/login', async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password required' });
-  }
-
-  const user = dataStore.users.find(u => u.email === email.trim().toLowerCase());
-  if (!user || user.password !== hashPassword(password)) {
-    return res.status(401).json({ error: 'Invalid email or password' });
-  }
-
-  const token = await createSession(user.id);
-  const { password: _, ...userWithoutPassword } = user;
-  res.json({ token, user: userWithoutPassword });
 });
 
 app.post('/api/auth/logout', requireAuth, async (req, res) => {
