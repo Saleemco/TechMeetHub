@@ -19,9 +19,7 @@ export async function HomePage() {
         </div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 relative hero-content">
           <div class="max-w-3xl">
-            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-sm font-medium mb-6">
-              ${getIcon('zap', 14)} The tech community's favorite event platform
-            </div>
+          
             <h1 class="hero-title text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
               Connect. Learn. <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400 glow-text">Build.</span>
             </h1>
