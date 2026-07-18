@@ -53,25 +53,10 @@ app.get('/debug-check/:file(*)', (req, res) => {
   }
 });
 
-// ===== DATA STORE (In-Memory) - FRESH RESET =====
+// ===== DATA STORE (In-Memory) =====
 let dataStore = {
   events: [],
-  users: [
-    {
-      id: 'admin-1',
-      name: 'Admin User',
-      email: 'admin@gmail.com',
-      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', // "password"
-      role: 'admin',
-      avatar: 'AU',
-      initialsColor: 'bg-gradient-to-br from-rose-500 to-pink-600',
-      bio: 'Platform Administrator',
-      skills: ['Management', 'Community', 'Tech'],
-      eventsAttending: [],
-      eventsHosting: [],
-      joinedDate: new Date().toISOString().split('T')[0],
-    }
-  ],
+  users: [],
   categories: [
     { id: 'hackathon', label: 'Hackathons', icon: 'zap', color: 'category-hackathon' },
     { id: 'meetup', label: 'Meetups', icon: 'users', color: 'category-meetup' },
@@ -82,29 +67,292 @@ let dataStore = {
   ]
 };
 
-// ===== RESET ALL DATA ENDPOINT =====
-app.post('/api/reset-all', (req, res) => {
-  // Clear all events
-  dataStore.events = [];
-  
-  // Reset users - only keep admin
-  dataStore.users = [
+// ===== SEED DATA =====
+function seedData() {
+  // ===== 5 ORGANIZERS =====
+  const organizers = [
     {
-      id: 'admin-1',
-      name: 'Admin User',
-      email: 'admin@gmail.com',
+      id: 'org-1',
+      name: 'Sarah Chen',
+      email: 'sarah@techmeethub.dev',
       password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
-      role: 'admin',
-      avatar: 'AU',
-      initialsColor: 'bg-gradient-to-br from-rose-500 to-pink-600',
-      bio: 'Platform Administrator',
-      skills: ['Management', 'Community', 'Tech'],
+      role: 'organizer',
+      avatar: 'SC',
+      initialsColor: 'bg-gradient-to-br from-violet-500 to-purple-600',
+      bio: 'AI researcher and hackathon organizer. Building communities.',
+      skills: ['AI', 'Python', 'TensorFlow', 'Community Building'],
       eventsAttending: [],
       eventsHosting: [],
-      joinedDate: new Date().toISOString().split('T')[0],
-    }
+      joinedDate: '2024-01-15',
+    },
+    {
+      id: 'org-2',
+      name: 'Alex Rivera',
+      email: 'alex@techmeethub.dev',
+      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+      role: 'organizer',
+      avatar: 'AR',
+      initialsColor: 'bg-gradient-to-br from-cyan-500 to-blue-600',
+      bio: 'React Core Team Contributor. Teaching workshops worldwide.',
+      skills: ['React', 'TypeScript', 'Node.js', 'Next.js', 'GraphQL'],
+      eventsAttending: [],
+      eventsHosting: [],
+      joinedDate: '2024-01-20',
+    },
+    {
+      id: 'org-3',
+      name: 'Maya Patel',
+      email: 'maya@techmeethub.dev',
+      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+      role: 'organizer',
+      avatar: 'MP',
+      initialsColor: 'bg-gradient-to-br from-emerald-500 to-teal-600',
+      bio: 'Platform engineer and community builder.',
+      skills: ['Kubernetes', 'DevOps', 'Go', 'Rust', 'System Design'],
+      eventsAttending: [],
+      eventsHosting: [],
+      joinedDate: '2024-02-01',
+    },
+    {
+      id: 'org-4',
+      name: 'Ryan O\'Connor',
+      email: 'ryan@techmeethub.dev',
+      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+      role: 'organizer',
+      avatar: 'RO',
+      initialsColor: 'bg-gradient-to-br from-red-500 to-pink-600',
+      bio: 'Blockchain developer and Web3 educator.',
+      skills: ['Solidity', 'Ethereum', 'Web3', 'JavaScript', 'Rust'],
+      eventsAttending: [],
+      eventsHosting: [],
+      joinedDate: '2024-02-15',
+    },
+    {
+      id: 'org-5',
+      name: 'Priya Sharma',
+      email: 'priya@techmeethub.dev',
+      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+      role: 'organizer',
+      avatar: 'PS',
+      initialsColor: 'bg-gradient-to-br from-amber-500 to-orange-600',
+      bio: 'Data scientist and ML engineer. Passionate about teaching.',
+      skills: ['Python', 'Machine Learning', 'Data Science', 'PyTorch', 'SQL'],
+      eventsAttending: [],
+      eventsHosting: [],
+      joinedDate: '2024-03-01',
+    },
   ];
-  
+
+  // ===== 4 PARTICIPANTS =====
+  const participants = [
+    {
+      id: 'part-1',
+      name: 'Jordan Smith',
+      email: 'jordan@techmeethub.dev',
+      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+      role: 'participant',
+      avatar: 'JS',
+      initialsColor: 'bg-gradient-to-br from-brand-500 to-violet-600',
+      bio: 'Fullstack developer passionate about AI and open source.',
+      skills: ['React', 'TypeScript', 'Node.js', 'Python', 'AI/ML'],
+      eventsAttending: [],
+      eventsHosting: [],
+      joinedDate: '2024-03-15',
+    },
+    {
+      id: 'part-2',
+      name: 'Jasmine Lee',
+      email: 'jasmine@techmeethub.dev',
+      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+      role: 'participant',
+      avatar: 'JL',
+      initialsColor: 'bg-gradient-to-br from-pink-500 to-rose-600',
+      bio: 'Frontend developer who loves community events.',
+      skills: ['Vue', 'CSS', 'Design', 'Community'],
+      eventsAttending: [],
+      eventsHosting: [],
+      joinedDate: '2024-04-01',
+    },
+    {
+      id: 'part-3',
+      name: 'David Kim',
+      email: 'david@techmeethub.dev',
+      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+      role: 'participant',
+      avatar: 'DK',
+      initialsColor: 'bg-gradient-to-br from-blue-500 to-indigo-600',
+      bio: 'Backend engineer interested in distributed systems.',
+      skills: ['Go', 'Rust', 'Kubernetes', 'Microservices'],
+      eventsAttending: [],
+      eventsHosting: [],
+      joinedDate: '2024-04-15',
+    },
+    {
+      id: 'part-4',
+      name: 'Lisa Wong',
+      email: 'lisa@techmeethub.dev',
+      password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+      role: 'participant',
+      avatar: 'LW',
+      initialsColor: 'bg-gradient-to-br from-teal-500 to-cyan-600',
+      bio: 'Mobile developer exploring cross-platform solutions.',
+      skills: ['React Native', 'Flutter', 'Swift', 'Kotlin'],
+      eventsAttending: [],
+      eventsHosting: [],
+      joinedDate: '2024-05-01',
+    },
+  ];
+
+  // ===== ADMIN USER =====
+  const admin = {
+    id: 'admin-1',
+    name: 'Admin User',
+    email: 'admin@gmail.com',
+    password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+    role: 'admin',
+    avatar: 'AU',
+    initialsColor: 'bg-gradient-to-br from-rose-500 to-pink-600',
+    bio: 'Platform Administrator',
+    skills: ['Management', 'Community', 'Tech'],
+    eventsAttending: [],
+    eventsHosting: [],
+    joinedDate: new Date().toISOString().split('T')[0],
+  };
+
+  // ===== 25 EVENTS (5 per organizer) =====
+  const getFutureDate = (daysFromNow) => {
+    const date = new Date();
+    date.setDate(date.getDate() + daysFromNow);
+    return date.toISOString().split('T')[0];
+  };
+
+  const eventTemplates = [
+    { title: 'AI & Machine Learning Summit', category: 'conference', location: 'San Francisco, CA', capacity: 500, tags: ['AI', 'ML', 'Deep Learning', 'Python'] },
+    { title: 'React Advanced Patterns Workshop', category: 'workshop', location: 'Online (Zoom)', capacity: 100, tags: ['React', 'TypeScript', 'Frontend'] },
+    { title: 'Tech Meetup: Building Scalable Systems', category: 'meetup', location: 'Austin, TX', capacity: 80, tags: ['System Design', 'Microservices'] },
+    { title: 'Web3 & Smart Contracts Bootcamp', category: 'webinar', location: 'Online (YouTube)', capacity: 1000, tags: ['Web3', 'Blockchain', 'Solidity'] },
+    { title: 'DevOps Best Practices Conference', category: 'conference', location: 'London, UK', capacity: 2000, tags: ['DevOps', 'Kubernetes', 'CI/CD'] },
+    { title: 'Fullstack TypeScript Masterclass', category: 'workshop', location: 'Online (Discord)', capacity: 50, tags: ['TypeScript', 'Next.js', 'tRPC'] },
+    { title: 'Cloud Native Architecture Summit', category: 'conference', location: 'Berlin, Germany', capacity: 1500, tags: ['Kubernetes', 'Serverless', 'Cloud'] },
+    { title: 'Tech Social: Summer Networking Mixer', category: 'social', location: 'Seattle, WA', capacity: 120, tags: ['Networking', 'Community'] },
+    { title: 'Intro to Python for Data Science', category: 'workshop', location: 'Online (Zoom)', capacity: 200, tags: ['Python', 'Data Science', 'Pandas'] },
+    { title: 'Cybersecurity in the Cloud Era', category: 'webinar', location: 'Online', capacity: 500, tags: ['Security', 'Cloud', 'DevSecOps'] },
+    { title: 'Mobile App Development Workshop', category: 'workshop', location: 'New York, NY', capacity: 60, tags: ['React Native', 'Flutter', 'Mobile'] },
+    { title: 'Blockchain for Enterprise Conference', category: 'conference', location: 'Singapore', capacity: 800, tags: ['Blockchain', 'Enterprise', 'Web3'] },
+    { title: 'UI/UX Design Masterclass', category: 'workshop', location: 'Online (Figma)', capacity: 150, tags: ['UI/UX', 'Design', 'Figma'] },
+    { title: 'Tech Leadership Summit 2025', category: 'conference', location: 'Chicago, IL', capacity: 300, tags: ['Leadership', 'Management', 'Tech'] },
+    { title: 'Data Engineering Bootcamp', category: 'workshop', location: 'Online (Zoom)', capacity: 100, tags: ['Data Engineering', 'ETL', 'Big Data'] },
+    { title: 'AI Ethics & Responsible Tech', category: 'webinar', location: 'Online', capacity: 400, tags: ['AI Ethics', 'Responsible AI'] },
+    { title: 'Kubernetes Deep Dive Workshop', category: 'workshop', location: 'San Jose, CA', capacity: 80, tags: ['Kubernetes', 'DevOps', 'Containers'] },
+    { title: 'Tech Career Fair & Networking', category: 'social', location: 'Los Angeles, CA', capacity: 300, tags: ['Career', 'Networking', 'Jobs'] },
+    { title: 'Modern JavaScript Ecosystem', category: 'meetup', location: 'Online (Discord)', capacity: 200, tags: ['JavaScript', 'Node.js', 'Frontend'] },
+    { title: 'AI in Healthcare Conference', category: 'conference', location: 'Boston, MA', capacity: 600, tags: ['AI', 'Healthcare', 'ML'] },
+    { title: 'Edge Computing & IoT Workshop', category: 'workshop', location: 'Online (Zoom)', capacity: 75, tags: ['IoT', 'Edge Computing', 'Hardware'] },
+    { title: 'Tech Diversity & Inclusion Summit', category: 'conference', location: 'Portland, OR', capacity: 400, tags: ['Diversity', 'Inclusion', 'Community'] },
+    { title: 'Advanced React Native Workshop', category: 'workshop', location: 'Online', capacity: 60, tags: ['React Native', 'Mobile', 'JavaScript'] },
+    { title: 'Web Performance Optimization', category: 'webinar', location: 'Online', capacity: 300, tags: ['Performance', 'Web', 'Optimization'] },
+    { title: 'Tech Startup Founder Meetup', category: 'meetup', location: 'Miami, FL', capacity: 150, tags: ['Startup', 'Founders', 'Networking'] },
+  ];
+
+  const eventImages = [
+    'https://images.unsplash.com/photo-1504384308090-c54be3855833?w=800&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=800&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1593642632823-8f78536788c6?w=800&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1531498860502-7c67cf02f657?w=800&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&h=400&fit=crop',
+  ];
+
+  const organizerEventDescriptions = [
+    'Join us for an exciting event focused on cutting-edge technology and innovation.',
+    'Learn from industry experts and network with fellow tech enthusiasts.',
+    'A hands-on workshop designed to take your skills to the next level.',
+    'Connect with the community and explore the latest trends in tech.',
+    'An immersive experience that will transform your understanding of modern technology.',
+  ];
+
+  // Add all users
+  dataStore.users = [admin, ...organizers, ...participants];
+
+  // Create events - 5 per organizer (25 total)
+  let eventId = 0;
+  const allParticipantIds = participants.map(p => p.id);
+
+  organizers.forEach((organizer, orgIndex) => {
+    for (let i = 0; i < 5; i++) {
+      const templateIndex = (orgIndex * 5 + i) % eventTemplates.length;
+      const template = eventTemplates[templateIndex];
+      const daysOffset = (orgIndex * 5 + i) * 3 + 7; // Events starting 7+ days from now
+      
+      // Select 4 random participants for this event
+      const shuffled = [...allParticipantIds].sort(() => 0.5 - Math.random());
+      const eventAttendees = shuffled.slice(0, 4);
+
+      const newEvent = {
+        id: 'evt-' + (++eventId),
+        title: template.title,
+        description: organizerEventDescriptions[orgIndex % organizerEventDescriptions.length] + ` Hosted by ${organizer.name}.`,
+        date: getFutureDate(daysOffset),
+        time: `${9 + (i % 8)}:${i % 2 === 0 ? '00' : '30'}`,
+        endTime: `${9 + (i % 8) + 2}:${i % 2 === 0 ? '00' : '30'}`,
+        location: template.location,
+        category: template.category,
+        image: eventImages[(orgIndex * 5 + i) % eventImages.length],
+        organizer: { 
+          id: organizer.id, 
+          name: organizer.name, 
+          avatar: organizer.avatar, 
+          initialsColor: organizer.initialsColor 
+        },
+        attendees: eventAttendees,
+        capacity: template.capacity,
+        tags: template.tags,
+        status: 'upcoming',
+        speakers: [
+          { name: organizer.name, role: 'Event Host & Speaker', topic: template.tags[0] + ' in Modern Tech' },
+          { name: participants[i % participants.length].name, role: 'Guest Speaker', topic: 'Real-world Applications' },
+        ],
+        agenda: [
+          { time: '09:00', title: 'Registration & Breakfast', type: 'social' },
+          { time: '10:00', title: 'Opening Keynote', type: 'keynote' },
+          { time: '11:30', title: 'Main Session', type: 'work' },
+          { time: '13:00', title: 'Lunch Break', type: 'social' },
+          { time: '14:00', title: 'Workshop / Panel', type: 'work' },
+          { time: '16:00', title: 'Closing & Networking', type: 'social' },
+        ],
+      };
+
+      dataStore.events.push(newEvent);
+
+      // Update participants' eventsAttending
+      eventAttendees.forEach(participantId => {
+        const participant = dataStore.users.find(u => u.id === participantId);
+        if (participant && participant.role === 'participant') {
+          participant.eventsAttending.push(newEvent.id);
+        }
+      });
+
+      // Update organizer's eventsHosting
+      organizer.eventsHosting.push(newEvent.id);
+    }
+  });
+}
+
+// Seed the data
+seedData();
+
+console.log('🌱 Seeded data:');
+console.log(`   👤 ${dataStore.users.length} users (1 admin, 5 organizers, 4 participants)`);
+console.log(`   📅 ${dataStore.events.length} events (5 per organizer)`);
+console.log(`   👥 Each event has 4 participants registered`);
+
+// ===== RESET ALL DATA ENDPOINT =====
+app.post('/api/reset-all', (req, res) => {
+  dataStore.events = [];
+  dataStore.users = [];
+  seedData();
   res.json({ 
     message: 'Data reset successfully!',
     users: dataStore.users.length,
@@ -145,7 +393,6 @@ if (process.env.DATABASE_URL) {
 // ===== INITIALIZE DATABASE TABLES =====
 async function initializeDatabase() {
   try {
-    // Create users table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id VARCHAR(50) PRIMARY KEY,
@@ -164,7 +411,6 @@ async function initializeDatabase() {
       )
     `);
 
-    // Create events table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS events (
         id VARCHAR(50) PRIMARY KEY,
@@ -191,7 +437,6 @@ async function initializeDatabase() {
       )
     `);
 
-    // Create sessions table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS sessions (
         token VARCHAR(64) PRIMARY KEY,
@@ -203,8 +448,6 @@ async function initializeDatabase() {
     `);
 
     console.log('✅ Database tables initialized');
-
-    // Insert default users if not exists
     await seedDefaultUsers();
 
   } catch (error) {
@@ -212,7 +455,6 @@ async function initializeDatabase() {
   }
 }
 
-// ===== SEED DEFAULT USERS =====
 async function seedDefaultUsers() {
   try {
     for (const user of dataStore.users) {
@@ -223,11 +465,28 @@ async function seedDefaultUsers() {
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
           [user.id, user.name, user.email, user.password, user.role, user.avatar, user.initialsColor, user.bio, user.skills, user.eventsAttending, user.eventsHosting, user.joinedDate]
         );
-        console.log(`✅ Created default user: ${user.name}`);
       }
     }
+
+    for (const event of dataStore.events) {
+      const result = await pool.query('SELECT * FROM events WHERE id = $1', [event.id]);
+      if (result.rows.length === 0) {
+        await pool.query(
+          `INSERT INTO events (id, title, description, date, time, end_time, location, category, image, 
+            organizer_id, organizer_name, organizer_avatar, organizer_initials_color, attendees, capacity, tags, speakers, agenda, status)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
+          [
+            event.id, event.title, event.description, event.date, event.time, event.endTime,
+            event.location, event.category, event.image,
+            event.organizer.id, event.organizer.name, event.organizer.avatar, event.organizer.initialsColor,
+            event.attendees, event.capacity, event.tags, JSON.stringify(event.speakers), JSON.stringify(event.agenda), event.status
+          ]
+        );
+      }
+    }
+    console.log('✅ Database seeded successfully');
   } catch (error) {
-    console.error('❌ Error seeding users:', error);
+    console.error('❌ Error seeding:', error);
   }
 }
 
@@ -264,7 +523,6 @@ async function getUserFromToken(token) {
     const userResult = await pool.query('SELECT * FROM users WHERE id = $1', [result.rows[0].user_id]);
     return userResult.rows[0] || null;
   } else {
-    // In-memory session handling
     const session = sessions.get(token);
     if (!session || session.expires < Date.now()) {
       sessions.delete(token);
@@ -274,10 +532,8 @@ async function getUserFromToken(token) {
   }
 }
 
-// In-memory sessions for local development
 const sessions = new Map();
 
-// Auth middleware
 async function requireAuth(req, res, next) {
   const token = req.headers.authorization?.replace('Bearer ', '') || req.query.token;
   const user = await getUserFromToken(token);
@@ -297,7 +553,6 @@ function requireRole(roles) {
 
 // ===== AUTH ENDPOINTS =====
 
-// POST /api/auth/register
 app.post('/api/auth/register', async (req, res) => {
   const { name, email, password, role } = req.body;
 
@@ -336,7 +591,6 @@ app.post('/api/auth/register', async (req, res) => {
   res.status(201).json({ token, user: userWithoutPassword });
 });
 
-// POST /api/auth/login
 app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -354,13 +608,11 @@ app.post('/api/auth/login', async (req, res) => {
   res.json({ token, user: userWithoutPassword });
 });
 
-// POST /api/auth/logout
 app.post('/api/auth/logout', requireAuth, async (req, res) => {
   sessions.delete(req.token);
   res.json({ message: 'Logged out' });
 });
 
-// GET /api/auth/me
 app.get('/api/auth/me', requireAuth, (req, res) => {
   const { password: _, ...userWithoutPassword } = req.user;
   res.json({ user: userWithoutPassword });
@@ -384,7 +636,6 @@ app.get('/api/events', async (req, res) => {
     );
   }
   
-  // Transform events to include organizer object
   const transformedEvents = events.map(event => ({
     ...event,
     organizer: event.organizer || {
@@ -402,7 +653,6 @@ app.get('/api/events/:id', async (req, res) => {
   const event = dataStore.events.find(e => e.id === req.params.id);
   if (!event) return res.status(404).json({ error: 'Event not found' });
 
-  // Get attendee details
   let attendeeDetails = [];
   if (event.attendees && event.attendees.length > 0) {
     attendeeDetails = event.attendees.map(uid => {
@@ -413,7 +663,6 @@ app.get('/api/events/:id', async (req, res) => {
     }).filter(Boolean);
   }
 
-  // Format organizer with fallbacks
   const organizer = event.organizer || {
     id: event.organizer_id || '',
     name: event.organizer_name || 'Unknown Organizer',
@@ -442,8 +691,6 @@ app.get('/api/stats', (req, res) => {
   const totalAttendees = dataStore.events.reduce((sum, e) => sum + (e.attendees?.length || 0), 0);
   const totalUsers = dataStore.users.length;
   const totalOrganizers = dataStore.users.filter(u => u.role === 'organizer').length;
-
-  console.log(`📊 Stats: ${totalEvents} events, ${totalAttendees} attendees, ${totalUsers} users`);
 
   res.json({
     totalEvents,
@@ -619,18 +866,25 @@ app.post('/api/reset', requireAuth, (req, res) => {
 
 // ===== SPA FALLBACK =====
 app.get('*', (req, res) => {
-  // Skip API routes
   if (req.path.startsWith('/api')) {
     return res.status(404).json({ error: 'API endpoint not found' });
   }
-  // All other routes - serve index.html for SPA routing
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n  TechMeetHub server running on http://localhost:${PORT}\n`);
   console.log(`  Demo accounts (password: "password"):`);
-  console.log(`    admin:       admin@gmail.com\n`);
+  console.log(`    admin:       admin@gmail.com`);
+  console.log(`    organizer:   sarah@techmeethub.dev`);
+  console.log(`    organizer:   alex@techmeethub.dev`);
+  console.log(`    organizer:   maya@techmeethub.dev`);
+  console.log(`    organizer:   ryan@techmeethub.dev`);
+  console.log(`    organizer:   priya@techmeethub.dev`);
+  console.log(`    participant: jordan@techmeethub.dev`);
+  console.log(`    participant: jasmine@techmeethub.dev`);
+  console.log(`    participant: david@techmeethub.dev`);
+  console.log(`    participant: lisa@techmeethub.dev\n`);
   console.log(`📊 Total Events: ${dataStore.events.length}`);
   console.log(`👥 Total Attendees: ${dataStore.events.reduce((sum, e) => sum + (e.attendees?.length || 0), 0)}`);
   console.log(`👤 Total Users: ${dataStore.users.length}\n`);
@@ -642,7 +896,16 @@ server.on('error', (err) => {
     const fallbackServer = app.listen(PORT + 1, '0.0.0.0', () => {
       console.log(`\n  TechMeetHub server running on http://localhost:${PORT + 1}\n`);
       console.log(`  Demo accounts (password: "password"):`);
-      console.log(`    admin:       admin@gmail.com\n`);
+      console.log(`    admin:       admin@gmail.com`);
+      console.log(`    organizer:   sarah@techmeethub.dev`);
+      console.log(`    organizer:   alex@techmeethub.dev`);
+      console.log(`    organizer:   maya@techmeethub.dev`);
+      console.log(`    organizer:   ryan@techmeethub.dev`);
+      console.log(`    organizer:   priya@techmeethub.dev`);
+      console.log(`    participant: jordan@techmeethub.dev`);
+      console.log(`    participant: jasmine@techmeethub.dev`);
+      console.log(`    participant: david@techmeethub.dev`);
+      console.log(`    participant: lisa@techmeethub.dev\n`);
       console.log(`📊 Total Events: ${dataStore.events.length}`);
       console.log(`👥 Total Attendees: ${dataStore.events.reduce((sum, e) => sum + (e.attendees?.length || 0), 0)}`);
       console.log(`👤 Total Users: ${dataStore.users.length}\n`);
