@@ -141,7 +141,7 @@ export class Router {
       });
     }
 
-    // Create event form
+    // Create event form - UPDATED with speakers and agenda
     const createForm = document.getElementById('create-event-form');
     if (createForm) {
       const newForm = createForm.cloneNode(true);
@@ -159,6 +159,40 @@ export class Router {
           return;
         }
         
+        // ===== COLLECT SPEAKERS =====
+        const speakers = [];
+        const speakerEntries = document.querySelectorAll('.speaker-entry');
+        speakerEntries.forEach(entry => {
+          const nameInput = entry.querySelector('input[name^="speaker_name_"]');
+          const roleInput = entry.querySelector('input[name^="speaker_role_"]');
+          const topicInput = entry.querySelector('input[name^="speaker_topic_"]');
+          const name = nameInput?.value?.trim();
+          const role = roleInput?.value?.trim();
+          const topic = topicInput?.value?.trim();
+          if (name) {
+            speakers.push({ 
+              name: name, 
+              role: role || 'Speaker', 
+              topic: topic || '' 
+            });
+          }
+        });
+
+        // ===== COLLECT AGENDA =====
+        const agenda = [];
+        const agendaEntries = document.querySelectorAll('.agenda-entry');
+        agendaEntries.forEach(entry => {
+          const timeInput = entry.querySelector('input[name^="agenda_time_"]');
+          const titleInput = entry.querySelector('input[name^="agenda_title_"]');
+          const typeSelect = entry.querySelector('select[name^="agenda_type_"]');
+          const time = timeInput?.value?.trim();
+          const title = titleInput?.value?.trim();
+          const type = typeSelect?.value || 'social';
+          if (time && title) {
+            agenda.push({ time, title, type });
+          }
+        });
+
         const eventData = {
           title: data.title.trim(),
           category: data.category,
@@ -168,6 +202,8 @@ export class Router {
           capacity: parseInt(data.capacity, 10),
           description: data.description.trim(),
           tags: data.tags ? data.tags.split(',').map(t => t.trim()).filter(t => t) : [],
+          speakers: speakers,
+          agenda: agenda,
         };
         
         const params = new URLSearchParams(window.location.search);
