@@ -79,7 +79,6 @@ function seedData() {
   dataStore.users = [];
 
   const hashedPassword = hashPassword('password');
-  console.log('🔑 Hashed password:', hashedPassword);
 
   // ===== ADMIN =====
   const admin = {
@@ -390,8 +389,14 @@ if (process.env.DATABASE_URL) {
 // ===== INITIALIZE DATABASE TABLES =====
 async function initializeDatabase() {
   try {
+    // Drop existing tables to start fresh
+    await pool.query(`DROP TABLE IF EXISTS sessions CASCADE`);
+    await pool.query(`DROP TABLE IF EXISTS events CASCADE`);
+    await pool.query(`DROP TABLE IF EXISTS users CASCADE`);
+
+    // Create users table
     await pool.query(`
-      CREATE TABLE IF NOT EXISTS users (
+      CREATE TABLE users (
         id VARCHAR(50) PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
         email VARCHAR(100) UNIQUE NOT NULL,
@@ -408,8 +413,9 @@ async function initializeDatabase() {
       )
     `);
 
+    // Create events table
     await pool.query(`
-      CREATE TABLE IF NOT EXISTS events (
+      CREATE TABLE events (
         id VARCHAR(50) PRIMARY KEY,
         title VARCHAR(200) NOT NULL,
         description TEXT,
@@ -430,60 +436,99 @@ async function initializeDatabase() {
         speakers JSONB,
         agenda JSONB,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (organizer_id) REFERENCES users(id)
+        FOREIGN KEY (organizer_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
 
+    // Create sessions table
     await pool.query(`
-      CREATE TABLE IF NOT EXISTS sessions (
+      CREATE TABLE sessions (
         token VARCHAR(64) PRIMARY KEY,
         user_id VARCHAR(50) NOT NULL,
         expires TIMESTAMP NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id)
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
 
-    console.log('✅ Database tables initialized');
-    await seedDefaultUsers();
+    console.log('✅ Database tables recreated');
+
+    // Seed the database
+    await seedDatabase();
 
   } catch (error) {
     console.error('❌ Database initialization error:', error);
   }
 }
 
-async function seedDefaultUsers() {
+async function seedDatabase() {
   try {
-    for (const user of dataStore.users) {
-      const result = await pool.query('SELECT * FROM users WHERE id = $1', [user.id]);
-      if (result.rows.length === 0) {
-        await pool.query(
-          `INSERT INTO users (id, name, email, password, role, avatar, initials_color, bio, skills, events_attending, events_hosting, joined_date)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
-          [user.id, user.name, user.email, user.password, user.role, user.avatar, user.initialsColor, user.bio, user.skills, user.eventsAttending, user.eventsHosting, user.joinedDate]
-        );
-      }
-    }
+    console.log('🌱 Seeding database...');
 
-    for (const event of dataStore.events) {
-      const result = await pool.query('SELECT * FROM events WHERE id = $1', [event.id]);
-      if (result.rows.length === 0) {
-        await pool.query(
-          `INSERT INTO events (id, title, description, date, time, end_time, location, category, image, 
-            organizer_id, organizer_name, organizer_avatar, organizer_initials_color, attendees, capacity, tags, speakers, agenda, status)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
-          [
-            event.id, event.title, event.description, event.date, event.time, event.endTime,
-            event.location, event.category, event.image,
-            event.organizer.id, event.organizer.name, event.organizer.avatar, event.organizer.initialsColor,
-            event.attendees, event.capacity, event.tags, JSON.stringify(event.speakers), JSON.stringify(event.agenda), event.status
-          ]
-        );
-      }
+    // Insert users
+    for (const user of dataStore.users) {
+      await pool.query(
+        `INSERT INTO users (id, name, email, password, role, avatar, initials_color, bio, skills, events_attending, events_hosting, joined_date)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+         ON CONFLICT (email) DO UPDATE SET
+           name = EXCLUDED.name,
+           password = EXCLUDED.password,
+           role = EXCLUDED.role,
+           avatar = EXCLUDED.avatar,
+           initials_color = EXCLUDED.initials_color,
+           bio = EXCLUDED.bio,
+           skills = EXCLUDED.skills,
+           events_attending = EXCLUDED.events_attending,
+           events_hosting = EXCLUDED.events_hosting,
+           joined_date = EXCLUDED.joined_date`,
+        [user.id, user.name, user.email, user.password, user.role, user.avatar, user.initialsColor, user.bio, user.skills, user.eventsAttending, user.eventsHosting, user.joinedDate]
+      );
     }
+    console.log('✅ Users seeded');
+
+    // Insert events
+    for (const event of dataStore.events) {
+      await pool.query(
+        `INSERT INTO events (id, title, description, date, time, end_time, location, category, image, 
+          organizer_id, organizer_name, organizer_avatar, organizer_initials_color, attendees, capacity, tags, speakers, agenda, status)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
+         ON CONFLICT (id) DO UPDATE SET
+           title = EXCLUDED.title,
+           description = EXCLUDED.description,
+           date = EXCLUDED.date,
+           time = EXCLUDED.time,
+           end_time = EXCLUDED.end_time,
+           location = EXCLUDED.location,
+           category = EXCLUDED.category,
+           image = EXCLUDED.image,
+           organizer_id = EXCLUDED.organizer_id,
+           organizer_name = EXCLUDED.organizer_name,
+           organizer_avatar = EXCLUDED.organizer_avatar,
+           organizer_initials_color = EXCLUDED.organizer_initials_color,
+           attendees = EXCLUDED.attendees,
+           capacity = EXCLUDED.capacity,
+           tags = EXCLUDED.tags,
+           speakers = EXCLUDED.speakers,
+           agenda = EXCLUDED.agenda,
+           status = EXCLUDED.status`,
+        [
+          event.id, event.title, event.description, event.date, event.time, event.endTime,
+          event.location, event.category, event.image,
+          event.organizer.id, event.organizer.name, event.organizer.avatar, event.organizer.initialsColor,
+          event.attendees, event.capacity, event.tags, JSON.stringify(event.speakers), JSON.stringify(event.agenda), event.status
+        ]
+      );
+    }
+    console.log('✅ Events seeded');
+
+    // Clear any existing sessions
+    await pool.query(`DELETE FROM sessions`);
+    console.log('✅ Sessions cleared');
+
     console.log('✅ Database seeded successfully');
+
   } catch (error) {
-    console.error('❌ Error seeding:', error);
+    console.error('❌ Error seeding database:', error);
   }
 }
 
@@ -554,7 +599,13 @@ app.post('/api/auth/login', async (req, res) => {
     return res.status(400).json({ error: 'Email and password required' });
   }
 
-  const user = dataStore.users.find(u => u.email === email.trim().toLowerCase());
+  let user;
+  if (useDatabase) {
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email.trim().toLowerCase()]);
+    user = result.rows[0];
+  } else {
+    user = dataStore.users.find(u => u.email === email.trim().toLowerCase());
+  }
   
   if (!user) {
     console.log('❌ User not found:', email);
@@ -562,9 +613,6 @@ app.post('/api/auth/login', async (req, res) => {
   }
 
   const hashedInput = hashPassword(password);
-  console.log('🔑 Hashed input:', hashedInput);
-  console.log('🔑 Stored hash:', user.password);
-
   if (user.password !== hashedInput) {
     console.log('❌ Password mismatch');
     return res.status(401).json({ error: 'Invalid email or password' });
@@ -584,21 +632,15 @@ app.post('/api/auth/register', async (req, res) => {
     return res.status(400).json({ error: 'Name, email, and password are required' });
   }
 
-  const existingUser = dataStore.users.find(u => u.email === email);
-  if (existingUser) {
-    return res.status(409).json({ error: 'Email already registered' });
-  }
-
-  const validRoles = ['participant', 'organizer'];
-  const userRole = validRoles.includes(role) ? role : 'participant';
+  const hashedPassword = hashPassword(password);
   const userId = 'user-' + Date.now();
 
   const newUser = {
     id: userId,
     name: name.trim(),
     email: email.trim().toLowerCase(),
-    password: hashPassword(password),
-    role: userRole,
+    password: hashedPassword,
+    role: role || 'participant',
     avatar: name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase(),
     initialsColor: 'bg-gradient-to-br from-brand-500 to-violet-600',
     bio: '',
@@ -608,15 +650,39 @@ app.post('/api/auth/register', async (req, res) => {
     joinedDate: new Date().toISOString().split('T')[0],
   };
 
-  dataStore.users.push(newUser);
-  const token = await createSession(newUser.id);
+  if (useDatabase) {
+    try {
+      await pool.query(
+        `INSERT INTO users (id, name, email, password, role, avatar, initials_color, bio, skills, events_attending, events_hosting, joined_date)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+        [newUser.id, newUser.name, newUser.email, newUser.password, newUser.role,
+         newUser.avatar, newUser.initialsColor, newUser.bio, newUser.skills, newUser.eventsAttending, newUser.eventsHosting, newUser.joinedDate]
+      );
+    } catch (err) {
+      if (err.code === '23505') {
+        return res.status(409).json({ error: 'Email already registered' });
+      }
+      throw err;
+    }
+  } else {
+    const existingUser = dataStore.users.find(u => u.email === email);
+    if (existingUser) {
+      return res.status(409).json({ error: 'Email already registered' });
+    }
+    dataStore.users.push(newUser);
+  }
 
+  const token = await createSession(newUser.id);
   const { password: _, ...userWithoutPassword } = newUser;
   res.status(201).json({ token, user: userWithoutPassword });
 });
 
 app.post('/api/auth/logout', requireAuth, async (req, res) => {
-  sessions.delete(req.token);
+  if (useDatabase) {
+    await pool.query('DELETE FROM sessions WHERE token = $1', [req.token]);
+  } else {
+    sessions.delete(req.token);
+  }
   res.json({ message: 'Logged out' });
 });
 
@@ -629,18 +695,46 @@ app.get('/api/auth/me', requireAuth, (req, res) => {
 
 app.get('/api/events', async (req, res) => {
   const { category, status, q } = req.query;
-  let events = [...dataStore.events];
+  
+  let events;
+  if (useDatabase) {
+    let query = 'SELECT * FROM events';
+    let params = [];
+    let conditions = [];
 
-  if (category && category !== 'all') events = events.filter(e => e.category === category);
-  if (status && status !== 'all') events = events.filter(e => e.status === status);
-  if (q) {
-    const query = q.toLowerCase();
-    events = events.filter(e =>
-      e.title.toLowerCase().includes(query) ||
-      e.description.toLowerCase().includes(query) ||
-      e.location.toLowerCase().includes(query) ||
-      e.tags.some(t => t.toLowerCase().includes(query))
-    );
+    if (category && category !== 'all') {
+      conditions.push(`category = $${params.length + 1}`);
+      params.push(category);
+    }
+    if (status && status !== 'all') {
+      conditions.push(`status = $${params.length + 1}`);
+      params.push(status);
+    }
+    if (q) {
+      conditions.push(`(title ILIKE $${params.length + 1} OR description ILIKE $${params.length + 1} OR location ILIKE $${params.length + 1})`);
+      params.push(`%${q}%`);
+    }
+
+    if (conditions.length > 0) {
+      query += ' WHERE ' + conditions.join(' AND ');
+    }
+
+    query += ' ORDER BY date ASC';
+    const result = await pool.query(query, params);
+    events = result.rows;
+  } else {
+    events = [...dataStore.events];
+    if (category && category !== 'all') events = events.filter(e => e.category === category);
+    if (status && status !== 'all') events = events.filter(e => e.status === status);
+    if (q) {
+      const query = q.toLowerCase();
+      events = events.filter(e =>
+        e.title.toLowerCase().includes(query) ||
+        e.description.toLowerCase().includes(query) ||
+        e.location.toLowerCase().includes(query) ||
+        e.tags.some(t => t.toLowerCase().includes(query))
+      );
+    }
   }
   
   const transformedEvents = events.map(event => ({
@@ -657,17 +751,32 @@ app.get('/api/events', async (req, res) => {
 });
 
 app.get('/api/events/:id', async (req, res) => {
-  const event = dataStore.events.find(e => e.id === req.params.id);
+  let event;
+  if (useDatabase) {
+    const result = await pool.query('SELECT * FROM events WHERE id = $1', [req.params.id]);
+    event = result.rows[0];
+  } else {
+    event = dataStore.events.find(e => e.id === req.params.id);
+  }
+  
   if (!event) return res.status(404).json({ error: 'Event not found' });
 
   let attendeeDetails = [];
   if (event.attendees && event.attendees.length > 0) {
-    attendeeDetails = event.attendees.map(uid => {
-      const u = dataStore.users.find(user => user.id === uid);
-      if (!u) return null;
-      const { password: _, ...safe } = u;
-      return { id: safe.id, name: safe.name, avatar: safe.avatar, initialsColor: safe.initialsColor };
-    }).filter(Boolean);
+    if (useDatabase) {
+      const result = await pool.query(
+        'SELECT id, name, avatar, initials_color FROM users WHERE id = ANY($1)',
+        [event.attendees]
+      );
+      attendeeDetails = result.rows;
+    } else {
+      attendeeDetails = event.attendees.map(uid => {
+        const u = dataStore.users.find(user => user.id === uid);
+        if (!u) return null;
+        const { password: _, ...safe } = u;
+        return { id: safe.id, name: safe.name, avatar: safe.avatar, initialsColor: safe.initialsColor };
+      }).filter(Boolean);
+    }
   }
 
   const organizer = event.organizer || {
@@ -693,11 +802,25 @@ app.get('/api/categories', (req, res) => {
   res.json({ categories: dataStore.categories });
 });
 
-app.get('/api/stats', (req, res) => {
-  const totalEvents = dataStore.events.length;
-  const totalAttendees = dataStore.events.reduce((sum, e) => sum + (e.attendees?.length || 0), 0);
-  const totalUsers = dataStore.users.length;
-  const totalOrganizers = dataStore.users.filter(u => u.role === 'organizer').length;
+app.get('/api/stats', async (req, res) => {
+  let totalEvents, totalAttendees, totalUsers, totalOrganizers;
+  
+  if (useDatabase) {
+    const eventsResult = await pool.query('SELECT COUNT(*) as total FROM events');
+    const usersResult = await pool.query('SELECT COUNT(*) as total FROM users');
+    const organizersResult = await pool.query('SELECT COUNT(*) as total FROM users WHERE role = $1', ['organizer']);
+    const attendeesResult = await pool.query('SELECT COALESCE(SUM(array_length(attendees, 1)), 0) as total FROM events');
+    
+    totalEvents = parseInt(eventsResult.rows[0].total) || 0;
+    totalUsers = parseInt(usersResult.rows[0].total) || 0;
+    totalOrganizers = parseInt(organizersResult.rows[0].total) || 0;
+    totalAttendees = parseInt(attendeesResult.rows[0].total) || 0;
+  } else {
+    totalEvents = dataStore.events.length;
+    totalUsers = dataStore.users.length;
+    totalOrganizers = dataStore.users.filter(u => u.role === 'organizer').length;
+    totalAttendees = dataStore.events.reduce((sum, e) => sum + (e.attendees?.length || 0), 0);
+  }
 
   res.json({
     totalEvents,
@@ -709,7 +832,7 @@ app.get('/api/stats', (req, res) => {
 
 // ===== PROTECTED EVENTS API =====
 
-app.post('/api/events', requireAuth, requireRole(['organizer', 'admin']), (req, res) => {
+app.post('/api/events', requireAuth, requireRole(['organizer', 'admin']), async (req, res) => {
   const { title, category, date, time, location, capacity, description, tags } = req.body;
   if (!title || !category || !date || !location || !capacity) {
     return res.status(400).json({ error: 'Missing required fields' });
@@ -733,64 +856,147 @@ app.post('/api/events', requireAuth, requireRole(['organizer', 'admin']), (req, 
     agenda: [],
   };
 
-  dataStore.events.unshift(newEvent);
-  req.user.eventsHosting.push(newEvent.id);
+  if (useDatabase) {
+    await pool.query(
+      `INSERT INTO events (id, title, description, date, time, location, category, image, 
+        organizer_id, organizer_name, organizer_avatar, organizer_initials_color, attendees, capacity, tags, speakers, agenda, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)`,
+      [
+        newEvent.id, newEvent.title, newEvent.description, newEvent.date, newEvent.time,
+        newEvent.location, newEvent.category, newEvent.image,
+        newEvent.organizer.id, newEvent.organizer.name, newEvent.organizer.avatar, newEvent.organizer.initialsColor,
+        newEvent.attendees, newEvent.capacity, newEvent.tags, newEvent.speakers, newEvent.agenda, newEvent.status
+      ]
+    );
+    req.user.eventsHosting.push(newEvent.id);
+  } else {
+    dataStore.events.unshift(newEvent);
+    req.user.eventsHosting.push(newEvent.id);
+  }
+
   res.status(201).json({ event: newEvent });
 });
 
-app.put('/api/events/:id', requireAuth, (req, res) => {
-  const idx = dataStore.events.findIndex(e => e.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'Event not found' });
+app.put('/api/events/:id', requireAuth, async (req, res) => {
+  let event;
+  if (useDatabase) {
+    const result = await pool.query('SELECT * FROM events WHERE id = $1', [req.params.id]);
+    event = result.rows[0];
+  } else {
+    event = dataStore.events.find(e => e.id === req.params.id);
+  }
+  
+  if (!event) return res.status(404).json({ error: 'Event not found' });
 
-  const event = dataStore.events[idx];
-  if (event.organizer.id !== req.user.id && req.user.role !== 'admin') {
+  if (event.organizer_id !== req.user.id && req.user.role !== 'admin') {
     return res.status(403).json({ error: 'You can only edit your own events' });
   }
 
-  dataStore.events[idx] = { ...event, ...req.body };
-  res.json({ event: dataStore.events[idx] });
+  const { title, description, date, time, location, category, capacity, tags } = req.body;
+  
+  if (useDatabase) {
+    await pool.query(
+      `UPDATE events SET 
+        title = COALESCE($1, title),
+        description = COALESCE($2, description),
+        date = COALESCE($3, date),
+        time = COALESCE($4, time),
+        location = COALESCE($5, location),
+        category = COALESCE($6, category),
+        capacity = COALESCE($7, capacity),
+        tags = COALESCE($8, tags)
+       WHERE id = $9`,
+      [title, description, date, time, location, category, capacity, tags, req.params.id]
+    );
+    const updatedResult = await pool.query('SELECT * FROM events WHERE id = $1', [req.params.id]);
+    event = updatedResult.rows[0];
+  } else {
+    const idx = dataStore.events.findIndex(e => e.id === req.params.id);
+    dataStore.events[idx] = { ...event, ...req.body };
+    event = dataStore.events[idx];
+  }
+
+  res.json({ event });
 });
 
-app.delete('/api/events/:id', requireAuth, (req, res) => {
-  const idx = dataStore.events.findIndex(e => e.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'Event not found' });
+app.delete('/api/events/:id', requireAuth, async (req, res) => {
+  let event;
+  if (useDatabase) {
+    const result = await pool.query('SELECT * FROM events WHERE id = $1', [req.params.id]);
+    event = result.rows[0];
+  } else {
+    event = dataStore.events.find(e => e.id === req.params.id);
+  }
+  
+  if (!event) return res.status(404).json({ error: 'Event not found' });
 
-  const event = dataStore.events[idx];
-  if (event.organizer.id !== req.user.id && req.user.role !== 'admin') {
+  if (event.organizer_id !== req.user.id && req.user.role !== 'admin') {
     return res.status(403).json({ error: 'You can only delete your own events' });
   }
 
-  dataStore.events.splice(idx, 1);
+  if (useDatabase) {
+    await pool.query('DELETE FROM events WHERE id = $1', [req.params.id]);
+  } else {
+    const idx = dataStore.events.findIndex(e => e.id === req.params.id);
+    dataStore.events.splice(idx, 1);
+  }
+
   res.json({ message: 'Event deleted' });
 });
 
 // ===== RSVP =====
 
-app.post('/api/events/:id/rsvp', requireAuth, requireRole(['participant', 'organizer', 'admin']), (req, res) => {
-  const event = dataStore.events.find(e => e.id === req.params.id);
+app.post('/api/events/:id/rsvp', requireAuth, requireRole(['participant', 'organizer', 'admin']), async (req, res) => {
+  let event;
+  if (useDatabase) {
+    const result = await pool.query('SELECT * FROM events WHERE id = $1', [req.params.id]);
+    event = result.rows[0];
+  } else {
+    event = dataStore.events.find(e => e.id === req.params.id);
+  }
+  
   if (!event) return res.status(404).json({ error: 'Event not found' });
 
-  const idx = event.attendees.indexOf(req.user.id);
+  let attendees = event.attendees || [];
+  const idx = attendees.indexOf(req.user.id);
   const attending = idx !== -1;
 
   if (attending) {
-    event.attendees.splice(idx, 1);
-    req.user.eventsAttending = req.user.eventsAttending.filter(id => id !== event.id);
+    attendees.splice(idx, 1);
+    if (useDatabase) {
+      await pool.query('UPDATE users SET events_attending = array_remove(events_attending, $1) WHERE id = $2', [event.id, req.user.id]);
+      await pool.query('UPDATE events SET attendees = $1 WHERE id = $2', [attendees, req.params.id]);
+    } else {
+      req.user.eventsAttending = req.user.eventsAttending.filter(id => id !== event.id);
+    }
   } else {
-    if (event.attendees.length >= event.capacity) {
+    if (attendees.length >= event.capacity) {
       return res.status(400).json({ error: 'Event is full' });
     }
-    event.attendees.push(req.user.id);
-    req.user.eventsAttending.push(event.id);
+    attendees.push(req.user.id);
+    if (useDatabase) {
+      await pool.query('UPDATE users SET events_attending = array_append(events_attending, $1) WHERE id = $2', [event.id, req.user.id]);
+      await pool.query('UPDATE events SET attendees = $1 WHERE id = $2', [attendees, req.params.id]);
+    } else {
+      req.user.eventsAttending.push(event.id);
+    }
   }
 
-  res.json({ attending: !attending, event });
+  res.json({ attending: !attending, event: { ...event, attendees } });
 });
 
-app.get('/api/events/:id/rsvp', requireAuth, (req, res) => {
-  const event = dataStore.events.find(e => e.id === req.params.id);
+app.get('/api/events/:id/rsvp', requireAuth, async (req, res) => {
+  let event;
+  if (useDatabase) {
+    const result = await pool.query('SELECT * FROM events WHERE id = $1', [req.params.id]);
+    event = result.rows[0];
+  } else {
+    event = dataStore.events.find(e => e.id === req.params.id);
+  }
+  
   if (!event) return res.status(404).json({ error: 'Event not found' });
-  res.json({ attending: event.attendees.includes(req.user.id) });
+  const attendees = event.attendees || [];
+  res.json({ attending: attendees.includes(req.user.id) });
 });
 
 // ===== USER PROFILE API =====
@@ -800,75 +1006,145 @@ app.get('/api/user', requireAuth, (req, res) => {
   res.json({ user });
 });
 
-app.put('/api/user', requireAuth, (req, res) => {
+app.put('/api/user', requireAuth, async (req, res) => {
   const { name, email, bio, skills } = req.body;
-  if (name) req.user.name = name;
-  if (email) req.user.email = email;
-  if (bio !== undefined) req.user.bio = bio;
-  if (skills) req.user.skills = Array.isArray(skills) ? skills : skills.split(',').map(s => s.trim()).filter(s => s);
+  const updates = {};
+  if (name) updates.name = name;
+  if (email) updates.email = email;
+  if (bio !== undefined) updates.bio = bio;
+  if (skills) updates.skills = Array.isArray(skills) ? skills : skills.split(',').map(s => s.trim()).filter(s => s);
+
+  if (useDatabase) {
+    const setClause = Object.keys(updates).map((key, i) => `${key} = $${i + 1}`).join(', ');
+    const values = Object.values(updates);
+    values.push(req.user.id);
+    await pool.query(`UPDATE users SET ${setClause} WHERE id = $${values.length}`, values);
+    const result = await pool.query('SELECT * FROM users WHERE id = $1', [req.user.id]);
+    req.user = result.rows[0];
+  } else {
+    Object.assign(req.user, updates);
+  }
+
   const { password: _, ...user } = req.user;
   res.json({ user });
 });
 
-app.get('/api/user/events/attending', requireAuth, (req, res) => {
-  const events = dataStore.events.filter(e => req.user.eventsAttending.includes(e.id));
+app.get('/api/user/events/attending', requireAuth, async (req, res) => {
+  let events;
+  if (useDatabase) {
+    const userEvents = req.user.events_attending || [];
+    if (userEvents.length === 0) {
+      return res.json({ events: [] });
+    }
+    const result = await pool.query('SELECT * FROM events WHERE id = ANY($1)', [userEvents]);
+    events = result.rows;
+  } else {
+    events = dataStore.events.filter(e => req.user.eventsAttending.includes(e.id));
+  }
   res.json({ events });
 });
 
-app.get('/api/user/events/hosting', requireAuth, (req, res) => {
-  const events = dataStore.events.filter(e => e.organizer.id === req.user.id);
+app.get('/api/user/events/hosting', requireAuth, async (req, res) => {
+  let events;
+  if (useDatabase) {
+    const result = await pool.query('SELECT * FROM events WHERE organizer_id = $1', [req.user.id]);
+    events = result.rows;
+  } else {
+    events = dataStore.events.filter(e => e.organizer.id === req.user.id);
+  }
   res.json({ events });
 });
 
 // ===== ADMIN API =====
 
-app.get('/api/admin/users', requireAuth, requireRole(['admin']), (req, res) => {
-  const users = dataStore.users.map(u => {
-    const { password: _, ...user } = u;
-    return user;
-  });
+app.get('/api/admin/users', requireAuth, requireRole(['admin']), async (req, res) => {
+  let users;
+  if (useDatabase) {
+    const result = await pool.query('SELECT id, name, email, role, avatar, initials_color, bio, skills, joined_date FROM users');
+    users = result.rows;
+  } else {
+    users = dataStore.users.map(u => {
+      const { password: _, ...user } = u;
+      return user;
+    });
+  }
   res.json({ users });
 });
 
-app.get('/api/admin/events', requireAuth, requireRole(['admin']), (req, res) => {
-  res.json({ events: dataStore.events });
+app.get('/api/admin/events', requireAuth, requireRole(['admin']), async (req, res) => {
+  let events;
+  if (useDatabase) {
+    const result = await pool.query('SELECT * FROM events');
+    events = result.rows;
+  } else {
+    events = dataStore.events;
+  }
+  res.json({ events });
 });
 
-app.get('/api/admin/stats', requireAuth, requireRole(['admin']), (req, res) => {
+app.get('/api/admin/stats', requireAuth, requireRole(['admin']), async (req, res) => {
   const now = new Date().toISOString().split('T')[0];
-  res.json({
-    totalUsers: dataStore.users.length,
-    totalEvents: dataStore.events.length,
-    totalAttendees: dataStore.events.reduce((sum, e) => sum + e.attendees.length, 0),
-    participants: dataStore.users.filter(u => u.role === 'participant').length,
-    organizers: dataStore.users.filter(u => u.role === 'organizer').length,
-    admins: dataStore.users.filter(u => u.role === 'admin').length,
-    upcomingEvents: dataStore.events.filter(e => e.date >= now).length,
-    pastEvents: dataStore.events.filter(e => e.date < now).length,
-  });
+  let stats;
+  
+  if (useDatabase) {
+    const usersResult = await pool.query('SELECT COUNT(*) as total FROM users');
+    const eventsResult = await pool.query('SELECT COUNT(*) as total FROM events');
+    const participantsResult = await pool.query('SELECT COUNT(*) as total FROM users WHERE role = $1', ['participant']);
+    const organizersResult = await pool.query('SELECT COUNT(*) as total FROM users WHERE role = $1', ['organizer']);
+    const adminsResult = await pool.query('SELECT COUNT(*) as total FROM users WHERE role = $1', ['admin']);
+    const upcomingResult = await pool.query('SELECT COUNT(*) as total FROM events WHERE date >= $1', [now]);
+    const pastResult = await pool.query('SELECT COUNT(*) as total FROM events WHERE date < $1', [now]);
+    const attendeesResult = await pool.query('SELECT COALESCE(SUM(array_length(attendees, 1)), 0) as total FROM events');
+
+    stats = {
+      totalUsers: parseInt(usersResult.rows[0].total),
+      totalEvents: parseInt(eventsResult.rows[0].total),
+      totalAttendees: parseInt(attendeesResult.rows[0].total),
+      participants: parseInt(participantsResult.rows[0].total),
+      organizers: parseInt(organizersResult.rows[0].total),
+      admins: parseInt(adminsResult.rows[0].total),
+      upcomingEvents: parseInt(upcomingResult.rows[0].total),
+      pastEvents: parseInt(pastResult.rows[0].total),
+    };
+  } else {
+    stats = {
+      totalUsers: dataStore.users.length,
+      totalEvents: dataStore.events.length,
+      totalAttendees: dataStore.events.reduce((sum, e) => sum + e.attendees.length, 0),
+      participants: dataStore.users.filter(u => u.role === 'participant').length,
+      organizers: dataStore.users.filter(u => u.role === 'organizer').length,
+      admins: dataStore.users.filter(u => u.role === 'admin').length,
+      upcomingEvents: dataStore.events.filter(e => e.date >= now).length,
+      pastEvents: dataStore.events.filter(e => e.date < now).length,
+    };
+  }
+
+  res.json(stats);
 });
 
-app.delete('/api/admin/users/:id', requireAuth, requireRole(['admin']), (req, res) => {
-  const idx = dataStore.users.findIndex(u => u.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'User not found' });
-  if (dataStore.users[idx].id === req.user.id) {
+app.delete('/api/admin/users/:id', requireAuth, requireRole(['admin']), async (req, res) => {
+  if (req.params.id === req.user.id) {
     return res.status(400).json({ error: 'Cannot delete yourself' });
   }
-  dataStore.users.splice(idx, 1);
+  if (useDatabase) {
+    await pool.query('DELETE FROM users WHERE id = $1', [req.params.id]);
+  } else {
+    const idx = dataStore.users.findIndex(u => u.id === req.params.id);
+    if (idx === -1) return res.status(404).json({ error: 'User not found' });
+    dataStore.users.splice(idx, 1);
+  }
   res.json({ message: 'User deleted' });
 });
 
-app.delete('/api/admin/events/:id', requireAuth, requireRole(['admin']), (req, res) => {
-  const idx = dataStore.events.findIndex(e => e.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'Event not found' });
-  dataStore.events.splice(idx, 1);
+app.delete('/api/admin/events/:id', requireAuth, requireRole(['admin']), async (req, res) => {
+  if (useDatabase) {
+    await pool.query('DELETE FROM events WHERE id = $1', [req.params.id]);
+  } else {
+    const idx = dataStore.events.findIndex(e => e.id === req.params.id);
+    if (idx === -1) return res.status(404).json({ error: 'Event not found' });
+    dataStore.events.splice(idx, 1);
+  }
   res.json({ message: 'Event deleted' });
-});
-
-// ===== RESET =====
-app.post('/api/reset', requireAuth, (req, res) => {
-  req.user.eventsAttending = [];
-  res.json({ message: 'Data reset' });
 });
 
 // ===== SPA FALLBACK =====
