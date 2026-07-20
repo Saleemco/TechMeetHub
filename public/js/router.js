@@ -54,9 +54,24 @@ export class Router {
     const user = await Auth.me();
     const { handler, params } = this.matchRoute(path);
     
+    // Check if we should show sidebar (hide on homepage for non-logged users)
+    const isHomePage = path === '/' || path === '/home';
+    const showSidebar = user || !isHomePage;
+    
+    // Render header and footer
     this.header.innerHTML = Header(user);
     this.footer.innerHTML = Footer();
     this.container.innerHTML = await handler(...params);
+    
+    // Add/remove sidebar class on main element
+    const main = document.getElementById('main');
+    if (main) {
+      if (showSidebar) {
+        main.classList.add('sidebar-visible');
+      } else {
+        main.classList.remove('sidebar-visible');
+      }
+    }
     
     this.updateActiveNav(path);
     this.updateSidebarActive(path);

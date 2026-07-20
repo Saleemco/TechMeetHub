@@ -22,10 +22,15 @@ window.toggleMobileMenu = () => {
 window.toggleSidebar = () => {
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebar-overlay');
+  const main = document.getElementById('main');
   if (sidebar) {
     sidebar.classList.toggle('-translate-x-full');
     if (overlay) {
       overlay.classList.toggle('hidden');
+    }
+    // Toggle the sidebar-visible class on main
+    if (main) {
+      main.classList.toggle('sidebar-visible');
     }
   }
 };
@@ -33,10 +38,14 @@ window.toggleSidebar = () => {
 window.closeSidebar = () => {
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebar-overlay');
+  const main = document.getElementById('main');
   if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
     sidebar.classList.add('-translate-x-full');
     if (overlay) {
       overlay.classList.add('hidden');
+    }
+    if (main) {
+      main.classList.remove('sidebar-visible');
     }
   }
 };
