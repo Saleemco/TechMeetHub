@@ -13,15 +13,15 @@ export function CreateEventPage() {
   return `
     <div class="page-transition max-w-3xl mx-auto">
       <div class="mb-8">
-        <h1 class="text-2xl font-bold text-white mb-1">${editId ? 'Edit Event' : 'Create New Event'}</h1>
-        <p class="text-gray-400 text-sm">${editId ? 'Update your event details' : 'Host a new event for the tech community'}</p>
+        <h1 class="text-2xl font-bold text-gray-900 mb-1">${editId ? 'Edit Event' : 'Create New Event'}</h1>
+        <p class="text-gray-500 text-sm">${editId ? 'Update your event details' : 'Host a new event for the tech community'}</p>
       </div>
-      <form id="create-event-form" class="glass rounded-xl p-6 md:p-8 border border-white/5">
+      <form id="create-event-form" class="bg-white rounded-xl p-6 md:p-8 border border-gray-200">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           ${Input({ label: 'Event Title', name: 'title', placeholder: 'e.g., React Advanced Patterns Workshop', required: true })}
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1.5">Category <span class="text-red-400">*</span></label>
-            <select name="category" required class="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors">
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Category <span class="text-red-500">*</span></label>
+            <select name="category" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors">
               <option value="" disabled selected>Select a category</option>
               ${allCategories.map(c => `<option value="${c.id}">${c.label}</option>`).join('')}
             </select>
@@ -37,15 +37,15 @@ export function CreateEventPage() {
         
         <!-- Speakers Section -->
         <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-300 mb-1.5">Speakers</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Speakers</label>
           <div id="speakers-container">
-            <div class="speaker-entry grid grid-cols-1 md:grid-cols-3 gap-3 mb-3 p-3 rounded-lg bg-white/5">
-              <input type="text" name="speaker_name_0" placeholder="Speaker Name" class="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors" />
-              <input type="text" name="speaker_role_0" placeholder="Role / Title" class="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors" />
-              <input type="text" name="speaker_topic_0" placeholder="Topic" class="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors" />
+            <div class="speaker-entry grid grid-cols-1 md:grid-cols-3 gap-3 mb-3 p-3 rounded-lg bg-gray-50">
+              <input type="text" name="speaker_name_0" placeholder="Speaker Name" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" />
+              <input type="text" name="speaker_role_0" placeholder="Role / Title" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" />
+              <input type="text" name="speaker_topic_0" placeholder="Topic" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" />
             </div>
           </div>
-          <button type="button" onclick="window.addSpeakerField()" class="text-sm text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1">
+          <button type="button" onclick="window.addSpeakerField()" class="text-sm text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1">
             ${getIcon('plus', 14)} Add Speaker
           </button>
           <p class="text-xs text-gray-500 mt-1">Add speakers for your event (optional)</p>
@@ -53,19 +53,19 @@ export function CreateEventPage() {
 
         <!-- Agenda Section -->
         <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-300 mb-1.5">Agenda</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Agenda</label>
           <div id="agenda-container">
-            <div class="agenda-entry grid grid-cols-1 md:grid-cols-3 gap-3 mb-3 p-3 rounded-lg bg-white/5">
-              <input type="text" name="agenda_time_0" placeholder="Time (e.g., 09:00)" class="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors" />
-              <input type="text" name="agenda_title_0" placeholder="Title (e.g., Opening Keynote)" class="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors" />
-              <select name="agenda_type_0" class="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors">
+            <div class="agenda-entry grid grid-cols-1 md:grid-cols-3 gap-3 mb-3 p-3 rounded-lg bg-gray-50">
+              <input type="text" name="agenda_time_0" placeholder="Time (e.g., 09:00)" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" />
+              <input type="text" name="agenda_title_0" placeholder="Title (e.g., Opening Keynote)" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" />
+              <select name="agenda_type_0" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors">
                 <option value="social">Social</option>
                 <option value="keynote">Keynote</option>
                 <option value="work">Work</option>
               </select>
             </div>
           </div>
-          <button type="button" onclick="window.addAgendaField()" class="text-sm text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1">
+          <button type="button" onclick="window.addAgendaField()" class="text-sm text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1">
             ${getIcon('plus', 14)} Add Agenda Item
           </button>
           <p class="text-xs text-gray-500 mt-1">Add agenda items for your event (optional)</p>
@@ -73,9 +73,9 @@ export function CreateEventPage() {
 
         ${Input({ label: 'Tags', name: 'tags', placeholder: 'e.g., React, JavaScript, AI, Web3', required: false })}
         
-        <div class="flex items-center gap-3 pt-4 border-t border-white/5">
-          <button type="submit" class="px-6 py-2.5 rounded-lg text-sm font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 transition-opacity">${editId ? 'Update Event' : 'Create Event'}</button>
-          <a href="/events" data-navigate class="px-6 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-colors">Cancel</a>
+        <div class="flex items-center gap-3 pt-4 border-t border-gray-200">
+          <button type="submit" class="px-6 py-2.5 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors">${editId ? 'Update Event' : 'Create Event'}</button>
+          <a href="/events" data-navigate class="px-6 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-colors">Cancel</a>
         </div>
       </form>
     </div>
@@ -88,11 +88,11 @@ window.addSpeakerField = function() {
   if (!container) return;
   const index = container.children.length;
   const entry = document.createElement('div');
-  entry.className = 'speaker-entry grid grid-cols-1 md:grid-cols-3 gap-3 mb-3 p-3 rounded-lg bg-white/5';
+  entry.className = 'speaker-entry grid grid-cols-1 md:grid-cols-3 gap-3 mb-3 p-3 rounded-lg bg-gray-50';
   entry.innerHTML = `
-    <input type="text" name="speaker_name_${index}" placeholder="Speaker Name" class="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors" />
-    <input type="text" name="speaker_role_${index}" placeholder="Role / Title" class="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors" />
-    <input type="text" name="speaker_topic_${index}" placeholder="Topic" class="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors" />
+    <input type="text" name="speaker_name_${index}" placeholder="Speaker Name" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" />
+    <input type="text" name="speaker_role_${index}" placeholder="Role / Title" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" />
+    <input type="text" name="speaker_topic_${index}" placeholder="Topic" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" />
   `;
   container.appendChild(entry);
 };
@@ -102,11 +102,11 @@ window.addAgendaField = function() {
   if (!container) return;
   const index = container.children.length;
   const entry = document.createElement('div');
-  entry.className = 'agenda-entry grid grid-cols-1 md:grid-cols-3 gap-3 mb-3 p-3 rounded-lg bg-white/5';
+  entry.className = 'agenda-entry grid grid-cols-1 md:grid-cols-3 gap-3 mb-3 p-3 rounded-lg bg-gray-50';
   entry.innerHTML = `
-    <input type="text" name="agenda_time_${index}" placeholder="Time (e.g., 09:00)" class="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors" />
-    <input type="text" name="agenda_title_${index}" placeholder="Title (e.g., Opening Keynote)" class="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors" />
-    <select name="agenda_type_${index}" class="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors">
+    <input type="text" name="agenda_time_${index}" placeholder="Time (e.g., 09:00)" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" />
+    <input type="text" name="agenda_title_${index}" placeholder="Title (e.g., Opening Keynote)" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" />
+    <select name="agenda_type_${index}" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors">
       <option value="social">Social</option>
       <option value="keynote">Keynote</option>
       <option value="work">Work</option>

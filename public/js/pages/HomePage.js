@@ -14,42 +14,38 @@ export async function HomePage() {
   return `
     <div class="page-transition">
       <!-- Hero Section -->
-      <section class="relative rounded-2xl overflow-hidden mb-12">
-        <div class="absolute inset-0 z-0">
-          <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&h=600&fit=crop" alt="Tech community" class="w-full h-full object-cover" />
-          <div class="absolute inset-0 bg-gradient-to-r from-[#0a0a0f]/90 via-[#0a0a0f]/60 to-transparent"></div>
-        </div>
+      <section class="relative rounded-2xl overflow-hidden mb-12 bg-gradient-to-r from-blue-600 to-indigo-700">
         <div class="relative z-10 px-6 py-16 md:py-24 max-w-2xl">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-medium mb-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white/90 text-xs font-medium mb-4">
             ${getIcon('zap', 12)} The tech community's favorite event platform
           </div>
           <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4">
-            Connect. Learn. <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Build.</span>
+            Connect. Learn. <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-indigo-200">Build.</span>
           </h1>
-          <p class="text-gray-300 text-lg mb-6 max-w-xl">
+          <p class="text-white/80 text-lg mb-6 max-w-xl">
             Discover hackathons, meetups, workshops, and conferences. Join thousands of developers building the future together.
           </p>
           <div class="flex flex-wrap items-center gap-3">
-            <a href="/events" data-navigate class="px-6 py-3 rounded-lg text-sm font-semibold bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 transition-opacity flex items-center gap-2">
+            <a href="/events" data-navigate class="px-6 py-3 rounded-lg text-sm font-semibold bg-white text-blue-600 hover:bg-blue-50 transition-colors flex items-center gap-2">
               Explore Events ${getIcon('arrowRight', 16)}
             </a>
             ${!user ? `
-              <a href="/register" data-navigate class="px-6 py-3 rounded-lg text-sm font-semibold bg-white/10 text-white hover:bg-white/20 transition-colors border border-white/10 flex items-center gap-2">
+              <a href="/register" data-navigate class="px-6 py-3 rounded-lg text-sm font-semibold bg-white/10 text-white hover:bg-white/20 transition-colors border border-white/20 flex items-center gap-2">
                 ${getIcon('userPlus', 16)} Join Free
               </a>
             ` : user.role === 'organizer' ? `
-              <a href="/create" data-navigate class="px-6 py-3 rounded-lg text-sm font-semibold bg-white/10 text-white hover:bg-white/20 transition-colors border border-white/10 flex items-center gap-2">
+              <a href="/create" data-navigate class="px-6 py-3 rounded-lg text-sm font-semibold bg-white/10 text-white hover:bg-white/20 transition-colors border border-white/20 flex items-center gap-2">
                 ${getIcon('plus', 16)} Host an Event
               </a>
             ` : ''}
           </div>
-          <div class="flex items-center gap-6 mt-8 text-sm text-gray-400">
+          <div class="flex items-center gap-6 mt-8 text-sm text-white/80">
             <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">${getIcon('users', 14)}</div>
+              <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">${getIcon('users', 14)}</div>
               <span><strong class="text-white">${stats.totalEvents || 0}</strong> Events</span>
             </div>
             <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">${getIcon('user', 14)}</div>
+              <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">${getIcon('user', 14)}</div>
               <span><strong class="text-white">${stats.totalAttendees || 0}+</strong> Attendees</span>
             </div>
           </div>
@@ -61,11 +57,11 @@ export async function HomePage() {
         ${SectionTitle({ title: 'Browse by Category', subtitle: 'Find events that match your interests' })}
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
           ${allCategories.map((cat, i) => `
-            <a href="/events?category=${cat.id}" data-navigate class="group glass rounded-xl p-4 text-center hover:scale-105 transition-all hover:border-purple-500/30 border border-white/5">
+            <a href="/events?category=${cat.id}" data-navigate class="group bg-white rounded-xl p-4 text-center hover:shadow-md transition-all border border-gray-200 hover:border-blue-300">
               <div class="w-12 h-12 rounded-lg ${cat.color} flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
                 <div class="text-white">${getIcon(cat.icon, 22)}</div>
               </div>
-              <span class="font-medium text-white text-sm">${cat.label}</span>
+              <span class="font-medium text-gray-700 text-sm">${cat.label}</span>
             </a>
           `).join('')}
         </div>
