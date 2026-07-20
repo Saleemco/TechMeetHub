@@ -1,4 +1,4 @@
-// Shared UI Components for TechMeetHub
+// Shared UI Components for TechMeetHub - REDESIGNED
 
 import { Auth, categories } from './data.js';
 
@@ -38,36 +38,10 @@ const icons = {
   share: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>',
   globe: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>',
   briefcase: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>',
-  github: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>',
-  twitter: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>',
-  linkedin: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>',
-  info: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>',
-  alert: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>',
-  play: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>',
-  bookOpen: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>',
-  code: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>',
-  layers: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>',
-  cpu: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>',
   shield: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>',
-  database: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>',
-  send: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>',
-  eye: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>',
-  eyeOff: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>',
-  unlock: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>',
-  lock: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>',
-  download: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>',
-  upload: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>',
-  image: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>',
-  map: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 21 18 21 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>',
-  coffee: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>',
   sun: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>',
   moon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>',
-  bell: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>',
-  moreHorizontal: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>',
-  key: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>',
-  userPlus: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>',
-  barChart: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>',
-  list: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>',
+  chevronRight: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>',
 };
 
 export function getIcon(name, size = 16) {
@@ -75,7 +49,7 @@ export function getIcon(name, size = 16) {
   return svg.replace(/width="16" height="16"/g, `width="${size}" height="${size}"`);
 }
 
-// ===== DATE AND TIME FORMATTING FUNCTIONS =====
+// ===== DATE AND TIME FORMATTING =====
 export function formatDate(dateStr) {
   if (!dateStr) return 'Date TBD';
   try {
@@ -86,7 +60,7 @@ export function formatDate(dateStr) {
     if (isNaN(date.getTime())) {
       return 'Date TBD';
     }
-    const options = { weekday: 'short', month: 'short', day: 'numeric' };
+    const options = { month: 'short', day: 'numeric', year: 'numeric' };
     return date.toLocaleDateString('en-US', options);
   } catch (e) {
     return 'Date TBD';
@@ -138,486 +112,180 @@ export function getCategoryIcon(catId, size = 16) {
   return cat ? getIcon(cat.icon, size) : getIcon('zap', size);
 }
 
-export function getCategoryColor(catId) {
-  const cat = categories.find(c => c.id === catId);
-  return cat ? cat.color : 'category-meetup';
-}
-
-// ========== EVENT CARD ==========
-export async function EventCard(event, index = 0, user = null) {
-  const userId = user?.id || '';
-  const userRole = user?.role || '';
-  
-  // Safely handle missing organizer with fallbacks
-  const organizer = event.organizer || {
-    id: event.organizer_id || '',
-    name: event.organizer_name || 'Unknown Organizer',
-    avatar: event.organizer_avatar || '?',
-    initialsColor: event.organizer_initials_color || 'bg-gradient-to-br from-brand-500 to-violet-600'
-  };
-  
-  const isAttending = userId ? (event.attendees?.includes(userId) || false) : false;
-  const isOwnEvent = userId && organizer.id === userId;
-  const spotsLeft = (event.capacity || 0) - (event.attendees?.length || 0);
-  const isFull = spotsLeft <= 0;
-  const date = formatDate(event.date);
-  const time = formatTime(event.time);
-
-  let actionButton = '';
-  if (!user) {
-    actionButton = '';
-  } else if (userRole === 'participant') {
-    actionButton = `
-      <button 
-        onclick="window.handleRsvp('${event.id}')" 
-        class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all btn-primary ${isAttending ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-brand-500 text-white hover:bg-brand-600'}"
-        ${isFull && !isAttending ? 'disabled' : ''}
-      >
-        ${isAttending ? getIcon('check', 12) + ' Going' : 'Register'}
-      </button>
-    `;
-  } else if (userRole === 'organizer' && isOwnEvent) {
-    actionButton = `
-      <button onclick="window.navigateTo('/create?edit=${event.id}')" class="px-3 py-1.5 rounded-lg text-xs font-medium btn-secondary border hover:text-brand-500 transition-colors">
-        ${getIcon('edit', 12)} Edit
-      </button>
-    `;
-  } else {
-    actionButton = `
-      <button 
-        onclick="window.handleRsvp('${event.id}')" 
-        class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all btn-primary ${isAttending ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-brand-500 text-white hover:bg-brand-600'}"
-        ${isFull && !isAttending ? 'disabled' : ''}
-      >
-        ${isAttending ? getIcon('check', 12) + ' Going' : 'Register'}
-      </button>
-    `;
-  }
-
-  return `
-    <div class="event-card glass rounded-xl overflow-hidden animate-fade-in-up stagger-${Math.min(index + 1, 6)} opacity-0" style="animation-fill-mode: forwards;">
-      <div class="h-40 relative img-overlay">
-        <img src="${event.image || 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&h=400&fit=crop'}" alt="${event.title}" class="w-full h-full object-cover" loading="lazy" />
-        <div class="absolute inset-0 bg-gradient-to-t from-[#08080f] via-[#08080f]/50 to-transparent z-10"></div>
-        <div class="absolute inset-0 flex items-center justify-center z-20">
-          <div class="text-center">
-            <div class="w-12 h-12 rounded-full bg-input backdrop-blur flex items-center justify-center mx-auto mb-2 border border-white/20">
-              <div class="text-white/90">${getCategoryIcon(event.category, 24)}</div>
-            </div>
-            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium text-white/90 bg-input backdrop-blur border border-default">
-              ${getCategoryLabel(event.category)}
-            </span>
-          </div>
-        </div>
-        <div class="absolute top-3 right-3 z-20">
-          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${isFull ? 'bg-red-500/20 text-red-300 border border-red-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'}">
-            ${isFull ? 'Full' : `${spotsLeft} spots left`}
-          </span>
-        </div>
-      </div>
-      <div class="p-4">
-        <h3 class="font-semibold text-lg text-primary leading-tight mb-2 hover:text-brand-400 transition-colors cursor-pointer" onclick="window.navigateTo('/events/${event.id}')">${event.title}</h3>
-        <div class="flex items-center gap-3 text-sm text-secondary mb-3">
-          <span class="flex items-center gap-1">${getIcon('calendar', 14)} ${date}</span>
-          <span class="flex items-center gap-1">${getIcon('clock', 14)} ${time}</span>
-        </div>
-        <div class="flex items-center gap-1 text-sm text-secondary mb-3">
-          ${getIcon('mapPin', 14)}
-          <span class="truncate">${event.location}</span>
-        </div>
-        <div class="flex items-center gap-2 mb-3">
-          ${(event.tags || []).slice(0, 3).map(tag => `<span class="tag-pill">${tag}</span>`).join('')}
-        </div>
-        <div class="flex items-center justify-between pt-3 border-t border-default">
-          <div class="flex items-center gap-2">
-            <div class="w-7 h-7 rounded-full ${organizer.initialsColor} avatar-initials text-xs">${organizer.avatar}</div>
-            <span class="text-xs text-secondary">${organizer.name}</span>
-          </div>
-          ${actionButton}
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-export function EventListItem(event, isAttending = false) {
-  const date = formatDate(event.date);
-  return `
-    <div class="flex items-center gap-4 p-4 glass rounded-lg hover:bg-card-hover transition-colors cursor-pointer neon-border" onclick="window.navigateTo('/events/${event.id}')">
-      <img src="${event.image || 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=200&h=200&fit=crop'}" alt="" class="w-14 h-14 rounded-lg object-cover flex-shrink-0" />
-      <div class="flex-1 min-w-0">
-        <h4 class="font-medium text-primary truncate">${event.title}</h4>
-        <div class="flex items-center gap-2 text-sm text-secondary mt-1">
-          <span class="flex items-center gap-1">${getIcon('calendar', 12)} ${date}</span>
-          <span class="flex items-center gap-1">${getIcon('mapPin', 12)} ${event.location}</span>
-        </div>
-      </div>
-      <span class="px-2 py-1 rounded-full text-xs font-medium ${isAttending ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-brand-500/20 text-brand-400 border border-brand-500/30'}">
-        ${isAttending ? 'Attending' : getCategoryLabel(event.category)}
-      </span>
-    </div>
-  `;
-}
-
-// ========== HEADER FUNCTION ==========
+// ========== HEADER WITH SIDEBAR ==========
 export function Header(user = null) {
   const isLoggedIn = !!user;
   const role = user?.role || '';
+  const isAdmin = role === 'admin';
+  const isOrganizer = role === 'organizer';
+  const isParticipant = role === 'participant';
 
-  // Check if we're on the admin dashboard
-  const pathname = window.location.pathname || '/';
-  const isAdminDashboard = pathname === '/dashboard' && user?.role === 'admin';
-
-  // If admin dashboard, show ONLY the logo and logout button
-  if (isAdminDashboard) {
-    return `
-      <nav class="fixed top-0 left-0 right-0 z-50 glass-dark border-b border-default">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex items-center justify-between h-16">
-            <div class="flex items-center gap-8">
-              <a href="/" class="flex items-center gap-2 group" data-navigate>
-                <div class="w-8 h-8 rounded-lg gradient-violet flex items-center justify-center">
-                  <span class="text-white font-bold text-sm">T</span>
-                </div>
-                <span class="font-bold text-lg text-primary group-hover:text-brand-400 transition-colors">TechMeetHub</span>
-              </a>
-            </div>
-            <div class="flex items-center gap-3">
-              <button onclick="window.logout()" class="px-3 py-1.5 rounded-lg text-xs font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors">
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-      <div class="h-16"></div>
-    `;
-  }
-
-  // If organizer is logged in (any page), show organizer nav (no Home link)
-  if (isLoggedIn && role === 'organizer') {
-    const organizerNavLinks = [
+  // Sidebar navigation items based on role
+  let navItems = [];
+  
+  if (isAdmin) {
+    navItems = [
       { href: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
       { href: '/events', label: 'Events', icon: 'calendar' },
+      { href: '/profile', label: 'Profile', icon: 'user' },
+    ];
+  } else if (isOrganizer) {
+    navItems = [
+      { href: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
+      { href: '/events', label: 'My Events', icon: 'calendar' },
       { href: '/create', label: 'Create Event', icon: 'plus' },
       { href: '/profile', label: 'Profile', icon: 'user' },
     ];
-
-    const themeToggleBtn = `
-      <button onclick="window.toggleTheme()" class="theme-toggle" title="Toggle theme">
-        <span class="sun-icon">${getIcon('sun', 18)}</span>
-        <span class="moon-icon">${getIcon('moon', 18)}</span>
-      </button>
-    `;
-
-    return `
-      <nav class="fixed top-0 left-0 right-0 z-50 glass-dark border-b border-default">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex items-center justify-between h-16">
-            <div class="flex items-center gap-8">
-              <a href="/" class="flex items-center gap-2 group" data-navigate>
-                <div class="w-8 h-8 rounded-lg gradient-violet flex items-center justify-center">
-                  <span class="text-white font-bold text-sm">T</span>
-                </div>
-                <span class="font-bold text-lg text-primary group-hover:text-brand-400 transition-colors">TechMeetHub</span>
-              </a>
-              <div class="hidden md:flex items-center gap-1">
-                ${organizerNavLinks.map(link => `
-                  <a href="${link.href}" class="nav-link px-3 py-2 rounded-lg text-sm font-medium text-secondary hover:text-primary hover:bg-card-hover transition-colors" data-route="${link.href}" data-navigate>
-                    <span class="flex items-center gap-1.5">${getIcon(link.icon, 14)} ${link.label}</span>
-                  </a>
-                `).join('')}
-              </div>
-            </div>
-            <div class="flex items-center gap-3">
-              ${themeToggleBtn}
-              <a href="/profile" class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-card-hover transition-colors" data-navigate>
-                <div class="w-8 h-8 rounded-full ${user.initialsColor || 'bg-gradient-to-br from-brand-500 to-violet-600'} avatar-initials text-sm">${user.avatar || '?'}</div>
-                <span class="text-sm font-medium text-secondary hidden sm:inline">${user.name || 'User'}</span>
-              </a>
-              <button onclick="window.logout()" class="p-2 rounded-lg text-secondary hover:text-primary hover:bg-card-hover transition-colors" title="Logout">
-                ${getIcon('logout', 18)}
-              </button>
-            </div>
-            <button class="md:hidden p-2 rounded-lg text-secondary hover:text-primary hover:bg-card-hover" onclick="window.toggleMobileMenu()">
-              ${getIcon('menu', 20)}
-            </button>
-          </div>
-        </div>
-      </nav>
-      <div class="h-16"></div>
-      <div id="mobile-menu" class="mobile-menu fixed inset-0 z-50 md:hidden">
-        <div class="p-4">
-          <div class="flex items-center justify-between mb-8">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-lg gradient-violet flex items-center justify-center">
-                <span class="text-white font-bold text-sm">T</span>
-              </div>
-              <span class="font-bold text-lg text-primary">TechMeetHub</span>
-            </div>
-            <button onclick="window.toggleMobileMenu()" class="p-2 rounded-lg text-secondary hover:text-primary">
-              ${getIcon('x', 20)}
-            </button>
-          </div>
-          <div class="flex flex-col gap-2">
-            ${organizerNavLinks.map(link => `
-              <a href="${link.href}" data-navigate onclick="window.navigateTo('${link.href}'); window.toggleMobileMenu();" class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary hover:text-primary hover:bg-card-hover transition-colors">
-                ${getIcon(link.icon, 18)} ${link.label}
-              </a>
-            `).join('')}
-            <button onclick="window.toggleTheme(); window.toggleMobileMenu();" class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary hover:text-primary hover:bg-card-hover transition-colors text-left w-full">
-              <span class="sun-icon inline">${getIcon('sun', 18)}</span>
-              <span class="moon-icon inline">${getIcon('moon', 18)}</span>
-              <span>Toggle Theme</span>
-            </button>
-            <button onclick="window.logout(); window.toggleMobileMenu();" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors text-left">
-              ${getIcon('logout', 18)} Logout
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // If participant is logged in (any page), show participant nav (no Home link)
-  if (isLoggedIn && role === 'participant') {
-    const participantNavLinks = [
+  } else if (isParticipant) {
+    navItems = [
       { href: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
-      { href: '/events', label: 'Events', icon: 'calendar' },
+      { href: '/events', label: 'Browse Events', icon: 'calendar' },
       { href: '/profile', label: 'Profile', icon: 'user' },
     ];
+  } else {
+    navItems = [
+      { href: '/', label: 'Home', icon: 'home' },
+      { href: '/events', label: 'Events', icon: 'calendar' },
+    ];
+  }
 
-    const themeToggleBtn = `
-      <button onclick="window.toggleTheme()" class="theme-toggle" title="Toggle theme">
-        <span class="sun-icon">${getIcon('sun', 18)}</span>
-        <span class="moon-icon">${getIcon('moon', 18)}</span>
-      </button>
-    `;
+  const userAvatar = user?.avatar || '?';
+  const userName = user?.name || 'Guest';
+  const userInitials = user?.avatar || '?';
+  const userRoleLabel = role.charAt(0).toUpperCase() + role.slice(1) || 'Guest';
 
-    return `
-      <nav class="fixed top-0 left-0 right-0 z-50 glass-dark border-b border-default">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex items-center justify-between h-16">
-            <div class="flex items-center gap-8">
-              <a href="/" class="flex items-center gap-2 group" data-navigate>
-                <div class="w-8 h-8 rounded-lg gradient-violet flex items-center justify-center">
-                  <span class="text-white font-bold text-sm">T</span>
-                </div>
-                <span class="font-bold text-lg text-primary group-hover:text-brand-400 transition-colors">TechMeetHub</span>
-              </a>
-              <div class="hidden md:flex items-center gap-1">
-                ${participantNavLinks.map(link => `
-                  <a href="${link.href}" class="nav-link px-3 py-2 rounded-lg text-sm font-medium text-secondary hover:text-primary hover:bg-card-hover transition-colors" data-route="${link.href}" data-navigate>
-                    <span class="flex items-center gap-1.5">${getIcon(link.icon, 14)} ${link.label}</span>
-                  </a>
-                `).join('')}
-              </div>
+  return `
+    <!-- Top Navigation Bar -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0f] border-b border-white/5 h-16">
+      <div class="flex items-center justify-between h-full px-4 lg:px-6">
+        <div class="flex items-center gap-3">
+          <button onclick="window.toggleSidebar()" class="lg:hidden text-gray-400 hover:text-white transition-colors">
+            ${getIcon('menu', 22)}
+          </button>
+          <a href="/" data-navigate class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+              <span class="text-white font-bold text-sm">TM</span>
             </div>
+            <span class="text-lg font-bold text-white hidden sm:block">TechMeetHub</span>
+          </a>
+        </div>
+        <div class="flex items-center gap-3">
+          ${isLoggedIn ? `
             <div class="flex items-center gap-3">
-              ${themeToggleBtn}
-              <a href="/profile" class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-card-hover transition-colors" data-navigate>
-                <div class="w-8 h-8 rounded-full ${user.initialsColor || 'bg-gradient-to-br from-brand-500 to-violet-600'} avatar-initials text-sm">${user.avatar || '?'}</div>
-                <span class="text-sm font-medium text-secondary hidden sm:inline">${user.name || 'User'}</span>
-              </a>
-              <button onclick="window.logout()" class="p-2 rounded-lg text-secondary hover:text-primary hover:bg-card-hover transition-colors" title="Logout">
+              <button onclick="window.toggleTheme()" class="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
+                ${getIcon('sun', 18)}
+              </button>
+              <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/5">
+                <div class="w-7 h-7 rounded-full ${user?.initialsColor || 'bg-gradient-to-br from-purple-500 to-pink-500'} avatar-initials text-xs">${userInitials}</div>
+                <span class="text-sm text-gray-300 hidden sm:inline">${userName}</span>
+              </div>
+              <button onclick="window.logout()" class="p-2 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors" title="Logout">
                 ${getIcon('logout', 18)}
               </button>
             </div>
-            <button class="md:hidden p-2 rounded-lg text-secondary hover:text-primary hover:bg-card-hover" onclick="window.toggleMobileMenu()">
-              ${getIcon('menu', 20)}
-            </button>
-          </div>
-        </div>
-      </nav>
-      <div class="h-16"></div>
-      <div id="mobile-menu" class="mobile-menu fixed inset-0 z-50 md:hidden">
-        <div class="p-4">
-          <div class="flex items-center justify-between mb-8">
+          ` : `
             <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-lg gradient-violet flex items-center justify-center">
-                <span class="text-white font-bold text-sm">T</span>
-              </div>
-              <span class="font-bold text-lg text-primary">TechMeetHub</span>
+              <button onclick="window.toggleTheme()" class="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
+                ${getIcon('sun', 18)}
+              </button>
+              <a href="/login" data-navigate class="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Sign In</a>
+              <a href="/register" data-navigate class="px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 transition-opacity">Get Started</a>
             </div>
-            <button onclick="window.toggleMobileMenu()" class="p-2 rounded-lg text-secondary hover:text-primary">
-              ${getIcon('x', 20)}
-            </button>
-          </div>
-          <div class="flex flex-col gap-2">
-            ${participantNavLinks.map(link => `
-              <a href="${link.href}" data-navigate onclick="window.navigateTo('${link.href}'); window.toggleMobileMenu();" class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary hover:text-primary hover:bg-card-hover transition-colors">
-                ${getIcon(link.icon, 18)} ${link.label}
-              </a>
-            `).join('')}
-            <button onclick="window.toggleTheme(); window.toggleMobileMenu();" class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary hover:text-primary hover:bg-card-hover transition-colors text-left w-full">
-              <span class="sun-icon inline">${getIcon('sun', 18)}</span>
-              <span class="moon-icon inline">${getIcon('moon', 18)}</span>
-              <span>Toggle Theme</span>
-            </button>
-            <button onclick="window.logout(); window.toggleMobileMenu();" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors text-left">
-              ${getIcon('logout', 18)} Logout
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // Regular navigation for non-logged in users only (shows Home and Events)
-  const navLinks = [
-    { href: '/', label: 'Home', icon: 'home' }, 
-    { href: '/events', label: 'Events', icon: 'calendar' }
-  ];
-
-  const themeToggleBtn = `
-    <button onclick="window.toggleTheme()" class="theme-toggle" title="Toggle theme">
-      <span class="sun-icon">${getIcon('sun', 18)}</span>
-      <span class="moon-icon">${getIcon('moon', 18)}</span>
-    </button>
-  `;
-
-  const authSection = isLoggedIn ? `
-    <div class="hidden md:flex items-center gap-3">
-      ${themeToggleBtn}
-      ${role === 'organizer' || role === 'admin' ? `
-        <a href="/create" class="px-4 py-2 rounded-lg text-sm font-medium bg-brand-500 text-white hover:bg-brand-600 transition-colors flex items-center gap-1.5" data-navigate>
-          ${getIcon('plus', 14)} Create Event
-        </a>
-      ` : ''}
-      <a href="/profile" class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-card-hover transition-colors" data-navigate>
-        <div class="w-8 h-8 rounded-full ${user.initialsColor || 'bg-gradient-to-br from-brand-500 to-violet-600'} avatar-initials text-sm">${user.avatar || '?'}</div>
-        <span class="text-sm font-medium text-secondary">${user.name || 'User'}</span>
-      </a>
-      <button onclick="window.logout()" class="p-2 rounded-lg text-secondary hover:text-primary hover:bg-card-hover transition-colors" title="Logout">
-        ${getIcon('logout', 18)}
-      </button>
-    </div>
-  ` : `
-    <div class="hidden md:flex items-center gap-3">
-      ${themeToggleBtn}
-      <a href="/login" class="px-4 py-2 rounded-lg text-sm font-medium text-secondary hover:text-primary hover:bg-card-hover transition-colors" data-navigate>Sign In</a>
-      <a href="/register" class="px-4 py-2 rounded-lg text-sm font-medium bg-brand-500 text-white hover:bg-brand-600 transition-colors" data-navigate>Get Started</a>
-    </div>
-  `;
-
-  const mobileAuthLinks = isLoggedIn ? `
-    <a href="/profile" data-navigate onclick="window.toggleMobileMenu()" class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary hover:text-primary hover:bg-card-hover transition-colors">${getIcon('user', 18)} Profile</a>
-    <button onclick="window.logout(); window.toggleMobileMenu();" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors text-left">${getIcon('logout', 18)} Logout</button>
-  ` : `
-    <a href="/login" data-navigate onclick="window.toggleMobileMenu()" class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary hover:text-primary hover:bg-card-hover transition-colors">${getIcon('lock', 18)} Sign In</a>
-    <a href="/register" data-navigate onclick="window.toggleMobileMenu()" class="flex items-center gap-3 px-4 py-3 rounded-lg text-brand-400 hover:bg-brand-500/10 transition-colors">${getIcon('userPlus', 18)} Get Started</a>
-  `;
-
-  const mobileCreateLink = (role === 'organizer' || role === 'admin') ? `
-    <a href="/create" data-navigate onclick="window.toggleMobileMenu()" class="flex items-center gap-3 px-4 py-3 rounded-lg text-brand-400 hover:bg-brand-500/10 transition-colors">${getIcon('plus', 18)} Create Event</a>
-  ` : '';
-
-  const mobileAdminLink = role === 'admin' ? `
-    <a href="/admin" data-navigate onclick="window.toggleMobileMenu()" class="flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors">${getIcon('shield', 18)} Admin</a>
-  ` : '';
-
-  const mobileThemeToggle = `
-    <button onclick="window.toggleTheme(); window.toggleMobileMenu();" class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary hover:text-primary hover:bg-card-hover transition-colors text-left w-full">
-      <span class="sun-icon inline">${getIcon('sun', 18)}</span>
-      <span class="moon-icon inline">${getIcon('moon', 18)}</span>
-      <span>Toggle Theme</span>
-    </button>
-  `;
-
-  return `
-    <nav class="fixed top-0 left-0 right-0 z-50 glass-dark border-b border-default">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16">
-          <div class="flex items-center gap-8">
-            <a href="/" class="flex items-center gap-2 group" data-navigate>
-              <div class="w-8 h-8 rounded-lg gradient-violet flex items-center justify-center">
-                <span class="text-white font-bold text-sm">T</span>
-              </div>
-              <span class="font-bold text-lg text-primary group-hover:text-brand-400 transition-colors">TechMeetHub</span>
-            </a>
-            <div class="hidden md:flex items-center gap-1">
-              ${navLinks.map(link => `
-                <a href="${link.href}" class="nav-link px-3 py-2 rounded-lg text-sm font-medium text-secondary hover:text-primary hover:bg-card-hover transition-colors" data-route="${link.href}" data-navigate>
-                  <span class="flex items-center gap-1.5">${getIcon(link.icon, 14)} ${link.label}</span>
-                </a>
-              `).join('')}
-            </div>
-          </div>
-          ${authSection}
-          <button class="md:hidden p-2 rounded-lg text-secondary hover:text-primary hover:bg-card-hover" onclick="window.toggleMobileMenu()">
-            ${getIcon('menu', 20)}
-          </button>
+          `}
         </div>
       </div>
     </nav>
-    <div class="h-16"></div>
-    <div id="mobile-menu" class="mobile-menu fixed inset-0 z-50 md:hidden">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed top-16 left-0 bottom-0 z-40 w-64 bg-[#0a0a0f] border-r border-white/5 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 overflow-y-auto">
       <div class="p-4">
-        <div class="flex items-center justify-between mb-8">
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-lg gradient-violet flex items-center justify-center">
-              <span class="text-white font-bold text-sm">T</span>
+        ${isLoggedIn ? `
+          <div class="mb-6 p-3 rounded-xl bg-white/5 border border-white/5">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full ${user?.initialsColor || 'bg-gradient-to-br from-purple-500 to-pink-500'} avatar-initials text-sm">${userInitials}</div>
+              <div>
+                <div class="text-sm font-medium text-white">${userName}</div>
+                <div class="text-xs text-gray-400">${userRoleLabel}</div>
+              </div>
             </div>
-            <span class="font-bold text-lg text-primary">TechMeetHub</span>
           </div>
-          <button onclick="window.toggleMobileMenu()" class="p-2 rounded-lg text-secondary hover:text-primary">
-            ${getIcon('x', 20)}
-          </button>
-        </div>
-        <div class="flex flex-col gap-2">
-          ${navLinks.map(link => `
-            <a href="${link.href}" data-navigate onclick="window.navigateTo('${link.href}'); window.toggleMobileMenu();" class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary hover:text-primary hover:bg-card-hover transition-colors">
-              ${getIcon(link.icon, 18)} ${link.label}
+        ` : ''}
+        <div class="space-y-1">
+          ${navItems.map(item => `
+            <a href="${item.href}" data-navigate class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors" data-route="${item.href}">
+              ${getIcon(item.icon, 18)}
+              <span class="text-sm font-medium">${item.label}</span>
             </a>
           `).join('')}
-          ${mobileCreateLink}
-          ${mobileAdminLink}
-          ${mobileThemeToggle}
-          ${mobileAuthLinks}
+          ${isLoggedIn ? `
+            <button onclick="window.logout()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors mt-4">
+              ${getIcon('logout', 18)}
+              <span class="text-sm font-medium">Logout</span>
+            </button>
+          ` : ''}
         </div>
       </div>
-    </div>
+    </aside>
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div id="sidebar-overlay" class="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm hidden lg:hidden" onclick="window.closeSidebar()"></div>
+
+    <style>
+      .sidebar-link.active {
+        color: #a78bfa;
+        background: rgba(167, 139, 250, 0.08);
+        border: 1px solid rgba(167, 139, 250, 0.15);
+      }
+      .sidebar-link.active svg {
+        color: #a78bfa;
+      }
+      .sidebar-link {
+        border: 1px solid transparent;
+      }
+    </style>
   `;
 }
+
+// ===== SIDEBAR TOGGLE FUNCTIONS =====
+window.toggleSidebar = function() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  if (sidebar) {
+    sidebar.classList.toggle('-translate-x-full');
+    if (overlay) {
+      overlay.classList.toggle('hidden');
+    }
+  }
+};
+
+window.closeSidebar = function() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
+    sidebar.classList.add('-translate-x-full');
+    if (overlay) {
+      overlay.classList.add('hidden');
+    }
+  }
+};
 
 // ========== FOOTER ==========
 export function Footer() {
   return `
-    <footer class="mt-16">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div class="col-span-1 md:col-span-2">
-            <div class="flex items-center gap-2 mb-4">
-              <div class="w-8 h-8 rounded-lg gradient-violet flex items-center justify-center">
-                <span class="text-white font-bold text-sm">T</span>
-              </div>
-              <span class="font-bold text-lg text-primary">TechMeetHub</span>
+    <footer class="bg-[#0a0a0f] border-t border-white/5 mt-auto">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+              <span class="text-white font-bold text-[10px]">TM</span>
             </div>
-            <p class="text-secondary text-sm max-w-sm">Connect with the tech community. Discover events, meet like-minded developers, and grow together.</p>
+            <span class="text-sm text-gray-400">TechMeetHub</span>
           </div>
-          <div>
-            <h4 class="font-semibold text-gray-200 mb-3 text-sm">Platform</h4>
-            <ul class="space-y-2">
-              <li><a href="/events" data-navigate class="text-secondary hover:text-brand-400 text-sm transition-colors">Browse Events</a></li>
-              <li><a href="/create" data-navigate class="text-secondary hover:text-brand-400 text-sm transition-colors">Create Event</a></li>
-              <li><a href="/dashboard" data-navigate class="text-secondary hover:text-brand-400 text-sm transition-colors">My Dashboard</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 class="font-semibold text-gray-200 mb-3 text-sm">Community</h4>
-            <ul class="space-y-2">
-              <li><span class="text-secondary text-sm">About</span></li>
-              <li><span class="text-secondary text-sm">Guidelines</span></li>
-              <li><span class="text-secondary text-sm">Support</span></li>
-            </ul>
-          </div>
-        </div>
-        <div class="border-t border-default mt-8 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p class="text-muted text-sm"> TechMeetHub. Built for the tech community.</p>
+          <p class="text-xs text-gray-500">Built for the tech community.</p>
           <div class="flex items-center gap-4">
-            <span class="text-secondary hover:text-primary transition-colors cursor-pointer">${getIcon('github', 18)}</span>
-            <span class="text-secondary hover:text-primary transition-colors cursor-pointer">${getIcon('twitter', 18)}</span>
-            <span class="text-secondary hover:text-primary transition-colors cursor-pointer">${getIcon('linkedin', 18)}</span>
+            <span class="text-gray-500 hover:text-gray-300 transition-colors cursor-pointer text-sm">About</span>
+            <span class="text-gray-500 hover:text-gray-300 transition-colors cursor-pointer text-sm">Guidelines</span>
+            <span class="text-gray-500 hover:text-gray-300 transition-colors cursor-pointer text-sm">Support</span>
           </div>
         </div>
       </div>
@@ -639,10 +307,10 @@ export function showToast(message, type = 'success') {
   const colors = {
     success: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400',
     error: 'bg-red-500/10 border-red-500/30 text-red-400',
-    info: 'bg-brand-500/10 border-brand-500/30 text-brand-400',
+    info: 'bg-purple-500/10 border-purple-500/30 text-purple-400',
   };
 
-  toast.className = `px-4 py-3 rounded-lg border glass toast ${colors[type] || colors.success}`;
+  toast.className = `px-4 py-3 rounded-lg border glass toast ${colors[type] || colors.success} max-w-md`;
   toast.innerHTML = `
     <div class="flex items-center gap-2">
       ${type === 'success' ? getIcon('check', 16) : type === 'error' ? getIcon('alert', 16) : getIcon('info', 16)}
@@ -660,16 +328,28 @@ export function showToast(message, type = 'success') {
   }, 3000);
 }
 
-// ========== EMPTY STATE ==========
-export function EmptyState({ icon, title, message, action }) {
+// ========== STAT CARD ==========
+export function StatCard({ icon, value, label, color = 'purple', change }) {
+  const colorMap = {
+    purple: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+    emerald: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+    amber: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+    rose: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
+    cyan: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
+    blue: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+  };
+  const colorClass = colorMap[color] || colorMap.purple;
+
   return `
-    <div class="flex flex-col items-center justify-center py-16 text-center">
-      <div class="w-16 h-16 rounded-full bg-input flex items-center justify-center mb-4">
-        <div class="text-muted">${getIcon(icon, 28)}</div>
+    <div class="stat-card glass rounded-xl p-5 border border-white/5 hover:border-white/10 transition-all hover:shadow-lg">
+      <div class="flex items-center justify-between mb-3">
+        <div class="w-10 h-10 rounded-lg ${colorClass} flex items-center justify-center border">
+          ${getIcon(icon, 18)}
+        </div>
+        ${change ? `<span class="text-xs font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">${change}</span>` : ''}
       </div>
-      <h3 class="text-lg font-semibold text-secondary mb-2">${title}</h3>
-      <p class="text-muted text-sm max-w-sm mb-6">${message}</p>
-      ${action ? `<a href="${action.href}" data-navigate class="px-4 py-2 rounded-lg text-sm font-medium bg-brand-500 text-white hover:bg-brand-600 transition-colors">${action.label}</a>` : ''}
+      <div class="text-2xl font-bold text-white">${value}</div>
+      <div class="text-sm text-gray-400 mt-0.5">${label}</div>
     </div>
   `;
 }
@@ -677,66 +357,46 @@ export function EmptyState({ icon, title, message, action }) {
 // ========== SECTION TITLE ==========
 export function SectionTitle({ title, subtitle, action }) {
   return `
-    <div class="flex items-end justify-between mb-6">
+    <div class="flex items-center justify-between mb-6">
       <div>
-        <h2 class="text-2xl font-bold text-primary">${title}</h2>
-        ${subtitle ? `<p class="text-secondary mt-1">${subtitle}</p>` : ''}
+        <h2 class="text-xl font-semibold text-white">${title}</h2>
+        ${subtitle ? `<p class="text-sm text-gray-400 mt-0.5">${subtitle}</p>` : ''}
       </div>
-      ${action ? `<a href="${action.href}" data-navigate class="text-sm font-medium text-brand-400 hover:text-brand-300 transition-colors">${action.label} ${getIcon('arrowRight', 14)}</a>` : ''}
+      ${action ? `<a href="${action.href}" data-navigate class="text-sm font-medium text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1">${action.label} ${getIcon('arrowRight', 14)}</a>` : ''}
     </div>
   `;
 }
 
-// ========== STAT CARD ==========
-export function StatCard({ icon, value, label, color = 'brand' }) {
-  const colorMap = {
-    brand: 'text-brand-400 bg-brand-500/10',
-    accent: 'text-accent-400 bg-accent-500/10',
-    emerald: 'text-emerald-400 bg-emerald-500/10',
-    amber: 'text-amber-400 bg-amber-500/10',
-    rose: 'text-rose-400 bg-rose-500/10',
-    cyan: 'text-cyan-400 bg-cyan-500/10',
-  };
-  const colorClass = colorMap[color] || colorMap.brand;
-
+// ========== EMPTY STATE ==========
+export function EmptyState({ icon, title, message, action }) {
   return `
-    <div class="stat-card rounded-xl p-5">
-      <div class="w-10 h-10 rounded-lg ${colorClass} flex items-center justify-center mb-3">
-        <div>${getIcon(icon, 20)}</div>
+    <div class="flex flex-col items-center justify-center py-16 text-center">
+      <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+        ${getIcon(icon, 28)}
       </div>
-      <div class="text-2xl font-bold text-primary">${value}</div>
-      <div class="text-sm text-secondary mt-1">${label}</div>
+      <h3 class="text-lg font-medium text-white mb-2">${title}</h3>
+      <p class="text-gray-400 text-sm max-w-sm mb-6">${message}</p>
+      ${action ? `<a href="${action.href}" data-navigate class="px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 transition-opacity">${action.label}</a>` : ''}
     </div>
   `;
 }
 
 // ========== INPUT ==========
 export function Input({ label, name, type = 'text', placeholder, value = '', required = false, rows, maxLength, min, max }) {
-  const inputClass = "w-full px-4 py-2.5 input-shell placeholder-gray-500";
+  const inputClass = "w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors";
 
   if (type === 'textarea') {
     return `
       <div class="mb-4">
-        <label class="block text-sm font-medium text-secondary mb-1.5">${label}${required ? ' <span class="text-red-400">*</span>' : ''}</label>
+        <label class="block text-sm font-medium text-gray-300 mb-1.5">${label}${required ? ' <span class="text-red-400">*</span>' : ''}</label>
         <textarea name="${name}" placeholder="${placeholder || ''}" ${required ? 'required' : ''} rows="${rows || 4}" maxlength="${maxLength || ''}" class="${inputClass} resize-none">${value}</textarea>
-      </div>
-    `;
-  }
-
-  if (type === 'select') {
-    return `
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-secondary mb-1.5">${label}${required ? ' <span class="text-red-400">*</span>' : ''}</label>
-        <select name="${name}" ${required ? 'required' : ''} class="${inputClass}">
-          ${placeholder ? `<option value="" disabled selected>${placeholder}</option>` : ''}
-        </select>
       </div>
     `;
   }
 
   return `
     <div class="mb-4">
-      <label class="block text-sm font-medium text-secondary mb-1.5">${label}${required ? ' <span class="text-red-400">*</span>' : ''}</label>
+      <label class="block text-sm font-medium text-gray-300 mb-1.5">${label}${required ? ' <span class="text-red-400">*</span>' : ''}</label>
       <input type="${type}" name="${name}" placeholder="${placeholder || ''}" value="${value}" ${required ? 'required' : ''} ${min ? `min="${min}"` : ''} ${max ? `max="${max}"` : ''} class="${inputClass}" />
     </div>
   `;
@@ -745,17 +405,107 @@ export function Input({ label, name, type = 'text', placeholder, value = '', req
 // ========== BUTTON ==========
 export function Button({ label, type = 'button', variant = 'primary', icon, fullWidth = false, onclick, disabled = false }) {
   const variants = {
-    primary: 'bg-brand-500 text-white hover:bg-brand-600',
-    secondary: 'bg-input text-gray-200 hover:bg-card-hover border border-default',
-    outline: 'bg-transparent border border-default text-secondary hover:bg-card-hover',
+    primary: 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90',
+    secondary: 'bg-white/5 text-white hover:bg-white/10 border border-white/10',
     danger: 'bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30',
-    ghost: 'text-secondary hover:text-primary hover:bg-card-hover',
+    outline: 'bg-transparent border border-white/10 text-gray-300 hover:bg-white/5',
   };
 
   return `
-    <button type="${type}" ${onclick ? `onclick="${onclick}"` : ''} ${disabled ? 'disabled' : ''} class="px-4 py-2.5 rounded-lg text-sm font-medium transition-all btn-primary ${variants[variant] || variants.primary} ${fullWidth ? 'w-full' : ''} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}">
-      ${icon ? `<span class="inline-flex items-center gap-1.5">${icon} ${label}</span>` : label}
+    <button type="${type}" ${onclick ? `onclick="${onclick}"` : ''} ${disabled ? 'disabled' : ''} class="px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${variants[variant] || variants.primary} ${fullWidth ? 'w-full' : ''} ${disabled ? 'opacity-50 cursor-not-allowed' : ''} flex items-center justify-center gap-2">
+      ${icon ? `${icon}` : ''} ${label}
     </button>
+  `;
+}
+
+// ========== EVENT CARD ==========
+export async function EventCard(event, index = 0, user = null) {
+  const userId = user?.id || '';
+  const userRole = user?.role || '';
+  
+  const organizer = event.organizer || {
+    id: event.organizer_id || '',
+    name: event.organizer_name || 'Unknown Organizer',
+    avatar: event.organizer_avatar || '?',
+    initialsColor: event.organizer_initials_color || 'bg-gradient-to-br from-purple-500 to-pink-500'
+  };
+  
+  const isAttending = userId ? (event.attendees?.includes(userId) || false) : false;
+  const spotsLeft = (event.capacity || 0) - (event.attendees?.length || 0);
+  const isFull = spotsLeft <= 0;
+  const date = formatDate(event.date);
+  const time = formatTime(event.time);
+
+  let actionButton = '';
+  if (!user) {
+    actionButton = '';
+  } else if (userRole === 'participant' || userRole === 'organizer' || userRole === 'admin') {
+    actionButton = `
+      <button 
+        onclick="window.handleRsvp('${event.id}')" 
+        class="px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${isAttending ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90'}"
+        ${isFull && !isAttending ? 'disabled' : ''}
+      >
+        ${isAttending ? 'Registered' : isFull ? 'Full' : 'Register'}
+      </button>
+    `;
+  }
+
+  return `
+    <div class="glass rounded-xl overflow-hidden border border-white/5 hover:border-white/10 transition-all hover:shadow-lg">
+      <div class="h-40 relative">
+        <img src="${event.image || 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&h=400&fit=crop'}" alt="${event.title}" class="w-full h-full object-cover" />
+        <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent to-transparent"></div>
+        <div class="absolute top-3 right-3">
+          <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium ${isFull ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}">
+            ${isFull ? 'Full' : `${spotsLeft} spots`}
+          </span>
+        </div>
+        <div class="absolute bottom-3 left-3">
+          <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-white/10 backdrop-blur text-white/90 border border-white/10">
+            ${getCategoryLabel(event.category)}
+          </span>
+        </div>
+      </div>
+      <div class="p-4">
+        <h3 class="font-semibold text-lg text-white leading-tight mb-2 hover:text-purple-400 transition-colors cursor-pointer" onclick="window.navigateTo('/events/${event.id}')">${event.title}</h3>
+        <div class="flex items-center gap-3 text-sm text-gray-400 mb-2">
+          <span class="flex items-center gap-1">${getIcon('calendar', 12)} ${date}</span>
+          <span class="flex items-center gap-1">${getIcon('clock', 12)} ${time}</span>
+        </div>
+        <div class="flex items-center gap-1 text-sm text-gray-400 mb-3">
+          ${getIcon('mapPin', 12)}
+          <span class="truncate">${event.location}</span>
+        </div>
+        <div class="flex items-center justify-between pt-3 border-t border-white/5">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-full ${organizer.initialsColor} avatar-initials text-[10px]">${organizer.avatar}</div>
+            <span class="text-xs text-gray-400">${organizer.name}</span>
+          </div>
+          ${actionButton}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ========== EVENT LIST ITEM ==========
+export function EventListItem(event, isAttending = false) {
+  const date = formatDate(event.date);
+  return `
+    <div class="flex items-center gap-4 p-4 glass rounded-xl border border-white/5 hover:border-white/10 transition-all cursor-pointer" onclick="window.navigateTo('/events/${event.id}')">
+      <img src="${event.image || 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=200&h=200&fit=crop'}" alt="" class="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+      <div class="flex-1 min-w-0">
+        <h4 class="font-medium text-white truncate">${event.title}</h4>
+        <div class="flex items-center gap-3 text-xs text-gray-400 mt-0.5">
+          <span class="flex items-center gap-1">${getIcon('calendar', 10)} ${date}</span>
+          <span class="flex items-center gap-1">${getIcon('mapPin', 10)} ${event.location}</span>
+        </div>
+      </div>
+      <span class="px-2 py-1 rounded-full text-xs font-medium ${isAttending ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-purple-500/20 text-purple-400 border border-purple-500/30'}">
+        ${isAttending ? 'Attending' : getCategoryLabel(event.category)}
+      </span>
+    </div>
   `;
 }
 
