@@ -19,7 +19,6 @@ window.toggleMobileMenu = () => {
   if (menu) menu.classList.toggle('open');
 };
 
-// Sidebar functions
 window.toggleSidebar = () => {
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebar-overlay');
@@ -50,8 +49,7 @@ window.logout = async () => {
 };
 
 window.toggleTheme = () => {
-  // Force light theme - disable toggle
-  showToast('Theme switching is disabled', 'info');
+  showToast('Theme switching is disabled in light mode', 'info');
 };
 
 let isRsvpProcessing = false;

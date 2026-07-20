@@ -12,41 +12,43 @@ export async function HomePage() {
   ]);
 
   return `
-    <div class="page-transition">
+    <div class="page-transition max-w-7xl mx-auto">
       <!-- Hero Section -->
       <section class="relative rounded-2xl overflow-hidden mb-12 bg-gradient-to-r from-blue-600 to-indigo-700">
-        <div class="relative z-10 px-6 py-16 md:py-24 max-w-2xl">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white/90 text-xs font-medium mb-4">
-            ${getIcon('zap', 12)} The tech community's favorite event platform
-          </div>
-          <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4">
-            Connect. Learn. <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-indigo-200">Build.</span>
-          </h1>
-          <p class="text-white/80 text-lg mb-6 max-w-xl">
-            Discover hackathons, meetups, workshops, and conferences. Join thousands of developers building the future together.
-          </p>
-          <div class="flex flex-wrap items-center gap-3">
-            <a href="/events" data-navigate class="px-6 py-3 rounded-lg text-sm font-semibold bg-white text-blue-600 hover:bg-blue-50 transition-colors flex items-center gap-2">
-              Explore Events ${getIcon('arrowRight', 16)}
-            </a>
-            ${!user ? `
-              <a href="/register" data-navigate class="px-6 py-3 rounded-lg text-sm font-semibold bg-white/10 text-white hover:bg-white/20 transition-colors border border-white/20 flex items-center gap-2">
-                ${getIcon('userPlus', 16)} Join Free
-              </a>
-            ` : user.role === 'organizer' ? `
-              <a href="/create" data-navigate class="px-6 py-3 rounded-lg text-sm font-semibold bg-white/10 text-white hover:bg-white/20 transition-colors border border-white/20 flex items-center gap-2">
-                ${getIcon('plus', 16)} Host an Event
-              </a>
-            ` : ''}
-          </div>
-          <div class="flex items-center gap-6 mt-8 text-sm text-white/80">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">${getIcon('users', 14)}</div>
-              <span><strong class="text-white">${stats.totalEvents || 0}</strong> Events</span>
+        <div class="relative z-10 px-6 py-16 md:py-24">
+          <div class="max-w-2xl">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white/90 text-xs font-medium mb-4">
+              ${getIcon('zap', 12)} The tech community's favorite event platform
             </div>
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">${getIcon('user', 14)}</div>
-              <span><strong class="text-white">${stats.totalAttendees || 0}+</strong> Attendees</span>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4">
+              Connect. Learn. <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-indigo-200">Build.</span>
+            </h1>
+            <p class="text-white/80 text-lg mb-6 max-w-xl">
+              Discover hackathons, meetups, workshops, and conferences. Join thousands of developers building the future together.
+            </p>
+            <div class="flex flex-wrap items-center gap-3">
+              <a href="/events" data-navigate class="px-6 py-3 rounded-lg text-sm font-semibold bg-white text-blue-600 hover:bg-blue-50 transition-colors flex items-center gap-2">
+                Explore Events ${getIcon('arrowRight', 16)}
+              </a>
+              ${!user ? `
+                <a href="/register" data-navigate class="px-6 py-3 rounded-lg text-sm font-semibold bg-white/10 text-white hover:bg-white/20 transition-colors border border-white/20 flex items-center gap-2">
+                  ${getIcon('userPlus', 16)} Join Free
+                </a>
+              ` : user.role === 'organizer' ? `
+                <a href="/create" data-navigate class="px-6 py-3 rounded-lg text-sm font-semibold bg-white/10 text-white hover:bg-white/20 transition-colors border border-white/20 flex items-center gap-2">
+                  ${getIcon('plus', 16)} Host an Event
+                </a>
+              ` : ''}
+            </div>
+            <div class="flex items-center gap-6 mt-8 text-sm text-white/80">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">${getIcon('users', 14)}</div>
+                <span><strong class="text-white">${stats.totalEvents || 0}</strong> Events</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">${getIcon('user', 14)}</div>
+                <span><strong class="text-white">${stats.totalAttendees || 0}+</strong> Attendees</span>
+              </div>
             </div>
           </div>
         </div>

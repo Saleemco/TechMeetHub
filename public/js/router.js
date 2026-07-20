@@ -59,10 +59,9 @@ export class Router {
     this.container.innerHTML = await handler(...params);
     
     this.updateActiveNav(path);
-    this.updateSidebarActive(path); // Add this line
+    this.updateSidebarActive(path);
     this.currentRoute = path;
     
-    // Attach handlers after DOM update
     setTimeout(() => {
       this.attachEventHandlers();
     }, 50);
@@ -73,16 +72,15 @@ export class Router {
     document.querySelectorAll('.nav-link').forEach(link => {
       const route = link.dataset.route;
       if (route === cleanPath || (route === '/events' && cleanPath.startsWith('/events'))) {
-        link.classList.add('text-brand-400', 'bg-white/5');
-        link.classList.remove('text-gray-400');
+        link.classList.add('text-blue-600', 'bg-blue-50');
+        link.classList.remove('text-gray-600');
       } else {
-        link.classList.remove('text-brand-400', 'bg-white/5');
-        link.classList.add('text-gray-400');
+        link.classList.remove('text-blue-600', 'bg-blue-50');
+        link.classList.add('text-gray-600');
       }
     });
   }
 
-  // ===== ADD THIS NEW METHOD =====
   updateSidebarActive(path) {
     const cleanPath = path.split('?')[0];
     document.querySelectorAll('.sidebar-link').forEach(link => {
@@ -105,7 +103,6 @@ export class Router {
       newForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('🔐 Login form submitted');
         
         const formData = new FormData(newForm);
         const email = formData.get('email');
@@ -114,11 +111,9 @@ export class Router {
         try {
           await Auth.login(email, password);
           const user = await Auth.me();
-          console.log('✅ Logged in user:', user);
           showToast('Welcome back!', 'success');
           this.navigateTo('/dashboard');
         } catch (err) {
-          console.error('❌ Login error:', err);
           showToast('Invalid email or password', 'error');
         }
       });
@@ -133,7 +128,6 @@ export class Router {
       newForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('📝 Register form submitted');
         
         const formData = new FormData(newForm);
         const data = Object.fromEntries(formData.entries());
@@ -145,17 +139,15 @@ export class Router {
         
         try {
           await Auth.register(data.name, data.email, data.password, data.role);
-          console.log('✅ Registration successful');
           showToast('Account created! Welcome to TechMeetHub.', 'success');
           this.navigateTo('/dashboard');
         } catch (err) {
-          console.error('❌ Register error:', err);
           showToast('Email already registered', 'error');
         }
       });
     }
 
-    // Create event form - UPDATED with speakers and agenda
+    // Create event form
     const createForm = document.getElementById('create-event-form');
     if (createForm) {
       const newForm = createForm.cloneNode(true);
@@ -173,7 +165,6 @@ export class Router {
           return;
         }
         
-        // ===== COLLECT SPEAKERS =====
         const speakers = [];
         const speakerEntries = document.querySelectorAll('.speaker-entry');
         speakerEntries.forEach(entry => {
@@ -184,15 +175,10 @@ export class Router {
           const role = roleInput?.value?.trim();
           const topic = topicInput?.value?.trim();
           if (name) {
-            speakers.push({ 
-              name: name, 
-              role: role || 'Speaker', 
-              topic: topic || '' 
-            });
+            speakers.push({ name, role: role || 'Speaker', topic: topic || '' });
           }
         });
 
-        // ===== COLLECT AGENDA =====
         const agenda = [];
         const agendaEntries = document.querySelectorAll('.agenda-entry');
         agendaEntries.forEach(entry => {
@@ -272,30 +258,21 @@ export class Router {
     if (searchInput) {
       const newInput = searchInput.cloneNode(true);
       searchInput.parentNode.replaceChild(newInput, searchInput);
-      
-      newInput.addEventListener('input', () => {
-        this.filterEvents();
-      });
+      newInput.addEventListener('input', () => { this.filterEvents(); });
     }
 
     const categoryFilter = document.getElementById('category-filter');
     if (categoryFilter) {
       const newFilter = categoryFilter.cloneNode(true);
       categoryFilter.parentNode.replaceChild(newFilter, categoryFilter);
-      
-      newFilter.addEventListener('change', () => {
-        this.filterEvents();
-      });
+      newFilter.addEventListener('change', () => { this.filterEvents(); });
     }
 
     const statusFilter = document.getElementById('status-filter');
     if (statusFilter) {
       const newFilter = statusFilter.cloneNode(true);
       statusFilter.parentNode.replaceChild(newFilter, statusFilter);
-      
-      newFilter.addEventListener('change', () => {
-        this.filterEvents();
-      });
+      newFilter.addEventListener('change', () => { this.filterEvents(); });
     }
   }
 

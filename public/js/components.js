@@ -1,4 +1,4 @@
-// public/js/components.js - LIGHT THEME
+// public/js/components.js - FULL LIGHT THEME
 import { Auth, categories } from './data.js';
 
 const icons = {
@@ -96,6 +96,11 @@ export function Header(user = null) {
   const isOrganizer = role === 'organizer';
   const isParticipant = role === 'participant';
 
+  // Check if we're on homepage
+  const pathname = window.location.pathname || '/';
+  const isHomePage = pathname === '/' || pathname === '/home';
+  const showSidebar = isLoggedIn || !isHomePage;
+
   let navItems = [];
   if (isAdmin) {
     navItems = [
@@ -128,12 +133,15 @@ export function Header(user = null) {
   const userRoleLabel = role.charAt(0).toUpperCase() + role.slice(1) || 'Guest';
 
   return `
+    <!-- Top Navigation Bar -->
     <nav class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16">
       <div class="flex items-center justify-between h-full px-4 lg:px-6">
         <div class="flex items-center gap-3">
-          <button onclick="window.toggleSidebar()" class="lg:hidden text-gray-600 hover:text-gray-900 transition-colors">
-            ${getIcon('menu', 22)}
-          </button>
+          ${showSidebar ? `
+            <button onclick="window.toggleSidebar()" class="lg:hidden text-gray-600 hover:text-gray-900 transition-colors">
+              ${getIcon('menu', 22)}
+            </button>
+          ` : ''}
           <a href="/" data-navigate class="flex items-center gap-2">
             <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
               <span class="text-white font-bold text-sm">TM</span>
@@ -168,37 +176,49 @@ export function Header(user = null) {
       </div>
     </nav>
 
-    <aside id="sidebar" class="fixed top-16 left-0 bottom-0 z-40 w-64 bg-white border-r border-gray-200 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 overflow-y-auto">
-      <div class="p-4">
-        ${isLoggedIn ? `
-          <div class="mb-6 p-3 rounded-lg bg-gray-50 border border-gray-200">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full ${user?.initialsColor || 'bg-blue-600'} avatar-initials text-sm text-white">${userInitials}</div>
-              <div>
-                <div class="text-sm font-medium text-gray-900">${userName}</div>
-                <div class="text-xs text-gray-500">${userRoleLabel}</div>
+    ${showSidebar ? `
+      <aside id="sidebar" class="fixed top-16 left-0 bottom-0 z-40 w-64 bg-white border-r border-gray-200 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 overflow-y-auto">
+        <div class="p-4">
+          ${isLoggedIn ? `
+            <div class="mb-6 p-3 rounded-lg bg-gray-50 border border-gray-200">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full ${user?.initialsColor || 'bg-blue-600'} avatar-initials text-sm text-white">${userInitials}</div>
+                <div>
+                  <div class="text-sm font-medium text-gray-900">${userName}</div>
+                  <div class="text-xs text-gray-500">${userRoleLabel}</div>
+                </div>
               </div>
             </div>
-          </div>
-        ` : ''}
-        <div class="space-y-1">
-          ${navItems.map(item => `
-            <a href="${item.href}" data-navigate class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors" data-route="${item.href}">
-              ${getIcon(item.icon, 18)}
-              <span class="text-sm font-medium">${item.label}</span>
-            </a>
-          `).join('')}
-          ${isLoggedIn ? `
-            <button onclick="window.logout()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors mt-4">
-              ${getIcon('logout', 18)}
-              <span class="text-sm font-medium">Logout</span>
-            </button>
           ` : ''}
+          <div class="space-y-1">
+            ${navItems.map(item => `
+              <a href="${item.href}" data-navigate class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors" data-route="${item.href}">
+                ${getIcon(item.icon, 18)}
+                <span class="text-sm font-medium">${item.label}</span>
+              </a>
+            `).join('')}
+            ${isLoggedIn ? `
+              <button onclick="window.logout()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors mt-4">
+                ${getIcon('logout', 18)}
+                <span class="text-sm font-medium">Logout</span>
+              </button>
+            ` : ''}
+          </div>
         </div>
-      </div>
-    </aside>
+      </aside>
 
-    <div id="sidebar-overlay" class="fixed inset-0 z-30 bg-black/30 backdrop-blur-sm hidden lg:hidden" onclick="window.closeSidebar()"></div>
+      <div id="sidebar-overlay" class="fixed inset-0 z-30 bg-black/30 backdrop-blur-sm hidden lg:hidden" onclick="window.closeSidebar()"></div>
+
+      <style>
+        .sidebar-link.active {
+          color: #2563EB;
+          background: #EFF6FF;
+        }
+        .sidebar-link.active svg {
+          color: #2563EB;
+        }
+      </style>
+    ` : ''}
   `;
 }
 
