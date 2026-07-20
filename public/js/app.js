@@ -1,4 +1,9 @@
 // public/js/app.js
+// Force light theme
+document.documentElement.setAttribute('data-theme', 'light');
+document.documentElement.classList.remove('dark');
+localStorage.setItem('techmeethub-theme', 'light');
+
 import { Router } from './router.js';
 import { showToast } from './components.js';
 import { Auth, Data } from './data.js';
@@ -6,6 +11,7 @@ import { Auth, Data } from './data.js';
 // Global functions
 window.navigateTo = (path) => {
   router.navigateTo(path);
+  closeSidebar();
 };
 
 window.toggleMobileMenu = () => {
@@ -13,20 +19,39 @@ window.toggleMobileMenu = () => {
   if (menu) menu.classList.toggle('open');
 };
 
+// Sidebar functions
+window.toggleSidebar = () => {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  if (sidebar) {
+    sidebar.classList.toggle('-translate-x-full');
+    if (overlay) {
+      overlay.classList.toggle('hidden');
+    }
+  }
+};
+
+window.closeSidebar = () => {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
+    sidebar.classList.add('-translate-x-full');
+    if (overlay) {
+      overlay.classList.add('hidden');
+    }
+  }
+};
+
 window.logout = async () => {
   await Auth.logout();
   showToast('Logged out successfully', 'info');
   router.navigateTo('/');
+  closeSidebar();
 };
 
 window.toggleTheme = () => {
-  const html = document.documentElement;
-  const current = html.getAttribute('data-theme') || 'dark';
-  const next = current === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
-  if (next === 'dark') html.classList.add('dark');
-  else html.classList.remove('dark');
-  localStorage.setItem('techmeethub-theme', next);
+  // Force light theme - disable toggle
+  showToast('Theme switching is disabled', 'info');
 };
 
 let isRsvpProcessing = false;
@@ -63,12 +88,12 @@ window.deleteEvent = async (eventId) => {
   const modalContainer = document.getElementById('modal-container');
   modalContainer.innerHTML = `
     <div class="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4 page-transition">
-      <div class="glass-dark rounded-xl max-w-md w-full p-6 border border-white/10">
-        <h3 class="text-lg font-semibold text-white mb-2">Delete Event</h3>
-        <p class="text-gray-400 text-sm mb-6">Delete "${event.title}"? This action cannot be undone.</p>
+      <div class="bg-white rounded-xl max-w-md w-full p-6 border border-gray-200 shadow-xl">
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Delete Event</h3>
+        <p class="text-gray-500 text-sm mb-6">Delete "${event.title}"? This action cannot be undone.</p>
         <div class="flex items-center justify-end gap-3">
-          <button id="modal-cancel" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Cancel</button>
-          <button id="modal-confirm" class="px-4 py-2 rounded-lg text-sm font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors">Delete</button>
+          <button id="modal-cancel" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-colors">Cancel</button>
+          <button id="modal-confirm" class="px-4 py-2 rounded-lg text-sm font-medium bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition-colors">Delete</button>
         </div>
       </div>
     </div>
@@ -88,12 +113,12 @@ window.deleteUser = async (userId) => {
   const modalContainer = document.getElementById('modal-container');
   modalContainer.innerHTML = `
     <div class="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4 page-transition">
-      <div class="glass-dark rounded-xl max-w-md w-full p-6 border border-white/10">
-        <h3 class="text-lg font-semibold text-white mb-2">Delete User</h3>
-        <p class="text-gray-400 text-sm mb-6">Are you sure you want to delete this user? This action cannot be undone.</p>
+      <div class="bg-white rounded-xl max-w-md w-full p-6 border border-gray-200 shadow-xl">
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Delete User</h3>
+        <p class="text-gray-500 text-sm mb-6">Are you sure you want to delete this user? This action cannot be undone.</p>
         <div class="flex items-center justify-end gap-3">
-          <button id="modal-cancel" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Cancel</button>
-          <button id="modal-confirm" class="px-4 py-2 rounded-lg text-sm font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors">Delete</button>
+          <button id="modal-cancel" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-colors">Cancel</button>
+          <button id="modal-confirm" class="px-4 py-2 rounded-lg text-sm font-medium bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition-colors">Delete</button>
         </div>
       </div>
     </div>
@@ -111,12 +136,12 @@ window.deleteEventAdmin = async (eventId) => {
   const modalContainer = document.getElementById('modal-container');
   modalContainer.innerHTML = `
     <div class="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4 page-transition">
-      <div class="glass-dark rounded-xl max-w-md w-full p-6 border border-white/10">
-        <h3 class="text-lg font-semibold text-white mb-2">Delete Event</h3>
-        <p class="text-gray-400 text-sm mb-6">Delete this event as admin? This action cannot be undone.</p>
+      <div class="bg-white rounded-xl max-w-md w-full p-6 border border-gray-200 shadow-xl">
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Delete Event</h3>
+        <p class="text-gray-500 text-sm mb-6">Delete this event as admin? This action cannot be undone.</p>
         <div class="flex items-center justify-end gap-3">
-          <button id="modal-cancel" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Cancel</button>
-          <button id="modal-confirm" class="px-4 py-2 rounded-lg text-sm font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors">Delete</button>
+          <button id="modal-cancel" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-colors">Cancel</button>
+          <button id="modal-confirm" class="px-4 py-2 rounded-lg text-sm font-medium bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition-colors">Delete</button>
         </div>
       </div>
     </div>

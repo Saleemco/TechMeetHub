@@ -35,7 +35,6 @@ export function CreateEventPage() {
         ${Input({ label: 'Capacity', name: 'capacity', type: 'number', placeholder: 'e.g., 100', required: true, min: 1 })}
         ${Input({ label: 'Description', name: 'description', type: 'textarea', placeholder: 'Describe your event, what attendees will learn, and any prerequisites...', required: true, rows: 5 })}
         
-        <!-- Speakers Section -->
         <div class="mb-4">
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Speakers</label>
           <div id="speakers-container">
@@ -51,7 +50,6 @@ export function CreateEventPage() {
           <p class="text-xs text-gray-500 mt-1">Add speakers for your event (optional)</p>
         </div>
 
-        <!-- Agenda Section -->
         <div class="mb-4">
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Agenda</label>
           <div id="agenda-container">
@@ -82,7 +80,6 @@ export function CreateEventPage() {
   `;
 }
 
-// Global functions for adding fields
 window.addSpeakerField = function() {
   const container = document.getElementById('speakers-container');
   if (!container) return;

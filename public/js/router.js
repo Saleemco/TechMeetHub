@@ -59,6 +59,7 @@ export class Router {
     this.container.innerHTML = await handler(...params);
     
     this.updateActiveNav(path);
+    this.updateSidebarActive(path); // Add this line
     this.currentRoute = path;
     
     // Attach handlers after DOM update
@@ -77,6 +78,19 @@ export class Router {
       } else {
         link.classList.remove('text-brand-400', 'bg-white/5');
         link.classList.add('text-gray-400');
+      }
+    });
+  }
+
+  // ===== ADD THIS NEW METHOD =====
+  updateSidebarActive(path) {
+    const cleanPath = path.split('?')[0];
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+      const route = link.dataset.route;
+      if (route === cleanPath || (route === '/events' && cleanPath.startsWith('/events'))) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
       }
     });
   }

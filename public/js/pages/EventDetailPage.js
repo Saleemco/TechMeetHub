@@ -38,7 +38,6 @@ export async function EventDetailPage(eventId) {
 
   return `
     <div class="page-transition">
-      <!-- Hero Image -->
       <div class="relative rounded-2xl overflow-hidden h-64 md:h-80 mb-8">
         <img src="${event.image}" alt="${event.title}" class="absolute inset-0 w-full h-full object-cover" />
         <div class="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-gray-900/20 to-transparent"></div>
@@ -71,10 +70,8 @@ export async function EventDetailPage(eventId) {
         </div>
       </div>
 
-      <!-- Content -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div class="lg:col-span-2 space-y-6">
-          <!-- About -->
           <div class="bg-white rounded-xl p-6 border border-gray-200">
             <h2 class="text-lg font-semibold text-gray-900 mb-3">About This Event</h2>
             <p class="text-gray-600 leading-relaxed">${event.description}</p>
@@ -83,7 +80,6 @@ export async function EventDetailPage(eventId) {
 
           ${participantSection}
 
-          <!-- Speakers -->
           ${event.speakers && event.speakers.length > 0 ? `
             <div class="bg-white rounded-xl p-6 border border-gray-200">
               <h2 class="text-lg font-semibold text-gray-900 mb-4">Speakers</h2>
@@ -102,7 +98,6 @@ export async function EventDetailPage(eventId) {
             </div>
           ` : ''}
 
-          <!-- Agenda -->
           ${event.agenda && event.agenda.length > 0 ? `
             <div class="bg-white rounded-xl p-6 border border-gray-200">
               <h2 class="text-lg font-semibold text-gray-900 mb-4">Agenda</h2>
@@ -121,9 +116,7 @@ export async function EventDetailPage(eventId) {
           ` : ''}
         </div>
 
-        <!-- Sidebar -->
         <div class="space-y-6">
-          <!-- Attendees -->
           <div class="bg-white rounded-xl p-6 border border-gray-200">
             <div class="flex items-center justify-between mb-4">
               <span class="text-sm text-gray-500">Attendees</span>
@@ -149,7 +142,6 @@ export async function EventDetailPage(eventId) {
             `}
           </div>
 
-          <!-- Organizer -->
           <div class="bg-white rounded-xl p-6 border border-gray-200">
             <h3 class="font-semibold text-gray-900 mb-3">Organizer</h3>
             <div class="flex items-center gap-3">
@@ -161,7 +153,6 @@ export async function EventDetailPage(eventId) {
             </div>
           </div>
 
-          <!-- Share -->
           <div class="bg-white rounded-xl p-6 border border-gray-200">
             <h3 class="font-semibold text-gray-900 mb-3">Share</h3>
             <button onclick="window.copyEventLink('${event.id}')" class="w-full px-4 py-2.5 rounded-lg bg-gray-50 text-gray-600 text-sm hover:bg-gray-100 transition-colors flex items-center justify-center gap-2">
