@@ -57,7 +57,7 @@ export async function HomePage() {
           </div>
         </section>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
 
           <!-- About Section -->
           <section class="py-10 md:py-14">
@@ -88,7 +88,7 @@ export async function HomePage() {
                   </div>
                 </div>
               </div>
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid grid-cols-2 gap-4 max-w-lg mx-auto lg:max-w-none w-full">
                 <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
                   <div class="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 mb-3">
                     ${getIcon('users', 24)}
@@ -129,7 +129,7 @@ export async function HomePage() {
             <div class="w-16 h-1 bg-orange-500 mx-auto mb-3 rounded-full"></div>
             <p class="text-gray-500 mb-10">Powerful tools to help you create memorable experiences for your community.</p>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left place-items-center">
               ${FeatureCard('calendar', 'Easy Event Creation', 'Set up and publish your events in minutes with our streamlined tools.', '/register', 'Create Event')}
               ${FeatureCard('mic', 'Manage Speakers & Sessions', 'Organize your agenda, speakers and schedules all in one place.', '/register', 'Explore Features')}
               ${FeatureCard('users', 'Seamless Registration', 'Handle attendee registrations, RSVPs and check-ins with ease.', '/register', 'See How It Works')}
@@ -140,7 +140,7 @@ export async function HomePage() {
           <!-- Featured Events -->
           <section class="mb-12">
             ${SectionTitle({ title: 'Featured Events', subtitle: "Hand-picked events you don't want to miss", action: { href: '/events', label: 'View All' } })}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center">
               ${(featured || []).length > 0 ? (await Promise.all(featured.map((event, i) => EventCard(event, i, user)))).join('') : `
                 <div class="col-span-full text-center text-gray-500 py-8">No featured events</div>
               `}
@@ -150,7 +150,7 @@ export async function HomePage() {
           <!-- Upcoming Events -->
           <section class="mb-16">
             ${SectionTitle({ title: 'Upcoming Events', subtitle: 'Mark your calendar for these upcoming tech gatherings', action: { href: '/events', label: 'View All' } })}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 place-items-center">
               ${(upcoming || []).slice(0, 4).length > 0 ? (await Promise.all(upcoming.slice(0, 4).map((event, i) => EventCard(event, i, user)))).join('') : `
                 <div class="col-span-full text-center text-gray-500 py-8">No upcoming events</div>
               `}
@@ -188,7 +188,7 @@ function StatItem(icon, value, label) {
 
 function FeatureCard(icon, title, description, href, linkLabel) {
   return `
-    <div class="bg-white rounded-xl border border-gray-200 p-6 text-center hover:shadow-md transition-shadow">
+    <div class="bg-white rounded-xl border border-gray-200 p-6 text-center hover:shadow-md transition-shadow w-full max-w-sm">
       <div class="w-14 h-14 rounded-full bg-teal-50 flex items-center justify-center mx-auto mb-4 text-teal-800">
         ${getIcon(icon, 26)}
       </div>
