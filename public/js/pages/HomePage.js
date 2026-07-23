@@ -19,10 +19,10 @@ export async function HomePage() {
     console.log('Upcoming events:', upcoming);
 
     return `
-      <div class="page-transition overflow-x-hidden -mt-4 sm:-mt-6 lg:-mt-8">
+      <div class="page-transition overflow-x-hidden -mt-6 -mb-6">
 
         <!-- Hero Section -->
-        <section class="relative bg-teal-900 -mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden min-h-[calc(100vh-72px)] lg:min-h-0 flex items-center">
+        <section class="relative bg-teal-900 -mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden min-h-[calc(100vh-56px)] sm:min-h-[calc(100vh-64px)] lg:min-h-0 flex items-center">
           <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-10 md:py-14 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center">
             <div class="max-w-xl">
               <div class="inline-flex items-center gap-2 bg-white/10 text-white text-xs font-semibold tracking-wide px-3 py-1.5 rounded-full mb-5">
