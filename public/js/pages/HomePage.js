@@ -33,7 +33,7 @@ export async function HomePage() {
                 Your <span class="text-orange-400">Tech Events</span> with Ease
               </h1>
               <p class="text-teal-100/80 text-base md:text-lg mb-6 max-w-md">
-                EventPro is the all-in-one platform for creating, managing and scaling impactful tech events — from meetups to global conferences.
+                TechMeetHub is the all-in-one platform for creating, managing and scaling impactful tech events — from meetups to global conferences.
               </p>
               <div class="flex flex-wrap items-center gap-4">
                 <a href="/register" data-navigate class="px-6 py-3 rounded-lg text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors flex items-center gap-2">
