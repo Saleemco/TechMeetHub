@@ -22,17 +22,17 @@ export async function HomePage() {
       <div class="page-transition overflow-x-hidden">
 
         <!-- Hero Section -->
-        <section class="relative bg-teal-900 -mx-4 sm:-mx-6 lg:mx-0 lg:rounded-2xl overflow-hidden">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-14 md:py-20 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+        <section class="relative bg-teal-900 -mx-4 sm:-mx-6 lg:mx-0 lg:rounded-2xl overflow-hidden min-h-[calc(100vh-72px)] lg:min-h-0 flex items-center">
+          <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-10 md:py-14 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center">
             <div class="max-w-xl">
               <div class="inline-flex items-center gap-2 bg-white/10 text-white text-xs font-semibold tracking-wide px-3 py-1.5 rounded-full mb-5">
                 ${getIcon('calendar', 14)} Smarter Events. Stronger Communities.
               </div>
-              <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight mb-4">
+              <h1 class="text-3xl sm:text-4xl md:text-[2.75rem] font-extrabold text-white leading-tight mb-3">
                 Plan, Manage and Grow
                 Your <span class="text-orange-400">Tech Events</span> with Ease
               </h1>
-              <p class="text-teal-100/80 text-base md:text-lg mb-8 max-w-md">
+              <p class="text-teal-100/80 text-base md:text-lg mb-6 max-w-md">
                 EventPro is the all-in-one platform for creating, managing and scaling impactful tech events — from meetups to global conferences.
               </p>
               <div class="flex flex-wrap items-center gap-4">
@@ -52,7 +52,7 @@ export async function HomePage() {
 
         <!-- Stats Bar -->
         <section class="bg-gray-100 -mx-4 sm:-mx-6 lg:mx-0 lg:rounded-b-none">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-8 grid grid-cols-2 lg:grid-cols-4 divide-y-0 gap-y-6">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-6 grid grid-cols-2 lg:grid-cols-4 divide-y-0 gap-y-6">
             ${StatItem('users', `${(stats?.totalAttendees || 10000).toLocaleString()}+`, 'Event Attendees')}
             ${StatItem('calendar', `${stats?.totalEvents || 350}+`, 'Events Hosted')}
             ${StatItem('building', `${stats?.totalPartners || 120}+`, 'Partner Organizations')}
@@ -63,7 +63,7 @@ export async function HomePage() {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
 
           <!-- Feature Highlights -->
-          <section class="py-14 md:py-16 text-center">
+          <section class="py-10 md:py-14 text-center">
             <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
               Everything You Need to Run Successful Tech Events
             </h2>
@@ -176,7 +176,7 @@ function HeroImage() {
       <img
         src="/img/hero-conference.jpg"
         alt="Tech conference audience watching a speaker on stage"
-        class="w-full h-64 md:h-80 lg:h-96 object-cover"
+        class="w-full h-52 sm:h-64 md:h-72 lg:h-80 object-cover"
       />
       <div class="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm rounded-lg px-4 py-2 text-white text-sm font-semibold hidden md:block">
         Building the Next Generation
