@@ -19,7 +19,7 @@ export async function HomePage() {
     console.log('Upcoming events:', upcoming);
 
     return `
-      <div class="page-transition overflow-x-hidden -mt-6 -mb-6">
+      <div class="page-transition -mt-6 -mb-6">
 
         <!-- Hero Section -->
         <section class="relative bg-teal-900 -mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden min-h-[calc(100vh-56px)] sm:min-h-[calc(100vh-64px)] lg:min-h-0 flex items-center">
