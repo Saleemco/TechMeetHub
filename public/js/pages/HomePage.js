@@ -25,9 +25,6 @@ export async function HomePage() {
         <section class="relative bg-teal-900 -mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden min-h-[calc(100vh-56px)] sm:min-h-[calc(100vh-64px)] lg:min-h-0 flex items-center">
           <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-10 md:py-14 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center">
             <div class="max-w-xl">
-              <div class="inline-flex items-center gap-2 bg-white/10 text-white text-xs font-semibold tracking-wide px-3 py-1.5 rounded-full mb-5">
-                ${getIcon('calendar', 14)} Smarter Events. Stronger Communities.
-              </div>
               <h1 class="text-3xl sm:text-4xl md:text-[2.75rem] font-extrabold text-white leading-tight mb-3">
                 Plan, Manage and Grow
                 Your <span class="text-orange-400">Tech Events</span> with Ease
@@ -62,6 +59,68 @@ export async function HomePage() {
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
 
+          <!-- About Section -->
+          <section class="py-10 md:py-14">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+              <div>
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+                  Empowering Tech Communities Worldwide
+                </h2>
+                <div class="w-16 h-1 bg-orange-500 mb-4 rounded-full"></div>
+                <p class="text-gray-600 leading-relaxed mb-4">
+                  TechMeetHub was built by event organizers, for event organizers. We understand the challenges of bringing the tech community together — from planning and promotion to ticketing and post-event engagement.
+                </p>
+                <p class="text-gray-600 leading-relaxed mb-6">
+                  Our platform streamlines every step of the event lifecycle, helping you focus on what matters most: creating meaningful experiences that connect, educate and inspire.
+                </p>
+                <div class="flex flex-wrap gap-6">
+                  <div>
+                    <div class="text-2xl font-bold text-teal-900">2019</div>
+                    <div class="text-sm text-gray-500">Founded</div>
+                  </div>
+                  <div>
+                    <div class="text-2xl font-bold text-teal-900">50K+</div>
+                    <div class="text-sm text-gray-500">Community Members</div>
+                  </div>
+                  <div>
+                    <div class="text-2xl font-bold text-teal-900">100+</div>
+                    <div class="text-sm text-gray-500">Cities Worldwide</div>
+                  </div>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                  <div class="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 mb-3">
+                    ${getIcon('users', 24)}
+                  </div>
+                  <h4 class="font-semibold text-gray-900">Community First</h4>
+                  <p class="text-sm text-gray-500">Built with input from organizers worldwide</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                  <div class="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 mb-3">
+                    ${getIcon('trend', 24)}
+                  </div>
+                  <h4 class="font-semibold text-gray-900">Grow Together</h4>
+                  <p class="text-sm text-gray-500">Tools that scale with your community</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                  <div class="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 mb-3">
+                    ${getIcon('shield', 24)}
+                  </div>
+                  <h4 class="font-semibold text-gray-900">Trusted & Secure</h4>
+                  <p class="text-sm text-gray-500">Enterprise-grade reliability</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                  <div class="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 mb-3">
+                    ${getIcon('globe', 24)}
+                  </div>
+                  <h4 class="font-semibold text-gray-900">Global Reach</h4>
+                  <p class="text-sm text-gray-500">Connect with techies worldwide</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
           <!-- Feature Highlights -->
           <section class="py-10 md:py-14 text-center">
             <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
@@ -75,21 +134,6 @@ export async function HomePage() {
               ${FeatureCard('mic', 'Manage Speakers & Sessions', 'Organize your agenda, speakers and schedules all in one place.', '/register', 'Explore Features')}
               ${FeatureCard('users', 'Seamless Registration', 'Handle attendee registrations, RSVPs and check-ins with ease.', '/register', 'See How It Works')}
               ${FeatureCard('barChart', 'Track & Analyze', 'Monitor attendance, budget and event performance with real-time insights.', '/register', 'View Reports')}
-            </div>
-          </section>
-
-          <!-- Categories -->
-          <section class="mb-12">
-            ${SectionTitle({ title: 'Browse by Category', subtitle: 'Find events that match your interests' })}
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-              ${(allCategories || []).map((cat) => `
-                <a href="/events?category=${cat.id}" data-navigate class="group bg-white rounded-xl p-4 text-center hover:shadow-md transition-all border border-gray-200 hover:border-teal-700">
-                  <div class="w-12 h-12 rounded-lg bg-teal-900 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                    <div class="text-white">${getIcon(cat.icon, 22)}</div>
-                  </div>
-                  <span class="font-medium text-gray-700 text-sm">${cat.label}</span>
-                </a>
-              `).join('')}
             </div>
           </section>
 
@@ -161,11 +205,11 @@ function HeroImage() {
   return `
     <div class="relative overflow-hidden shadow-xl">
       <img
-        src="/img/hero-conference.png"
+        src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=400&fit=crop"
         alt="Tech conference audience watching a speaker on stage"
-        class="w-full h-52 sm:h-64 md:h-72 lg:h-80 object-cover"
+        class="w-full h-52 sm:h-64 md:h-72 lg:h-80 object-cover rounded-lg"
       />
-      <div class="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm px-4 py-2 text-white text-sm font-semibold hidden md:block">
+      <div class="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm px-4 py-2 text-white text-sm font-semibold hidden md:block rounded-lg">
         Building the Next Generation
       </div>
     </div>
