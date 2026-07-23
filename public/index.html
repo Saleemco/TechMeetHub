@@ -43,6 +43,7 @@
 
     html {
       overflow-x: hidden;
+      overflow-y: hidden; /* Hide vertical scrollbar */
     }
 
     body {
@@ -52,12 +53,21 @@
       min-height: 100vh;
       padding-top: 64px;
       overflow-x: hidden;
+      overflow-y: hidden; /* Hide vertical scrollbar */
     }
 
+    /* Allow scrolling but hide the scrollbar */
     #app {
       min-height: calc(100vh - 64px);
       display: flex;
       flex-direction: column;
+      overflow-y: auto;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE and Edge */
+    }
+
+    #app::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
     }
 
     #main { 
@@ -71,29 +81,24 @@
       padding-left: 256px;
     }
 
-    /* ===== SCROLLBAR - Hide horizontal, show vertical ===== */
+    /* ===== COMPLETELY HIDE ALL SCROLLBARS ===== */
     ::-webkit-scrollbar {
-      width: 6px;
-      height: 0px; /* Hide horizontal scrollbar */
+      width: 0px;
+      height: 0px;
+      background: transparent;
     }
 
     ::-webkit-scrollbar-track {
-      background: #f1f5f9;
+      background: transparent;
     }
 
     ::-webkit-scrollbar-thumb {
-      background: #94a3b8;
-      border-radius: 99px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: #64748b;
+      background: transparent;
     }
 
     /* For Firefox */
     * {
-      scrollbar-width: thin;
-      scrollbar-color: #94a3b8 #f1f5f9;
+      scrollbar-width: none;
     }
 
     /* ===== ANIMATIONS ===== */
