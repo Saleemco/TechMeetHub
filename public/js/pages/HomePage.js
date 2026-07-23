@@ -114,19 +114,6 @@ export async function HomePage() {
           </section>
         </div>
 
-        <!-- Bottom CTA Banner -->
-        <section class="bg-orange-500 -mx-4 sm:-mx-6 lg:-mx-8">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-10 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
-            <div>
-              <h3 class="text-xl md:text-2xl font-bold text-white mb-1">Ready to host your next impactful tech event?</h3>
-              <p class="text-white/85">Join hundreds of organizers building stronger tech communities.</p>
-            </div>
-            <a href="/register" data-navigate class="shrink-0 px-6 py-3 rounded-lg text-sm font-semibold bg-teal-900 text-white hover:bg-teal-800 transition-colors flex items-center gap-2">
-              Get Started Today ${getIcon('arrowRight', 16)}
-            </a>
-          </div>
-        </section>
-
       </div>
     `;
   } catch (error) {
