@@ -1,4 +1,4 @@
-// public/js/components.js - FULL MODERN HEADER & FOOTER REDESIGN
+// public/js/components.js - FULL MODERN HEADER & FOOTER WITH TECHMEETHUB BRANDING
 import { Auth, categories } from './data.js';
 
 const icons = {
@@ -118,8 +118,8 @@ export function Header(user = null) {
             <div class="text-orange-400">${getIcon('calendar', 18)}</div>
           </div>
           <div class="flex flex-col leading-none">
-            <span class="text-lg font-bold text-teal-900 tracking-tight">EventPro</span>
-            <span class="text-[10px] text-gray-500 tracking-wide">Tech Event Planning System</span>
+            <span class="text-lg font-bold text-teal-900 tracking-tight">TechMeetHub</span>
+            <span class="text-[10px] text-gray-500 tracking-wide">Tech Event Platform</span>
           </div>
         </a>
 
@@ -199,8 +199,8 @@ export function Footer() {
                 <div class="text-orange-400">${getIcon('calendar', 18)}</div>
               </div>
               <div class="flex flex-col leading-none">
-                <span class="text-lg font-bold text-white tracking-tight">EventPro</span>
-                <span class="text-[10px] text-teal-300 tracking-wide">Tech Event Planning System</span>
+                <span class="text-lg font-bold text-white tracking-tight">TechMeetHub</span>
+                <span class="text-[10px] text-teal-300 tracking-wide">Tech Event Platform</span>
               </div>
             </a>
             <p class="text-sm text-teal-200/70 leading-relaxed">The all-in-one platform for creating, managing and scaling impactful tech events.</p>
@@ -241,7 +241,7 @@ export function Footer() {
 
         <!-- Bottom Bar -->
         <div class="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p class="text-xs text-teal-300/50">&copy; ${new Date().getFullYear()} EventPro. All rights reserved.</p>
+          <p class="text-xs text-teal-300/50">&copy; ${new Date().getFullYear()} TechMeetHub. All rights reserved.</p>
           <div class="flex items-center gap-6">
             <a href="#" class="text-xs text-teal-300/50 hover:text-white transition-colors">Terms</a>
             <a href="#" class="text-xs text-teal-300/50 hover:text-white transition-colors">Privacy</a>
