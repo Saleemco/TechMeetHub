@@ -60,7 +60,7 @@ export async function HomePage() {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
 
           <!-- About Section -->
-          <section class="py-10 md:py-14">
+          <section id="about" class="py-10 md:py-14">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
               <div>
                 <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
@@ -122,7 +122,7 @@ export async function HomePage() {
           </section>
 
           <!-- Feature Highlights -->
-          <section id="about" class="py-10 md:py-14 text-center">
+          <section class="py-10 md:py-14 text-center">
             <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
               Everything You Need to Run Successful Tech Events
             </h2>
@@ -205,7 +205,7 @@ function HeroImage() {
   return `
     <div class="relative overflow-hidden shadow-xl">
       <img
-        src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=400&fit=crop"
+        src="/img/hero-conference.png"
         alt="Tech conference audience watching a speaker on stage"
         class="w-full h-52 sm:h-64 md:h-72 lg:h-80 object-cover rounded-lg"
       />

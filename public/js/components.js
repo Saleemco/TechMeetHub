@@ -103,8 +103,8 @@ export function Header(user = null) {
 
   const publicNav = [
     { href: '/', label: 'Home' },
-    { href: '/events', label: 'Events' },
-    { href: '/about', label: 'About' },
+    { href: '/#events', label: 'Events', scrollTo: 'events' },
+    { href: '/#about', label: 'About', scrollTo: 'about' },
   ];
 
   return `
@@ -123,9 +123,10 @@ export function Header(user = null) {
 
         <!-- Desktop Nav -->
         <div class="hidden md:flex items-center gap-1">
-          ${publicNav.map(item => `
-            <a href="${item.href}" data-navigate class="nav-link px-4 py-2 text-sm font-medium text-gray-600 hover:text-teal-900 transition-colors rounded-lg hover:bg-gray-50" data-route="${item.href}">${item.label}</a>
-          `).join('')}
+          ${publicNav.map(item => item.scrollTo
+            ? `<a href="${item.href}" onclick="window.scrollToHomeSection('${item.scrollTo}'); return false;" class="nav-link px-4 py-2 text-sm font-medium text-gray-600 hover:text-teal-900 transition-colors rounded-lg hover:bg-gray-50" data-route="${item.href}">${item.label}</a>`
+            : `<a href="${item.href}" data-navigate class="nav-link px-4 py-2 text-sm font-medium text-gray-600 hover:text-teal-900 transition-colors rounded-lg hover:bg-gray-50" data-route="${item.href}">${item.label}</a>`
+          ).join('')}
         </div>
 
         <!-- Right Side -->
@@ -154,9 +155,10 @@ export function Header(user = null) {
       <!-- Mobile Nav Dropdown -->
       <div id="mobile-nav" class="hidden md:hidden bg-white border-t border-gray-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-3 space-y-1">
-          ${publicNav.map(item => `
-            <a href="${item.href}" data-navigate class="block px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-teal-900 hover:bg-gray-50 rounded-lg transition-colors" data-route="${item.href}">${item.label}</a>
-          `).join('')}
+          ${publicNav.map(item => item.scrollTo
+            ? `<a href="${item.href}" onclick="window.scrollToHomeSection('${item.scrollTo}'); return false;" class="block px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-teal-900 hover:bg-gray-50 rounded-lg transition-colors" data-route="${item.href}">${item.label}</a>`
+            : `<a href="${item.href}" data-navigate class="block px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-teal-900 hover:bg-gray-50 rounded-lg transition-colors" data-route="${item.href}">${item.label}</a>`
+          ).join('')}
           ${!isLoggedIn ? `
             <div class="pt-2 mt-2 border-t border-gray-100 flex gap-3">
               <a href="/login" data-navigate class="flex-1 text-center px-4 py-2 rounded-lg text-sm font-semibold text-teal-900 border border-teal-900 hover:bg-teal-50 transition-colors">Login</a>
@@ -208,9 +210,9 @@ export function Footer() {
           <div>
             <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Quick Links</h4>
             <ul class="space-y-2.5">
-              <li><a href="#events" class="text-sm text-teal-200/70 hover:text-white transition-colors">Browse Events</a></li>
+              <li><a href="/events" data-navigate class="text-sm text-teal-200/70 hover:text-white transition-colors">Browse Events</a></li>
               <li><a href="/register" data-navigate class="text-sm text-teal-200/70 hover:text-white transition-colors">Create an Event</a></li>
-              <li><a href="#about" class="text-sm text-teal-200/70 hover:text-white transition-colors">About Us</a></li>
+              <li><a href="/about" data-navigate class="text-sm text-teal-200/70 hover:text-white transition-colors">About Us</a></li>
               <li><a href="/contact" data-navigate class="text-sm text-teal-200/70 hover:text-white transition-colors">Contact</a></li>
             </ul>
           </div>

@@ -61,6 +61,27 @@ window.toggleTheme = () => {
   showToast('Theme switching is disabled in light mode', 'info');
 };
 
+// Scroll to a section on the homepage (used by the Events / About navbar links).
+// If we're not already on the homepage, navigate there first, then scroll
+// once the new content has rendered.
+window.scrollToHomeSection = (sectionId) => {
+  const mobileNav = document.getElementById('mobile-nav');
+  if (mobileNav) mobileNav.classList.add('hidden');
+
+  const scrollNow = () => {
+    const el = document.getElementById(sectionId);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const isHome = window.location.pathname === '/' || window.location.pathname === '/home';
+  if (isHome) {
+    scrollNow();
+  } else {
+    router.navigateTo('/');
+    setTimeout(scrollNow, 150);
+  }
+};
+
 let isRsvpProcessing = false;
 
 window.handleRsvp = async (eventId) => {
