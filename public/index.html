@@ -43,7 +43,6 @@
 
     html {
       overflow-x: hidden;
-      overflow-y: hidden; /* Hide vertical scrollbar */
     }
 
     body {
@@ -53,7 +52,6 @@
       min-height: 100vh;
       padding-top: 64px;
       overflow-x: hidden;
-      overflow-y: hidden; /* Hide vertical scrollbar */
     }
 
     /* Allow scrolling but hide the scrollbar */
@@ -170,29 +168,12 @@
   <div id="modal-container"></div>
   <script type="module" src="/js/app.js"></script>
   <script>
-    // Handle anchor link scrolling for SPA navigation
-    document.addEventListener('click', function(e) {
-      const link = e.target.closest('a[href^="/#"]');
-      if (link) {
-        const hash = link.getAttribute('href').replace('/#', '');
-        const target = document.getElementById(hash);
-        if (target) {
-          e.preventDefault();
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          history.pushState(null, null, '/#' + hash);
-        }
-      }
-    });
-
-    // Scroll to anchor on page load if hash present
+    // Scroll to anchor on page load (for direct links like /#events)
     window.addEventListener('load', function() {
       if (window.location.hash) {
-        const hash = window.location.hash.replace('#', '');
-        const target = document.getElementById(hash);
-        if (target) {
-          setTimeout(() => {
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 100);
+        const el = document.querySelector(window.location.hash);
+        if (el) {
+          setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
         }
       }
     });
