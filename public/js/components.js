@@ -103,8 +103,8 @@ export function Header(user = null) {
 
   const publicNav = [
     { href: '/', label: 'Home' },
-    { href: '/events', label: 'Events' },
-    { href: '/about', label: 'About' },
+    { href: '/#events', label: 'Events' },
+    { href: '/#about', label: 'About' },
   ];
 
   return `
@@ -208,9 +208,9 @@ export function Footer() {
           <div class="text-center lg:text-left">
             <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Quick Links</h4>
             <ul class="space-y-2.5">
-              <li><a href="/events" data-navigate class="text-sm text-teal-200/70 hover:text-white transition-colors">Browse Events</a></li>
+              <li><a href="/#events" data-navigate class="text-sm text-teal-200/70 hover:text-white transition-colors">Browse Events</a></li>
               <li><a href="/register" data-navigate class="text-sm text-teal-200/70 hover:text-white transition-colors">Create an Event</a></li>
-              <li><a href="/about" data-navigate class="text-sm text-teal-200/70 hover:text-white transition-colors">About Us</a></li>
+              <li><a href="/#about" data-navigate class="text-sm text-teal-200/70 hover:text-white transition-colors">About Us</a></li>
               <li><a href="/contact" data-navigate class="text-sm text-teal-200/70 hover:text-white transition-colors">Contact</a></li>
             </ul>
           </div>

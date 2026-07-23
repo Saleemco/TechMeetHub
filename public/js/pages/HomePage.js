@@ -60,7 +60,7 @@ export async function HomePage() {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
 
           <!-- About Section -->
-          <section class="py-10 md:py-14">
+          <section id="about" class="py-10 md:py-14">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
               <div>
                 <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
@@ -138,7 +138,7 @@ export async function HomePage() {
           </section>
 
           <!-- Featured Events -->
-          <section class="mb-12">
+          <section id="events" class="mb-12">
             ${SectionTitle({ title: 'Featured Events', subtitle: "Hand-picked events you don't want to miss", action: { href: '/events', label: 'View All' } })}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center">
               ${(featured || []).length > 0 ? (await Promise.all(featured.map((event, i) => EventCard(event, i, user)))).join('') : `
