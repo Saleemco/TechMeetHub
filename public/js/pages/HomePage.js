@@ -19,10 +19,10 @@ export async function HomePage() {
     console.log('Upcoming events:', upcoming);
 
     return `
-      <div class="page-transition overflow-x-hidden">
+      <div class="page-transition overflow-x-hidden -mt-4 sm:-mt-6 lg:-mt-8">
 
         <!-- Hero Section -->
-        <section class="relative bg-teal-900 -mx-4 sm:-mx-6 lg:mx-0 lg:rounded-2xl overflow-hidden min-h-[calc(100vh-72px)] lg:min-h-0 flex items-center">
+        <section class="relative bg-teal-900 -mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden min-h-[calc(100vh-72px)] lg:min-h-0 flex items-center">
           <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-10 md:py-14 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center">
             <div class="max-w-xl">
               <div class="inline-flex items-center gap-2 bg-white/10 text-white text-xs font-semibold tracking-wide px-3 py-1.5 rounded-full mb-5">
@@ -51,7 +51,7 @@ export async function HomePage() {
         </section>
 
         <!-- Stats Bar -->
-        <section class="bg-gray-100 -mx-4 sm:-mx-6 lg:mx-0 lg:rounded-b-none">
+        <section class="bg-gray-100 -mx-4 sm:-mx-6 lg:-mx-8">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-6 grid grid-cols-2 lg:grid-cols-4 divide-y-0 gap-y-6">
             ${StatItem('users', `${(stats?.totalAttendees || 10000).toLocaleString()}+`, 'Event Attendees')}
             ${StatItem('calendar', `${stats?.totalEvents || 350}+`, 'Events Hosted')}
@@ -115,7 +115,7 @@ export async function HomePage() {
         </div>
 
         <!-- Bottom CTA Banner -->
-        <section class="bg-teal-900 -mx-4 sm:-mx-6 lg:mx-0 lg:rounded-2xl mb-4">
+        <section class="bg-teal-900 -mx-4 sm:-mx-6 lg:-mx-8">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-10 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
             <div>
               <h3 class="text-xl md:text-2xl font-bold text-white mb-1">Ready to host your next impactful tech event?</h3>
@@ -172,13 +172,13 @@ function FeatureCard(icon, title, description, href, linkLabel) {
 
 function HeroImage() {
   return `
-    <div class="relative rounded-xl overflow-hidden shadow-xl">
+    <div class="relative overflow-hidden shadow-xl">
       <img
-        src="/img/hero-conference.jpg"
+        src="/img/hero-conference.png"
         alt="Tech conference audience watching a speaker on stage"
         class="w-full h-52 sm:h-64 md:h-72 lg:h-80 object-cover"
       />
-      <div class="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm rounded-lg px-4 py-2 text-white text-sm font-semibold hidden md:block">
+      <div class="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm px-4 py-2 text-white text-sm font-semibold hidden md:block">
         Building the Next Generation
       </div>
     </div>
