@@ -1,4 +1,4 @@
-// public/js/components.js - FULL LIGHT THEME WITH FIXED getIcon
+// public/js/components.js - FULL MODERN HEADER & FOOTER REDESIGN
 import { Auth, categories } from './data.js';
 
 const icons = {
@@ -37,10 +37,12 @@ const icons = {
   chevronRight: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>',
   info: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
   alert: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+  building: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><path d="M9 22v-4h6v4"></path><line x1="8" y1="6" x2="8.01" y2="6"></line><line x1="16" y1="6" x2="16.01" y2="6"></line><line x1="8" y1="10" x2="8.01" y2="10"></line><line x1="16" y1="10" x2="16.01" y2="10"></line><line x1="8" y1="14" x2="8.01" y2="14"></line><line x1="16" y1="14" x2="16.01" y2="14"></line></svg>',
+  globe: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>',
+  barChart: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>',
 };
 
 export function getIcon(name, size = 16) {
-  // If name is not provided or doesn't exist, use a fallback
   if (!name || !icons[name]) {
     return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
   }
@@ -98,169 +100,152 @@ export function getCategoryIcon(catId, size = 16) {
 export function Header(user = null) {
   const isLoggedIn = !!user;
   const role = user?.role || '';
-  const isAdmin = role === 'admin';
-  const isOrganizer = role === 'organizer';
-  const isParticipant = role === 'participant';
 
-  const pathname = window.location.pathname || '/';
-  const isHomePage = pathname === '/' || pathname === '/home';
-  const showSidebar = isLoggedIn || !isHomePage;
-
-  let navItems = [];
-  if (isAdmin) {
-    navItems = [
-      { href: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
-      { href: '/events', label: 'Events', icon: 'calendar' },
-      { href: '/profile', label: 'Profile', icon: 'user' }
-    ];
-  } else if (isOrganizer) {
-    navItems = [
-      { href: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
-      { href: '/events', label: 'My Events', icon: 'calendar' },
-      { href: '/create', label: 'Create Event', icon: 'plus' },
-      { href: '/profile', label: 'Profile', icon: 'user' }
-    ];
-  } else if (isParticipant) {
-    navItems = [
-      { href: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
-      { href: '/events', label: 'Browse Events', icon: 'calendar' },
-      { href: '/profile', label: 'Profile', icon: 'user' }
-    ];
-  } else {
-    navItems = [
-      { href: '/', label: 'Home', icon: 'home' },
-      { href: '/events', label: 'Events', icon: 'calendar' }
-    ];
-  }
-
-  const userInitials = user?.avatar || '?';
-  const userName = user?.name || 'Guest';
-  const userRoleLabel = role.charAt(0).toUpperCase() + role.slice(1) || 'Guest';
+  const publicNav = [
+    { href: '/', label: 'Home' },
+    { href: '/events', label: 'Events' },
+    { href: '/about', label: 'About' },
+    { href: '/how-it-works', label: 'How It Works' },
+    { href: '/contact', label: 'Contact' },
+  ];
 
   return `
     <nav class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16">
-      <div class="flex items-center justify-between h-full px-4 lg:px-6">
-        <div class="flex items-center gap-3">
-          ${showSidebar ? `
-            <button onclick="window.toggleSidebar()" class="lg:hidden text-gray-600 hover:text-gray-900 transition-colors">
-              ${getIcon('menu', 22)}
-            </button>
-          ` : ''}
-          <a href="/" data-navigate class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-              <span class="text-white font-bold text-sm">TM</span>
-            </div>
-            <span class="text-lg font-bold text-gray-900 hidden sm:block">TechMeetHub</span>
-          </a>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 h-full flex items-center justify-between">
+        <!-- Logo -->
+        <a href="/" data-navigate class="flex items-center gap-2.5 shrink-0">
+          <div class="w-9 h-9 rounded-lg bg-teal-900 flex items-center justify-center border border-teal-800">
+            <div class="text-orange-400">${getIcon('calendar', 18)}</div>
+          </div>
+          <div class="flex flex-col leading-none">
+            <span class="text-lg font-bold text-teal-900 tracking-tight">EventPro</span>
+            <span class="text-[10px] text-gray-500 tracking-wide">Tech Event Planning System</span>
+          </div>
+        </a>
+
+        <!-- Desktop Nav -->
+        <div class="hidden md:flex items-center gap-1">
+          ${publicNav.map(item => `
+            <a href="${item.href}" data-navigate class="nav-link px-4 py-2 text-sm font-medium text-gray-600 hover:text-teal-900 transition-colors rounded-lg hover:bg-gray-50" data-route="${item.href}">${item.label}</a>
+          `).join('')}
         </div>
-        <div class="flex items-center gap-3">
+
+        <!-- Right Side -->
+        <div class="flex items-center gap-3 shrink-0">
           ${isLoggedIn ? `
             <div class="flex items-center gap-3">
-              <button onclick="window.toggleTheme()" class="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors">
-                ${getIcon('sun', 18)}
-              </button>
-              <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-50 border border-gray-200">
-                <div class="w-7 h-7 rounded-full ${user?.initialsColor || 'bg-blue-600'} avatar-initials text-xs text-white">${userInitials}</div>
-                <span class="text-sm text-gray-700 hidden sm:inline">${userName}</span>
+              <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-50 border border-gray-200">
+                <div class="w-7 h-7 rounded-full ${user?.initialsColor || 'bg-teal-900'} avatar-initials text-xs text-white flex items-center justify-center">${user?.avatar || '?'}</div>
+                <span class="text-sm text-gray-700">${user?.name || 'User'}</span>
               </div>
               <button onclick="window.logout()" class="p-2 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors" title="Logout">
                 ${getIcon('logout', 18)}
               </button>
             </div>
           ` : `
-            <div class="flex items-center gap-2">
-              <button onclick="window.toggleTheme()" class="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors">
-                ${getIcon('sun', 18)}
-              </button>
-              <a href="/login" data-navigate class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors">Sign In</a>
-              <a href="/register" data-navigate class="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors">Get Started</a>
-            </div>
+            <a href="/login" data-navigate class="hidden sm:inline-flex px-5 py-2 rounded-lg text-sm font-semibold text-teal-900 border border-teal-900 hover:bg-teal-50 transition-colors">Login</a>
+            <a href="/register" data-navigate class="px-5 py-2 rounded-lg text-sm font-semibold bg-teal-900 text-white hover:bg-teal-800 transition-colors">Get Started</a>
           `}
+          <!-- Mobile menu button -->
+          <button onclick="window.toggleMobileNav()" class="md:hidden p-2 rounded-lg text-gray-600 hover:text-teal-900 hover:bg-gray-100 transition-colors">
+            ${getIcon('menu', 22)}
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Nav Dropdown -->
+      <div id="mobile-nav" class="hidden md:hidden bg-white border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-3 space-y-1">
+          ${publicNav.map(item => `
+            <a href="${item.href}" data-navigate class="block px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-teal-900 hover:bg-gray-50 rounded-lg transition-colors" data-route="${item.href}">${item.label}</a>
+          `).join('')}
+          ${!isLoggedIn ? `
+            <div class="pt-2 mt-2 border-t border-gray-100 flex gap-3">
+              <a href="/login" data-navigate class="flex-1 text-center px-4 py-2 rounded-lg text-sm font-semibold text-teal-900 border border-teal-900 hover:bg-teal-50 transition-colors">Login</a>
+              <a href="/register" data-navigate class="flex-1 text-center px-4 py-2 rounded-lg text-sm font-semibold bg-teal-900 text-white hover:bg-teal-800 transition-colors">Get Started</a>
+            </div>
+          ` : ''}
         </div>
       </div>
     </nav>
 
-    ${showSidebar ? `
-      <aside id="sidebar" class="fixed top-16 left-0 bottom-0 z-40 w-64 bg-white border-r border-gray-200 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 overflow-y-auto">
-        <div class="p-4">
-          ${isLoggedIn ? `
-            <div class="mb-6 p-3 rounded-lg bg-gray-50 border border-gray-200">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full ${user?.initialsColor || 'bg-blue-600'} avatar-initials text-sm text-white">${userInitials}</div>
-                <div>
-                  <div class="text-sm font-medium text-gray-900">${userName}</div>
-                  <div class="text-xs text-gray-500">${userRoleLabel}</div>
-                </div>
-              </div>
-            </div>
-          ` : ''}
-          <div class="space-y-1">
-            ${navItems.map(item => `
-              <a href="${item.href}" data-navigate class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors" data-route="${item.href}">
-                ${getIcon(item.icon, 18)}
-                <span class="text-sm font-medium">${item.label}</span>
-              </a>
-            `).join('')}
-            ${isLoggedIn ? `
-              <button onclick="window.logout()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors mt-4">
-                ${getIcon('logout', 18)}
-                <span class="text-sm font-medium">Logout</span>
-              </button>
-            ` : ''}
-          </div>
-        </div>
-      </aside>
-
-      <div id="sidebar-overlay" class="fixed inset-0 z-30 bg-black/30 backdrop-blur-sm hidden lg:hidden" onclick="window.closeSidebar()"></div>
-
-      <style>
-        .sidebar-link.active {
-          color: #2563EB;
-          background: #EFF6FF;
-        }
-        .sidebar-link.active svg {
-          color: #2563EB;
-        }
-      </style>
-    ` : ''}
+    <style>
+      .nav-link.active {
+        color: #0f766e;
+        background: #f0fdfa;
+      }
+      .nav-link.active svg {
+        color: #0f766e;
+      }
+    </style>
   `;
 }
 
-window.toggleSidebar = function() {
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebar-overlay');
-  if (sidebar) {
-    sidebar.classList.toggle('-translate-x-full');
-    if (overlay) { overlay.classList.toggle('hidden'); }
-  }
-};
-
-window.closeSidebar = function() {
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebar-overlay');
-  if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
-    sidebar.classList.add('-translate-x-full');
-    if (overlay) { overlay.classList.add('hidden'); }
-  }
+window.toggleMobileNav = function() {
+  const nav = document.getElementById('mobile-nav');
+  if (nav) nav.classList.toggle('hidden');
 };
 
 // ========== FOOTER ==========
 export function Footer() {
   return `
-    <footer class="bg-white border-t border-gray-200 mt-auto">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded-lg bg-blue-600 flex items-center justify-center">
-              <span class="text-white font-bold text-[10px]">TM</span>
-            </div>
-            <span class="text-sm text-gray-600">TechMeetHub</span>
+    <footer class="bg-teal-950 text-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+          <!-- Brand Column -->
+          <div class="md:col-span-1">
+            <a href="/" data-navigate class="flex items-center gap-2.5 mb-4">
+              <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center border border-white/20">
+                <div class="text-orange-400">${getIcon('calendar', 18)}</div>
+              </div>
+              <div class="flex flex-col leading-none">
+                <span class="text-lg font-bold text-white tracking-tight">EventPro</span>
+                <span class="text-[10px] text-teal-300 tracking-wide">Tech Event Planning System</span>
+              </div>
+            </a>
+            <p class="text-sm text-teal-200/70 leading-relaxed">The all-in-one platform for creating, managing and scaling impactful tech events.</p>
           </div>
-          <p class="text-xs text-gray-400">Built for the tech community.</p>
-          <div class="flex items-center gap-4">
-            <span class="text-gray-500 hover:text-gray-700 transition-colors cursor-pointer text-sm">About</span>
-            <span class="text-gray-500 hover:text-gray-700 transition-colors cursor-pointer text-sm">Guidelines</span>
-            <span class="text-gray-500 hover:text-gray-700 transition-colors cursor-pointer text-sm">Support</span>
+
+          <!-- Quick Links -->
+          <div>
+            <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Quick Links</h4>
+            <ul class="space-y-2.5">
+              <li><a href="/events" data-navigate class="text-sm text-teal-200/70 hover:text-white transition-colors">Browse Events</a></li>
+              <li><a href="/register" data-navigate class="text-sm text-teal-200/70 hover:text-white transition-colors">Create an Event</a></li>
+              <li><a href="/about" data-navigate class="text-sm text-teal-200/70 hover:text-white transition-colors">About Us</a></li>
+              <li><a href="/contact" data-navigate class="text-sm text-teal-200/70 hover:text-white transition-colors">Contact</a></li>
+            </ul>
+          </div>
+
+          <!-- Resources -->
+          <div>
+            <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Resources</h4>
+            <ul class="space-y-2.5">
+              <li><a href="/how-it-works" data-navigate class="text-sm text-teal-200/70 hover:text-white transition-colors">How It Works</a></li>
+              <li><a href="#" class="text-sm text-teal-200/70 hover:text-white transition-colors">Guidelines</a></li>
+              <li><a href="#" class="text-sm text-teal-200/70 hover:text-white transition-colors">Support</a></li>
+              <li><a href="#" class="text-sm text-teal-200/70 hover:text-white transition-colors">Privacy Policy</a></li>
+            </ul>
+          </div>
+
+          <!-- Newsletter -->
+          <div>
+            <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Stay Updated</h4>
+            <p class="text-sm text-teal-200/70 mb-4">Get the latest tech events delivered to your inbox.</p>
+            <form onsubmit="event.preventDefault(); showToast('Thanks for subscribing!', 'success');" class="flex gap-2">
+              <input type="email" placeholder="Enter your email" class="flex-1 px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-teal-300/50 text-sm focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 transition-colors" />
+              <button type="submit" class="px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 transition-colors">Subscribe</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p class="text-xs text-teal-300/50">&copy; ${new Date().getFullYear()} EventPro. All rights reserved.</p>
+          <div class="flex items-center gap-6">
+            <a href="#" class="text-xs text-teal-300/50 hover:text-white transition-colors">Terms</a>
+            <a href="#" class="text-xs text-teal-300/50 hover:text-white transition-colors">Privacy</a>
+            <a href="#" class="text-xs text-teal-300/50 hover:text-white transition-colors">Cookies</a>
           </div>
         </div>
       </div>
@@ -332,7 +317,7 @@ export function SectionTitle({ title, subtitle, action }) {
         <h2 class="text-lg font-semibold text-gray-900">${title}</h2>
         ${subtitle ? `<p class="text-sm text-gray-500 mt-0.5">${subtitle}</p>` : ''}
       </div>
-      ${action ? `<a href="${action.href}" data-navigate class="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1">${action.label} ${getIcon('arrowRight', 14)}</a>` : ''}
+      ${action ? `<a href="${action.href}" data-navigate class="text-sm font-medium text-teal-800 hover:text-orange-500 transition-colors flex items-center gap-1">${action.label} ${getIcon('arrowRight', 14)}</a>` : ''}
     </div>
   `;
 }
@@ -346,14 +331,14 @@ export function EmptyState({ icon, title, message, action }) {
       </div>
       <h3 class="text-lg font-medium text-gray-900 mb-2">${title}</h3>
       <p class="text-gray-500 text-sm max-w-sm mb-6">${message}</p>
-      ${action ? `<a href="${action.href}" data-navigate class="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors">${action.label}</a>` : ''}
+      ${action ? `<a href="${action.href}" data-navigate class="px-4 py-2 rounded-lg text-sm font-medium bg-teal-900 text-white hover:bg-teal-800 transition-colors">${action.label}</a>` : ''}
     </div>
   `;
 }
 
 // ========== INPUT ==========
 export function Input({ label, name, type = 'text', placeholder, value = '', required = false, rows, maxLength, min, max }) {
-  const inputClass = "w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors";
+  const inputClass = "w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100 transition-colors";
   if (type === 'textarea') {
     return `
       <div class="mb-4">
@@ -373,7 +358,7 @@ export function Input({ label, name, type = 'text', placeholder, value = '', req
 // ========== BUTTON ==========
 export function Button({ label, type = 'button', variant = 'primary', icon, fullWidth = false, onclick, disabled = false }) {
   const variants = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700',
+    primary: 'bg-teal-900 text-white hover:bg-teal-800',
     secondary: 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300',
     danger: 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200',
     outline: 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300',
@@ -393,7 +378,7 @@ export async function EventCard(event, index = 0, user = null) {
     id: event.organizer_id || '',
     name: event.organizer_name || 'Unknown Organizer',
     avatar: event.organizer_avatar || '?',
-    initialsColor: event.organizer_initials_color || 'bg-blue-600'
+    initialsColor: event.organizer_initials_color || 'bg-teal-900'
   };
   const isAttending = userId ? (event.attendees?.includes(userId) || false) : false;
   const spotsLeft = (event.capacity || 0) - (event.attendees?.length || 0);
@@ -406,7 +391,7 @@ export async function EventCard(event, index = 0, user = null) {
     actionButton = '';
   } else if (userRole === 'participant' || userRole === 'organizer' || userRole === 'admin') {
     actionButton = `
-      <button onclick="window.handleRsvp('${event.id}')" class="px-4 py-1.5 rounded-lg text-xs font-medium transition-colors ${isAttending ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-blue-600 text-white hover:bg-blue-700'}" ${isFull && !isAttending ? 'disabled' : ''}>
+      <button onclick="window.handleRsvp('${event.id}')" class="px-4 py-1.5 rounded-lg text-xs font-medium transition-colors ${isAttending ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-teal-900 text-white hover:bg-teal-800'}" ${isFull && !isAttending ? 'disabled' : ''}>
         ${isAttending ? 'Registered' : isFull ? 'Full' : 'Register'}
       </button>
     `;
@@ -425,7 +410,7 @@ export async function EventCard(event, index = 0, user = null) {
         </div>
       </div>
       <div class="p-4">
-        <h3 class="font-semibold text-lg text-gray-900 leading-tight mb-2 hover:text-blue-600 transition-colors cursor-pointer" onclick="window.navigateTo('/events/${event.id}')">${event.title}</h3>
+        <h3 class="font-semibold text-lg text-gray-900 leading-tight mb-2 hover:text-teal-800 transition-colors cursor-pointer" onclick="window.navigateTo('/events/${event.id}')">${event.title}</h3>
         <div class="flex items-center gap-3 text-sm text-gray-500 mb-2">
           <span class="flex items-center gap-1">${getIcon('calendar', 12)} ${date}</span>
           <span class="flex items-center gap-1">${getIcon('clock', 12)} ${time}</span>
@@ -436,7 +421,7 @@ export async function EventCard(event, index = 0, user = null) {
         </div>
         <div class="flex items-center justify-between pt-3 border-t border-gray-100">
           <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded-full ${organizer.initialsColor} avatar-initials text-[10px] text-white">${organizer.avatar}</div>
+            <div class="w-6 h-6 rounded-full ${organizer.initialsColor} avatar-initials text-[10px] text-white flex items-center justify-center">${organizer.avatar}</div>
             <span class="text-xs text-gray-500">${organizer.name}</span>
           </div>
           ${actionButton}
@@ -459,7 +444,7 @@ export function EventListItem(event, isAttending = false) {
           <span class="flex items-center gap-1">${getIcon('mapPin', 10)} ${event.location}</span>
         </div>
       </div>
-      <span class="px-2 py-1 rounded-full text-xs font-medium ${isAttending ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-blue-50 text-blue-600 border border-blue-200'}">
+      <span class="px-2 py-1 rounded-full text-xs font-medium ${isAttending ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-teal-50 text-teal-800 border border-teal-200'}">
         ${isAttending ? 'Attending' : getCategoryLabel(event.category)}
       </span>
     </div>
