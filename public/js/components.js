@@ -189,10 +189,10 @@ export function Footer() {
   return `
     <footer class="bg-teal-950 text-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-12">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8 place-items-center sm:place-items-start lg:place-items-start">
           <!-- Brand Column -->
-          <div class="md:col-span-1">
-            <a href="/" data-navigate class="flex items-center gap-2.5 mb-4">
+          <div class="text-center sm:text-left">
+            <a href="/" data-navigate class="flex items-center gap-2.5 mb-4 justify-center sm:justify-start">
               <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center border border-white/20">
                 <div class="text-orange-400">${getIcon('calendar', 18)}</div>
               </div>
@@ -201,11 +201,11 @@ export function Footer() {
                 <span class="text-[10px] text-teal-300 tracking-wide">Tech Event Platform</span>
               </div>
             </a>
-            <p class="text-sm text-teal-200/70 leading-relaxed">The all-in-one platform for creating, managing and scaling impactful tech events.</p>
+            <p class="text-sm text-teal-200/70 leading-relaxed max-w-xs mx-auto sm:mx-0">The all-in-one platform for creating, managing and scaling impactful tech events.</p>
           </div>
 
           <!-- Quick Links -->
-          <div>
+          <div class="text-center sm:text-left">
             <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Quick Links</h4>
             <ul class="space-y-2.5">
               <li><a href="/events" data-navigate class="text-sm text-teal-200/70 hover:text-white transition-colors">Browse Events</a></li>
@@ -216,7 +216,7 @@ export function Footer() {
           </div>
 
           <!-- Resources -->
-          <div>
+          <div class="text-center sm:text-left">
             <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Resources</h4>
             <ul class="space-y-2.5">
               <li><a href="/how-it-works" data-navigate class="text-sm text-teal-200/70 hover:text-white transition-colors">How It Works</a></li>
@@ -227,12 +227,12 @@ export function Footer() {
           </div>
 
           <!-- Newsletter -->
-          <div>
+          <div class="text-center sm:text-left w-full max-w-sm sm:max-w-none">
             <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Stay Updated</h4>
             <p class="text-sm text-teal-200/70 mb-4">Get the latest tech events delivered to your inbox.</p>
-            <form onsubmit="event.preventDefault(); showToast('Thanks for subscribing!', 'success');" class="flex gap-2">
+            <form onsubmit="event.preventDefault(); showToast('Thanks for subscribing!', 'success');" class="flex flex-col sm:flex-row gap-2">
               <input type="email" placeholder="Enter your email" class="flex-1 px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-teal-300/50 text-sm focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 transition-colors" />
-              <button type="submit" class="px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 transition-colors">Subscribe</button>
+              <button type="submit" class="px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 transition-colors whitespace-nowrap">Subscribe</button>
             </form>
           </div>
         </div>
