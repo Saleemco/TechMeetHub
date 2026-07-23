@@ -36,8 +36,8 @@ export async function HomePage() {
                 EventPro is the all-in-one platform for creating, managing and scaling impactful tech events — from meetups to global conferences.
               </p>
               <div class="flex flex-wrap items-center gap-4">
-                <a href="${user && user.role === 'organizer' ? '/create' : '/register'}" data-navigate class="px-6 py-3 rounded-lg text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors flex items-center gap-2">
-                  ${user && user.role === 'organizer' ? 'Create an Event' : 'Create an Event'} ${getIcon('arrowRight', 16)}
+                <a href="/register" data-navigate class="px-6 py-3 rounded-lg text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors flex items-center gap-2">
+                  Create an Event ${getIcon('arrowRight', 16)}
                 </a>
                 <a href="/events" data-navigate class="px-6 py-3 rounded-lg text-sm font-semibold bg-transparent text-white border border-white/40 hover:bg-white/10 transition-colors flex items-center gap-2">
                   Browse Events ${getIcon('calendar', 16)}
@@ -71,10 +71,10 @@ export async function HomePage() {
             <p class="text-gray-500 mb-10">Powerful tools to help you create memorable experiences for your community.</p>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
-              ${FeatureCard('calendar', 'Easy Event Creation', 'Set up and publish your events in minutes with our streamlined tools.', '/create', 'Create Event')}
-              ${FeatureCard('mic', 'Manage Speakers & Sessions', 'Organize your agenda, speakers and schedules all in one place.', '/events', 'Explore Features')}
-              ${FeatureCard('users', 'Seamless Registration', 'Handle attendee registrations, RSVPs and check-ins with ease.', '/events', 'See How It Works')}
-              ${FeatureCard('barChart', 'Track & Analyze', 'Monitor attendance, budget and event performance with real-time insights.', '/dashboard', 'View Reports')}
+              ${FeatureCard('calendar', 'Easy Event Creation', 'Set up and publish your events in minutes with our streamlined tools.', '/register', 'Create Event')}
+              ${FeatureCard('mic', 'Manage Speakers & Sessions', 'Organize your agenda, speakers and schedules all in one place.', '/register', 'Explore Features')}
+              ${FeatureCard('users', 'Seamless Registration', 'Handle attendee registrations, RSVPs and check-ins with ease.', '/register', 'See How It Works')}
+              ${FeatureCard('barChart', 'Track & Analyze', 'Monitor attendance, budget and event performance with real-time insights.', '/register', 'View Reports')}
             </div>
           </section>
 
