@@ -34,40 +34,115 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    /* ===== RESET & BASE ===== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      overflow-x: hidden;
+    }
+
     body {
       font-family: 'Inter', system-ui, sans-serif;
       background: #f1f5f9;
       color: #0f172a;
       min-height: 100vh;
       padding-top: 64px;
+      overflow-x: hidden;
     }
-    #app { min-height: calc(100vh - 64px); display: flex; flex-direction: column; }
+
+    #app {
+      min-height: calc(100vh - 64px);
+      display: flex;
+      flex-direction: column;
+    }
+
     #main { 
       flex: 1; 
       padding-left: 0;
       transition: padding-left 0.3s ease;
+      overflow-x: hidden;
     }
+
     #main.sidebar-visible {
       padding-left: 256px;
     }
+
+    /* ===== SCROLLBAR - Hide horizontal, show vertical ===== */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 0px; /* Hide horizontal scrollbar */
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #94a3b8;
+      border-radius: 99px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
+
+    /* For Firefox */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #94a3b8 #f1f5f9;
+    }
+
+    /* ===== ANIMATIONS ===== */
     .page-transition { animation: fadeSlideUp 0.35s ease forwards; }
     @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ===== UTILITY ===== */
     .tag-pill { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 500; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
     .tag-pill:hover { background: #e2e8f0; color: #0f172a; }
     .avatar-initials { display: flex; align-items: center; justify-content: center; font-weight: 600; color: white; flex-shrink: 0; text-transform: uppercase; }
+
+    /* ===== CATEGORY COLORS ===== */
     .category-hackathon { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
     .category-meetup { background: linear-gradient(135deg, #10b981, #34d399); }
     .category-workshop { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
     .category-conference { background: linear-gradient(135deg, #ef4444, #f87171); }
     .category-webinar { background: linear-gradient(135deg, #06b6d4, #22d3ee); }
     .category-social { background: linear-gradient(135deg, #ec4899, #f472b6); }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 99px; }
-    .sidebar-link.active { color: #2563EB; background: #EFF6FF; }
-    .sidebar-link.active svg { color: #2563EB; }
-    @media (max-width: 640px) { body { padding-top: 56px; } }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar-link.active {
+      color: #2563EB;
+      background: #EFF6FF;
+    }
+    .sidebar-link.active svg {
+      color: #2563EB;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 640px) {
+      body { padding-top: 56px; }
+    }
+
+    /* ===== ENSURE NO OVERFLOW ===== */
+    .max-w-7xl {
+      max-width: 80rem;
+    }
+    .container, .max-w-*, .w-full {
+      max-width: 100%;
+    }
+    img, svg, video, iframe {
+      max-width: 100%;
+    }
+    .overflow-hidden {
+      overflow: hidden;
+    }
+    .overflow-x-auto {
+      overflow-x: auto;
+    }
   </style>
 </head>
 <body>
