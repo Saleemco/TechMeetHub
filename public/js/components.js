@@ -105,8 +105,6 @@ export function Header(user = null) {
     { href: '/', label: 'Home' },
     { href: '/events', label: 'Events' },
     { href: '/about', label: 'About' },
-    { href: '/how-it-works', label: 'How It Works' },
-    { href: '/contact', label: 'Contact' },
   ];
 
   return `
