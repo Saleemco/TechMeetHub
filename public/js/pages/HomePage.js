@@ -57,7 +57,7 @@ export async function HomePage() {
           </div>
         </section>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
+        <div class="max-w-7xl mx-auto -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-10">
 
           <!-- About Section -->
           <section id="about" class="py-10 md:py-14">
