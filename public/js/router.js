@@ -20,7 +20,7 @@ const routes = {
 };
 
 const LOADING_PLACEHOLDER = `
-  <div class="min-h-[60vh] flex flex-col items-center justify-center text-gray-400">
+  <div class="flex flex-col items-center justify-center text-gray-400" style="min-height:calc(100vh - 64px - 80px)">
     <div class="w-8 h-8 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin mb-3"></div>
     <span class="text-sm">Loading...</span>
   </div>
@@ -33,6 +33,7 @@ export class Router {
     this.container = document.getElementById('main');
     this.header = document.getElementById('header');
     this.footer = document.getElementById('footer');
+    this._hasRendered = false;
   }
 
   matchRoute(path) {
@@ -75,6 +76,12 @@ export class Router {
     this.updateActiveNav(path);
     this.updateSidebarActive(path);
     this.currentRoute = path;
+
+    // 5. Reveal footer now that first render is complete
+    if (!this._hasRendered) {
+      this._hasRendered = true;
+      document.getElementById('app')?.classList.add('app-ready');
+    }
 
     setTimeout(() => this.attachEventHandlers(), 50);
   }

@@ -40,23 +40,34 @@
       overflow-x: hidden;
     }
 
-    /* Flexbox sticky-footer layout */
+    /* Flexbox sticky-footer: header | main (fills screen) | footer */
     #app {
       min-height: calc(100vh - 64px);
       display: flex;
       flex-direction: column;
     }
 
+    /* #main always takes at least the full remaining viewport height,
+       guaranteeing the footer sits at the bottom edge — never higher */
     #main { 
       flex: 1 0 auto;
-      /* Guarantees footer stays below the fold even when empty */
-      min-height: calc(100vh - 64px - 100px);
+      min-height: calc(100vh - 64px);
       padding-left: 0;
       transition: padding-left 0.3s ease;
       overflow-x: hidden;
     }
 
     #main.sidebar-visible { padding-left: 256px; }
+
+    /* Footer starts invisible; router fades it in once ready.
+       This eliminates any flash before JS renders content. */
+    #footer {
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    #app.app-ready #footer {
+      opacity: 1;
+    }
 
     /* Scrollbar hide */
     ::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
@@ -96,7 +107,7 @@
     @media (max-width: 640px) {
       body { padding-top: 56px; }
       #app { min-height: calc(100vh - 56px); }
-      #main { min-height: calc(100vh - 56px - 100px); }
+      #main { min-height: calc(100vh - 56px); }
     }
 
     .max-w-7xl { max-width: 80rem; }
