@@ -187,6 +187,7 @@ window.toggleMobileNav = function() {
 };
 
 // ========== FOOTER (centered content) ==========
+// ========== FOOTER (centered, fixed newsletter) ==========
 export function Footer() {
   return `
     <div class="bg-teal-950 text-white">
@@ -230,12 +231,12 @@ export function Footer() {
           </div>
 
           <!-- Newsletter -->
-          <div class="flex flex-col items-center sm:items-start">
+          <div class="flex flex-col items-center sm:items-start w-full">
             <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Stay Updated</h4>
-            <p class="text-sm text-teal-200/70 mb-4 max-w-xs">Get the latest tech events delivered to your inbox.</p>
-            <form onsubmit="event.preventDefault(); window.showToast && window.showToast('Thanks for subscribing!', 'success');" class="flex flex-col sm:flex-row gap-2 w-full max-w-xs sm:max-w-none">
-              <input type="email" placeholder="Enter your email" class="flex-1 px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-teal-300/50 text-sm focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 transition-colors" />
-              <button type="submit" class="px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 transition-colors whitespace-nowrap">Subscribe</button>
+            <p class="text-sm text-teal-200/70 mb-4">Get the latest tech events delivered to your inbox.</p>
+            <form onsubmit="event.preventDefault(); window.showToast && window.showToast('Thanks for subscribing!', 'success');" class="flex flex-col sm:flex-row gap-2 w-full">
+              <input type="email" placeholder="Enter your email" class="flex-1 min-w-0 px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-teal-300/50 text-sm focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 transition-colors" />
+              <button type="submit" class="px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 transition-colors shrink-0">Subscribe</button>
             </form>
           </div>
         </div>
@@ -253,7 +254,6 @@ export function Footer() {
     </div>
   `;
 }
-
 // ========== TOAST ==========
 export function showToast(message, type = 'success') {
   let container = document.getElementById('toast-container');
