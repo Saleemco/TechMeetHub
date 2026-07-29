@@ -57,105 +57,109 @@ export async function HomePage() {
           </div>
         </section>
 
-        <div class="max-w-7xl mx-auto -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-10">
+        <!-- Content wrapper: breakout + centered inner container -->
+        <div class="-mx-4 sm:-mx-6 lg:-mx-8">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
 
-          <!-- About Section -->
-          <section id="about" class="py-10 md:py-14">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-              <div>
-                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-                  Empowering Tech Communities Worldwide
-                </h2>
-                <div class="w-16 h-1 bg-orange-500 mb-4 rounded-full"></div>
-                <p class="text-gray-600 leading-relaxed mb-4">
-                  TechMeetHub was built by event organizers, for event organizers. We understand the challenges of bringing the tech community together — from planning and promotion to ticketing and post-event engagement.
-                </p>
-                <p class="text-gray-600 leading-relaxed mb-6">
-                  Our platform streamlines every step of the event lifecycle, helping you focus on what matters most: creating meaningful experiences that connect, educate and inspire.
-                </p>
-                <div class="flex flex-wrap gap-6">
-                  <div>
-                    <div class="text-2xl font-bold text-teal-900">2019</div>
-                    <div class="text-sm text-gray-500">Founded</div>
+            <!-- About Section -->
+            <section id="about" class="py-10 md:py-14">
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                <div>
+                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+                    Empowering Tech Communities Worldwide
+                  </h2>
+                  <div class="w-16 h-1 bg-orange-500 mb-4 rounded-full"></div>
+                  <p class="text-gray-600 leading-relaxed mb-4">
+                    TechMeetHub was built by event organizers, for event organizers. We understand the challenges of bringing the tech community together — from planning and promotion to ticketing and post-event engagement.
+                  </p>
+                  <p class="text-gray-600 leading-relaxed mb-6">
+                    Our platform streamlines every step of the event lifecycle, helping you focus on what matters most: creating meaningful experiences that connect, educate and inspire.
+                  </p>
+                  <div class="flex flex-wrap gap-6">
+                    <div>
+                      <div class="text-2xl font-bold text-teal-900">2019</div>
+                      <div class="text-sm text-gray-500">Founded</div>
+                    </div>
+                    <div>
+                      <div class="text-2xl font-bold text-teal-900">50K+</div>
+                      <div class="text-sm text-gray-500">Community Members</div>
+                    </div>
+                    <div>
+                      <div class="text-2xl font-bold text-teal-900">100+</div>
+                      <div class="text-sm text-gray-500">Cities Worldwide</div>
+                    </div>
                   </div>
-                  <div>
-                    <div class="text-2xl font-bold text-teal-900">50K+</div>
-                    <div class="text-sm text-gray-500">Community Members</div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 mb-3">
+                      ${getIcon('users', 24)}
+                    </div>
+                    <h4 class="font-semibold text-gray-900">Community First</h4>
+                    <p class="text-sm text-gray-500">Built with input from organizers worldwide</p>
                   </div>
-                  <div>
-                    <div class="text-2xl font-bold text-teal-900">100+</div>
-                    <div class="text-sm text-gray-500">Cities Worldwide</div>
+                  <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 mb-3">
+                      ${getIcon('trend', 24)}
+                    </div>
+                    <h4 class="font-semibold text-gray-900">Grow Together</h4>
+                    <p class="text-sm text-gray-500">Tools that scale with your community</p>
+                  </div>
+                  <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 mb-3">
+                      ${getIcon('shield', 24)}
+                    </div>
+                    <h4 class="font-semibold text-gray-900">Trusted & Secure</h4>
+                    <p class="text-sm text-gray-500">Enterprise-grade reliability</p>
+                  </div>
+                  <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 mb-3">
+                      ${getIcon('globe', 24)}
+                    </div>
+                    <h4 class="font-semibold text-gray-900">Global Reach</h4>
+                    <p class="text-sm text-gray-500">Connect with techies worldwide</p>
                   </div>
                 </div>
               </div>
-              <div class="grid grid-cols-2 gap-4">
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                  <div class="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 mb-3">
-                    ${getIcon('users', 24)}
-                  </div>
-                  <h4 class="font-semibold text-gray-900">Community First</h4>
-                  <p class="text-sm text-gray-500">Built with input from organizers worldwide</p>
-                </div>
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                  <div class="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 mb-3">
-                    ${getIcon('trend', 24)}
-                  </div>
-                  <h4 class="font-semibold text-gray-900">Grow Together</h4>
-                  <p class="text-sm text-gray-500">Tools that scale with your community</p>
-                </div>
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                  <div class="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 mb-3">
-                    ${getIcon('shield', 24)}
-                  </div>
-                  <h4 class="font-semibold text-gray-900">Trusted & Secure</h4>
-                  <p class="text-sm text-gray-500">Enterprise-grade reliability</p>
-                </div>
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                  <div class="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 mb-3">
-                    ${getIcon('globe', 24)}
-                  </div>
-                  <h4 class="font-semibold text-gray-900">Global Reach</h4>
-                  <p class="text-sm text-gray-500">Connect with techies worldwide</p>
-                </div>
+            </section>
+
+            <!-- Feature Highlights -->
+            <section class="py-10 md:py-14 text-center">
+              <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                Everything You Need to Run Successful Tech Events
+              </h2>
+              <div class="w-16 h-1 bg-orange-500 mx-auto mb-3 rounded-full"></div>
+              <p class="text-gray-500 mb-10">Powerful tools to help you create memorable experiences for your community.</p>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+                ${FeatureCard('calendar', 'Easy Event Creation', 'Set up and publish your events in minutes with our streamlined tools.', '/register', 'Create Event')}
+                ${FeatureCard('mic', 'Manage Speakers & Sessions', 'Organize your agenda, speakers and schedules all in one place.', '/register', 'Explore Features')}
+                ${FeatureCard('users', 'Seamless Registration', 'Handle attendee registrations, RSVPs and check-ins with ease.', '/register', 'See How It Works')}
+                ${FeatureCard('barChart', 'Track & Analyze', 'Monitor attendance, budget and event performance with real-time insights.', '/register', 'View Reports')}
               </div>
-            </div>
-          </section>
+            </section>
 
-          <!-- Feature Highlights -->
-          <section class="py-10 md:py-14 text-center">
-            <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              Everything You Need to Run Successful Tech Events
-            </h2>
-            <div class="w-16 h-1 bg-orange-500 mx-auto mb-3 rounded-full"></div>
-            <p class="text-gray-500 mb-10">Powerful tools to help you create memorable experiences for your community.</p>
+            <!-- Featured Events -->
+            <section id="events" class="mb-12">
+              ${SectionTitle({ title: 'Featured Events', subtitle: "Hand-picked events you don't want to miss", action: { href: '/events', label: 'View All' } })}
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                ${(featured || []).length > 0 ? (await Promise.all(featured.map((event, i) => EventCard(event, i, user)))).join('') : `
+                  <div class="col-span-full text-center text-gray-500 py-8">No featured events</div>
+                `}
+              </div>
+            </section>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
-              ${FeatureCard('calendar', 'Easy Event Creation', 'Set up and publish your events in minutes with our streamlined tools.', '/register', 'Create Event')}
-              ${FeatureCard('mic', 'Manage Speakers & Sessions', 'Organize your agenda, speakers and schedules all in one place.', '/register', 'Explore Features')}
-              ${FeatureCard('users', 'Seamless Registration', 'Handle attendee registrations, RSVPs and check-ins with ease.', '/register', 'See How It Works')}
-              ${FeatureCard('barChart', 'Track & Analyze', 'Monitor attendance, budget and event performance with real-time insights.', '/register', 'View Reports')}
-            </div>
-          </section>
+            <!-- Upcoming Events -->
+            <section class="mb-16">
+              ${SectionTitle({ title: 'Upcoming Events', subtitle: 'Mark your calendar for these upcoming tech gatherings', action: { href: '/events', label: 'View All' } })}
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                ${(upcoming || []).slice(0, 4).length > 0 ? (await Promise.all(upcoming.slice(0, 4).map((event, i) => EventCard(event, i, user)))).join('') : `
+                  <div class="col-span-full text-center text-gray-500 py-8">No upcoming events</div>
+                `}
+              </div>
+            </section>
 
-          <!-- Featured Events -->
-          <section id="events" class="mb-12">
-            ${SectionTitle({ title: 'Featured Events', subtitle: "Hand-picked events you don't want to miss", action: { href: '/events', label: 'View All' } })}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              ${(featured || []).length > 0 ? (await Promise.all(featured.map((event, i) => EventCard(event, i, user)))).join('') : `
-                <div class="col-span-full text-center text-gray-500 py-8">No featured events</div>
-              `}
-            </div>
-          </section>
-
-          <!-- Upcoming Events -->
-          <section class="mb-16">
-            ${SectionTitle({ title: 'Upcoming Events', subtitle: 'Mark your calendar for these upcoming tech gatherings', action: { href: '/events', label: 'View All' } })}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              ${(upcoming || []).slice(0, 4).length > 0 ? (await Promise.all(upcoming.slice(0, 4).map((event, i) => EventCard(event, i, user)))).join('') : `
-                <div class="col-span-full text-center text-gray-500 py-8">No upcoming events</div>
-              `}
-            </div>
-          </section>
+          </div>
         </div>
 
       </div>
