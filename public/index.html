@@ -54,22 +54,16 @@
       overflow-x: hidden;
     }
 
-    /* Allow scrolling but hide the scrollbar */
+    /* #app drives the sticky-footer layout */
     #app {
       min-height: calc(100vh - 64px);
       display: flex;
       flex-direction: column;
-      overflow-y: auto;
-      scrollbar-width: none; /* Firefox */
-      -ms-overflow-style: none; /* IE and Edge */
-    }
-
-    #app::-webkit-scrollbar {
-      display: none; /* Chrome, Safari, Opera */
     }
 
     #main { 
-      flex: 1; 
+      flex: 1 0 auto;          /* grow and shrink, but base size is auto */
+      min-height: 50vh;         /* prevents footer from jumping up while loading */
       padding-left: 0;
       transition: padding-left 0.3s ease;
       overflow-x: hidden;
@@ -128,6 +122,7 @@
     /* ===== RESPONSIVE ===== */
     @media (max-width: 640px) {
       body { padding-top: 56px; }
+      #app { min-height: calc(100vh - 56px); }
     }
 
     /* ===== ENSURE NO OVERFLOW ===== */

@@ -58,9 +58,20 @@ export class Router {
     const isHomePage = path === '/' || path === '/home';
     const showSidebar = user || !isHomePage;
     
-    // Render header and footer
+    // Render header and footer immediately
     this.header.innerHTML = Header(user);
     this.footer.innerHTML = Footer();
+    
+    // Show a loading state in main so the footer doesn't collapse upward
+    // while async page data is fetching
+    this.container.innerHTML = `
+      <div class="min-h-[50vh] flex flex-col items-center justify-center text-gray-400">
+        <div class="w-8 h-8 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin mb-3"></div>
+        <span class="text-sm">Loading...</span>
+      </div>
+    `;
+    
+    // Now fetch and render the actual page content
     this.container.innerHTML = await handler(...params);
     
     // Add/remove sidebar class on main element
