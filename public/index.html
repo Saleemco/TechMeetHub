@@ -40,15 +40,13 @@
       overflow-x: hidden;
     }
 
-    /* Flexbox sticky-footer: header | main (fills screen) | footer */
+    /* Flexbox sticky-footer */
     #app {
       min-height: calc(100vh - 64px);
       display: flex;
       flex-direction: column;
     }
 
-    /* #main always takes at least the full remaining viewport height,
-       guaranteeing the footer sits at the bottom edge — never higher */
     #main { 
       flex: 1 0 auto;
       min-height: calc(100vh - 64px);
@@ -59,12 +57,14 @@
 
     #main.sidebar-visible { padding-left: 256px; }
 
-    /* Footer starts invisible; router fades it in once ready.
-       This eliminates any flash before JS renders content. */
-    #footer {
+    /* Hide header & footer until first render completes.
+       The router adds .app-ready once content is ready,
+       then everything fades in together as one unit. */
+    #header, #footer {
       opacity: 0;
       transition: opacity 0.25s ease;
     }
+    #app.app-ready #header,
     #app.app-ready #footer {
       opacity: 1;
     }
