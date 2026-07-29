@@ -20,9 +20,9 @@ const routes = {
 };
 
 const LOADING_PLACEHOLDER = `
-  <div class="h-full flex flex-col items-center justify-center text-gray-400">
+  <div class="min-h-[60vh] flex flex-col items-center justify-center text-gray-400">
     <div class="w-8 h-8 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin mb-3"></div>
-    <span class="text-sm">Loading…</span>
+    <span class="text-sm">Loading...</span>
   </div>
 `;
 
@@ -51,25 +51,22 @@ export class Router {
   }
 
   async render(path) {
+    // 1. INSTANTLY show loading state so #main is never empty
+    this.container.innerHTML = LOADING_PLACEHOLDER;
+
     const user = await Auth.me();
     const { handler, params } = this.matchRoute(path);
     const isHomePage = path === '/' || path === '/home';
     const showSidebar = user || !isHomePage;
 
-    // 1. Render header + footer immediately so skeleton is visible
+    // 2. Render header & footer
     this.header.innerHTML = Header(user);
     this.footer.innerHTML = Footer();
 
-    // 2. If main is empty, show a tall placeholder so footer stays at bottom
-    //    while we wait for the async page data.
-    if (!this.container.innerHTML.trim()) {
-      this.container.innerHTML = LOADING_PLACEHOLDER;
-    }
-
-    // 3. Fetch and swap in real content
+    // 3. Swap in real content
     this.container.innerHTML = await handler(...params);
 
-    // 4. Sidebar class toggle
+    // 4. Sidebar toggle
     const main = document.getElementById('main');
     if (main) {
       main.classList.toggle('sidebar-visible', showSidebar);

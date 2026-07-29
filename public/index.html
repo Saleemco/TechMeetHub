@@ -40,14 +40,17 @@
       overflow-x: hidden;
     }
 
-    /* GRID sticky-footer: header | main (grows) | footer */
+    /* Flexbox sticky-footer layout */
     #app {
       min-height: calc(100vh - 64px);
-      display: grid;
-      grid-template-rows: auto 1fr auto;
+      display: flex;
+      flex-direction: column;
     }
 
-    #main {
+    #main { 
+      flex: 1 0 auto;
+      /* Guarantees footer stays below the fold even when empty */
+      min-height: calc(100vh - 64px - 100px);
       padding-left: 0;
       transition: padding-left 0.3s ease;
       overflow-x: hidden;
@@ -93,6 +96,7 @@
     @media (max-width: 640px) {
       body { padding-top: 56px; }
       #app { min-height: calc(100vh - 56px); }
+      #main { min-height: calc(100vh - 56px - 100px); }
     }
 
     .max-w-7xl { max-width: 80rem; }

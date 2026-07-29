@@ -189,7 +189,7 @@ window.toggleMobileNav = function() {
 // ========== FOOTER ==========
 export function Footer() {
   return `
-    <footer class="bg-teal-950 text-white">
+    <div class="bg-teal-950 text-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-12">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <!-- Brand Column -->
@@ -232,7 +232,7 @@ export function Footer() {
           <div>
             <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Stay Updated</h4>
             <p class="text-sm text-teal-200/70 mb-4">Get the latest tech events delivered to your inbox.</p>
-            <form onsubmit="event.preventDefault(); showToast('Thanks for subscribing!', 'success');" class="flex gap-2">
+            <form onsubmit="event.preventDefault(); window.showToast && window.showToast('Thanks for subscribing!', 'success');" class="flex gap-2">
               <input type="email" placeholder="Enter your email" class="flex-1 px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-teal-300/50 text-sm focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 transition-colors" />
               <button type="submit" class="px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 transition-colors">Subscribe</button>
             </form>
@@ -249,7 +249,7 @@ export function Footer() {
           </div>
         </div>
       </div>
-    </footer>
+    </div>
   `;
 }
 

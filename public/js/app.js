@@ -8,6 +8,9 @@ import { Router } from './router.js';
 import { showToast } from './components.js';
 import { Auth, Data } from './data.js';
 
+// Expose showToast globally so inline handlers (e.g. footer newsletter) can use it
+window.showToast = showToast;
+
 // Global functions
 window.navigateTo = (path) => {
   router.navigateTo(path);
