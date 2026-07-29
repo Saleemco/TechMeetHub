@@ -19,6 +19,13 @@ const routes = {
   '/admin': DashboardPage,
 };
 
+const LOADING_PLACEHOLDER = `
+  <div class="h-full flex flex-col items-center justify-center text-gray-400">
+    <div class="w-8 h-8 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin mb-3"></div>
+    <span class="text-sm">Loading…</span>
+  </div>
+`;
+
 export class Router {
   constructor() {
     this.currentRoute = '/';
@@ -30,18 +37,11 @@ export class Router {
 
   matchRoute(path) {
     const cleanPath = path.split('?')[0];
-    
-    if (routes[cleanPath]) {
-      return { handler: routes[cleanPath], params: [] };
-    }
-    
+    if (routes[cleanPath]) return { handler: routes[cleanPath], params: [] };
     if (cleanPath.startsWith('/events/')) {
       const id = cleanPath.replace('/events/', '');
-      if (id) {
-        return { handler: routes['/events/:id'], params: [id] };
-      }
+      if (id) return { handler: routes['/events/:id'], params: [id] };
     }
-    
     return { handler: NotFoundPage, params: [] };
   }
 
@@ -53,57 +53,43 @@ export class Router {
   async render(path) {
     const user = await Auth.me();
     const { handler, params } = this.matchRoute(path);
-    
-    // Check if we should show sidebar (hide on homepage for non-logged users)
     const isHomePage = path === '/' || path === '/home';
     const showSidebar = user || !isHomePage;
-    
-    // Render header and footer immediately
+
+    // 1. Render header + footer immediately so skeleton is visible
     this.header.innerHTML = Header(user);
     this.footer.innerHTML = Footer();
-    
-    // Show a loading state in main so the footer doesn't collapse upward
-    // while async page data is fetching
-    this.container.innerHTML = `
-      <div class="min-h-[50vh] flex flex-col items-center justify-center text-gray-400">
-        <div class="w-8 h-8 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin mb-3"></div>
-        <span class="text-sm">Loading...</span>
-      </div>
-    `;
-    
-    // Now fetch and render the actual page content
+
+    // 2. If main is empty, show a tall placeholder so footer stays at bottom
+    //    while we wait for the async page data.
+    if (!this.container.innerHTML.trim()) {
+      this.container.innerHTML = LOADING_PLACEHOLDER;
+    }
+
+    // 3. Fetch and swap in real content
     this.container.innerHTML = await handler(...params);
-    
-    // Add/remove sidebar class on main element
+
+    // 4. Sidebar class toggle
     const main = document.getElementById('main');
     if (main) {
-      if (showSidebar) {
-        main.classList.add('sidebar-visible');
-      } else {
-        main.classList.remove('sidebar-visible');
-      }
+      main.classList.toggle('sidebar-visible', showSidebar);
     }
-    
+
     this.updateActiveNav(path);
     this.updateSidebarActive(path);
     this.currentRoute = path;
-    
-    setTimeout(() => {
-      this.attachEventHandlers();
-    }, 50);
+
+    setTimeout(() => this.attachEventHandlers(), 50);
   }
 
   updateActiveNav(path) {
     const cleanPath = path.split('?')[0];
     document.querySelectorAll('.nav-link').forEach(link => {
       const route = link.dataset.route;
-      if (route === cleanPath || (route === '/events' && cleanPath.startsWith('/events'))) {
-        link.classList.add('text-blue-600', 'bg-blue-50');
-        link.classList.remove('text-gray-600');
-      } else {
-        link.classList.remove('text-blue-600', 'bg-blue-50');
-        link.classList.add('text-gray-600');
-      }
+      const isActive = route === cleanPath || (route === '/events' && cleanPath.startsWith('/events'));
+      link.classList.toggle('text-blue-600', isActive);
+      link.classList.toggle('bg-blue-50', isActive);
+      link.classList.toggle('text-gray-600', !isActive);
     });
   }
 
@@ -111,11 +97,8 @@ export class Router {
     const cleanPath = path.split('?')[0];
     document.querySelectorAll('.sidebar-link').forEach(link => {
       const route = link.dataset.route;
-      if (route === cleanPath || (route === '/events' && cleanPath.startsWith('/events'))) {
-        link.classList.add('active');
-      } else {
-        link.classList.remove('active');
-      }
+      const isActive = route === cleanPath || (route === '/events' && cleanPath.startsWith('/events'));
+      link.classList.toggle('active', isActive);
     });
   }
 
@@ -125,18 +108,12 @@ export class Router {
     if (loginForm) {
       const newForm = loginForm.cloneNode(true);
       loginForm.parentNode.replaceChild(newForm, loginForm);
-      
       newForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        
         const formData = new FormData(newForm);
-        const email = formData.get('email');
-        const password = formData.get('password');
-        
         try {
-          await Auth.login(email, password);
-          const user = await Auth.me();
+          await Auth.login(formData.get('email'), formData.get('password'));
           showToast('Welcome back!', 'success');
           this.navigateTo('/dashboard');
         } catch (err) {
@@ -150,19 +127,14 @@ export class Router {
     if (registerForm) {
       const newForm = registerForm.cloneNode(true);
       registerForm.parentNode.replaceChild(newForm, registerForm);
-      
       newForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        
-        const formData = new FormData(newForm);
-        const data = Object.fromEntries(formData.entries());
-        
+        const data = Object.fromEntries(new FormData(newForm).entries());
         if (data.password !== data.confirmPassword) {
           showToast('Passwords do not match', 'error');
           return;
         }
-        
         try {
           await Auth.register(data.name, data.email, data.password, data.role);
           showToast('Account created! Welcome to TechMeetHub.', 'success');
@@ -178,45 +150,30 @@ export class Router {
     if (createForm) {
       const newForm = createForm.cloneNode(true);
       createForm.parentNode.replaceChild(newForm, createForm);
-      
       newForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        
-        const formData = new FormData(newForm);
-        const data = Object.fromEntries(formData.entries());
-        
+        const data = Object.fromEntries(new FormData(newForm).entries());
+
         if (!data.title || !data.category || !data.date || !data.time || !data.location || !data.capacity || !data.description) {
           showToast('Please fill in all required fields.', 'error');
           return;
         }
-        
+
         const speakers = [];
-        const speakerEntries = document.querySelectorAll('.speaker-entry');
-        speakerEntries.forEach(entry => {
-          const nameInput = entry.querySelector('input[name^="speaker_name_"]');
-          const roleInput = entry.querySelector('input[name^="speaker_role_"]');
-          const topicInput = entry.querySelector('input[name^="speaker_topic_"]');
-          const name = nameInput?.value?.trim();
-          const role = roleInput?.value?.trim();
-          const topic = topicInput?.value?.trim();
-          if (name) {
-            speakers.push({ name, role: role || 'Speaker', topic: topic || '' });
-          }
+        document.querySelectorAll('.speaker-entry').forEach(entry => {
+          const name = entry.querySelector('input[name^="speaker_name_"]')?.value?.trim();
+          const role = entry.querySelector('input[name^="speaker_role_"]')?.value?.trim();
+          const topic = entry.querySelector('input[name^="speaker_topic_"]')?.value?.trim();
+          if (name) speakers.push({ name, role: role || 'Speaker', topic: topic || '' });
         });
 
         const agenda = [];
-        const agendaEntries = document.querySelectorAll('.agenda-entry');
-        agendaEntries.forEach(entry => {
-          const timeInput = entry.querySelector('input[name^="agenda_time_"]');
-          const titleInput = entry.querySelector('input[name^="agenda_title_"]');
-          const typeSelect = entry.querySelector('select[name^="agenda_type_"]');
-          const time = timeInput?.value?.trim();
-          const title = titleInput?.value?.trim();
-          const type = typeSelect?.value || 'social';
-          if (time && title) {
-            agenda.push({ time, title, type });
-          }
+        document.querySelectorAll('.agenda-entry').forEach(entry => {
+          const time = entry.querySelector('input[name^="agenda_time_"]')?.value?.trim();
+          const title = entry.querySelector('input[name^="agenda_title_"]')?.value?.trim();
+          const type = entry.querySelector('select[name^="agenda_type_"]')?.value || 'social';
+          if (time && title) agenda.push({ time, title, type });
         });
 
         const eventData = {
@@ -227,14 +184,12 @@ export class Router {
           location: data.location.trim(),
           capacity: parseInt(data.capacity, 10),
           description: data.description.trim(),
-          tags: data.tags ? data.tags.split(',').map(t => t.trim()).filter(t => t) : [],
-          speakers: speakers,
-          agenda: agenda,
+          tags: data.tags ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+          speakers,
+          agenda,
         };
-        
-        const params = new URLSearchParams(window.location.search);
-        const editId = params.get('edit');
-        
+
+        const editId = new URLSearchParams(window.location.search).get('edit');
         try {
           if (editId) {
             await Data.updateEvent(editId, eventData);
@@ -256,20 +211,16 @@ export class Router {
     if (profileForm) {
       const newForm = profileForm.cloneNode(true);
       profileForm.parentNode.replaceChild(newForm, profileForm);
-      
       newForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        
-        const formData = new FormData(newForm);
-        const data = Object.fromEntries(formData.entries());
-        
+        const data = Object.fromEntries(new FormData(newForm).entries());
         try {
           await Data.updateUser({
             name: data.name.trim(),
             email: data.email.trim(),
             bio: data.bio.trim(),
-            skills: data.skills ? data.skills.split(',').map(s => s.trim()).filter(s => s) : [],
+            skills: data.skills ? data.skills.split(',').map(s => s.trim()).filter(Boolean) : [],
           });
           showToast('Profile updated!', 'success');
           await this.render(this.currentRoute);
@@ -279,26 +230,26 @@ export class Router {
       });
     }
 
-    // Events search/filter
+    // Search / filter listeners
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
       const newInput = searchInput.cloneNode(true);
       searchInput.parentNode.replaceChild(newInput, searchInput);
-      newInput.addEventListener('input', () => { this.filterEvents(); });
+      newInput.addEventListener('input', () => this.filterEvents());
     }
 
     const categoryFilter = document.getElementById('category-filter');
     if (categoryFilter) {
       const newFilter = categoryFilter.cloneNode(true);
       categoryFilter.parentNode.replaceChild(newFilter, categoryFilter);
-      newFilter.addEventListener('change', () => { this.filterEvents(); });
+      newFilter.addEventListener('change', () => this.filterEvents());
     }
 
     const statusFilter = document.getElementById('status-filter');
     if (statusFilter) {
       const newFilter = statusFilter.cloneNode(true);
       statusFilter.parentNode.replaceChild(newFilter, statusFilter);
-      newFilter.addEventListener('change', () => { this.filterEvents(); });
+      newFilter.addEventListener('change', () => this.filterEvents());
     }
   }
 
@@ -308,7 +259,6 @@ export class Router {
     const statusFilter = document.getElementById('status-filter');
     const eventsGrid = document.getElementById('events-grid');
     const eventsEmpty = document.getElementById('events-empty');
-
     if (!eventsGrid) return;
 
     const query = searchInput?.value?.trim() || '';
@@ -321,9 +271,9 @@ export class Router {
 
     if (events.length === 0) {
       eventsGrid.innerHTML = '';
-      if (eventsEmpty) eventsEmpty.classList.remove('hidden');
+      eventsEmpty?.classList.remove('hidden');
     } else {
-      if (eventsEmpty) eventsEmpty.classList.add('hidden');
+      eventsEmpty?.classList.add('hidden');
       const user = await Auth.me();
       const { EventCard } = await import('./components.js');
       eventsGrid.innerHTML = (await Promise.all(events.map((event, i) => EventCard(event, i, user)))).join('');
@@ -331,16 +281,13 @@ export class Router {
   }
 
   init() {
-    window.addEventListener('popstate', () => {
-      this.render(window.location.pathname);
-    });
+    window.addEventListener('popstate', () => this.render(window.location.pathname));
 
     document.addEventListener('click', (e) => {
       const link = e.target.closest('a[data-navigate]');
       if (link) {
         e.preventDefault();
-        const href = link.getAttribute('href');
-        this.navigateTo(href);
+        this.navigateTo(link.getAttribute('href'));
       }
     });
 
