@@ -186,28 +186,29 @@ window.toggleMobileNav = function() {
   if (nav) nav.classList.toggle('hidden');
 };
 
-// ========== FOOTER ==========
+// ========== FOOTER (centered content) ==========
 export function Footer() {
   return `
     <div class="bg-teal-950 text-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-12">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8 text-center sm:text-left">
+          
           <!-- Brand Column -->
-          <div class="md:col-span-1">
+          <div class="flex flex-col items-center sm:items-start">
             <a href="/" data-navigate class="flex items-center gap-2.5 mb-4">
               <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center border border-white/20">
                 <div class="text-orange-400">${getIcon('calendar', 18)}</div>
               </div>
-              <div class="flex flex-col leading-none">
+              <div class="flex flex-col leading-none text-left">
                 <span class="text-lg font-bold text-white tracking-tight">TechMeetHub</span>
                 <span class="text-[10px] text-teal-300 tracking-wide">Tech Event Platform</span>
               </div>
             </a>
-            <p class="text-sm text-teal-200/70 leading-relaxed">The all-in-one platform for creating, managing and scaling impactful tech events.</p>
+            <p class="text-sm text-teal-200/70 leading-relaxed max-w-xs">The all-in-one platform for creating, managing and scaling impactful tech events.</p>
           </div>
 
           <!-- Quick Links -->
-          <div>
+          <div class="flex flex-col items-center sm:items-start">
             <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Quick Links</h4>
             <ul class="space-y-2.5">
               <li><a href="/events" data-navigate class="text-sm text-teal-200/70 hover:text-white transition-colors">Browse Events</a></li>
@@ -218,7 +219,7 @@ export function Footer() {
           </div>
 
           <!-- Resources -->
-          <div>
+          <div class="flex flex-col items-center sm:items-start">
             <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Resources</h4>
             <ul class="space-y-2.5">
               <li><a href="/how-it-works" data-navigate class="text-sm text-teal-200/70 hover:text-white transition-colors">How It Works</a></li>
@@ -229,18 +230,18 @@ export function Footer() {
           </div>
 
           <!-- Newsletter -->
-          <div>
+          <div class="flex flex-col items-center sm:items-start">
             <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Stay Updated</h4>
-            <p class="text-sm text-teal-200/70 mb-4">Get the latest tech events delivered to your inbox.</p>
-            <form onsubmit="event.preventDefault(); window.showToast && window.showToast('Thanks for subscribing!', 'success');" class="flex gap-2">
+            <p class="text-sm text-teal-200/70 mb-4 max-w-xs">Get the latest tech events delivered to your inbox.</p>
+            <form onsubmit="event.preventDefault(); window.showToast && window.showToast('Thanks for subscribing!', 'success');" class="flex flex-col sm:flex-row gap-2 w-full max-w-xs sm:max-w-none">
               <input type="email" placeholder="Enter your email" class="flex-1 px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-teal-300/50 text-sm focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 transition-colors" />
-              <button type="submit" class="px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 transition-colors">Subscribe</button>
+              <button type="submit" class="px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 transition-colors whitespace-nowrap">Subscribe</button>
             </form>
           </div>
         </div>
 
         <!-- Bottom Bar -->
-        <div class="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-4">
           <p class="text-xs text-teal-300/50">&copy; ${new Date().getFullYear()} TechMeetHub. All rights reserved.</p>
           <div class="flex items-center gap-6">
             <a href="#" class="text-xs text-teal-300/50 hover:text-white transition-colors">Terms</a>
