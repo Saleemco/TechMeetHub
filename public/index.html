@@ -40,6 +40,26 @@
       overflow-x: hidden;
     }
 
+    /* Auth pages: no header padding, full viewport */
+    body.auth-page {
+      padding-top: 0;
+    }
+    body.auth-page #app {
+      min-height: 100vh;
+    }
+    /* CRITICAL: on auth pages, #main must fill viewport, have NO padding,
+       and NO transition so it doesn't slide when sidebar is removed */
+    body.auth-page #main {
+      min-height: 100vh !important;
+      padding: 0 !important;
+      transition: none !important;
+    }
+    @media (max-width: 640px) {
+      body { padding-top: 56px; }
+      body.auth-page #app { min-height: 100vh; }
+      body.auth-page #main { min-height: 100vh !important; }
+    }
+
     /* Flexbox sticky-footer */
     #app {
       min-height: calc(100vh - 64px);
@@ -49,7 +69,7 @@
 
     #main { 
       flex: 1 0 auto;
-      min-height: calc(100vh - 64px);
+      min-height: calc(100vh - 64px - 100px);
       padding-left: 0;
       transition: padding-left 0.3s ease;
       overflow-x: hidden;
@@ -57,9 +77,7 @@
 
     #main.sidebar-visible { padding-left: 256px; }
 
-    /* Hide header & footer until first render completes.
-       The router adds .app-ready once content is ready,
-       then everything fades in together as one unit. */
+    /* Hide header & footer until first render */
     #header, #footer {
       opacity: 0;
       transition: opacity 0.25s ease;
@@ -103,12 +121,6 @@
 
     .sidebar-link.active { color: #2563EB; background: #EFF6FF; }
     .sidebar-link.active svg { color: #2563EB; }
-
-    @media (max-width: 640px) {
-      body { padding-top: 56px; }
-      #app { min-height: calc(100vh - 56px); }
-      #main { min-height: calc(100vh - 56px); }
-    }
 
     .max-w-7xl { max-width: 80rem; }
     .container, .max-w-*, .w-full { max-width: 100%; }
