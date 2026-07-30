@@ -62,7 +62,7 @@ export class Router {
     const user = await Auth.me();
     const { handler, params } = this.matchRoute(path);
     const isHomePage = path === '/' || path === '/home';
-    const showSidebar = user || !isHomePage;
+    const showSidebar = (user || !isHomePage) && !isAuthPage;
 
     // 2. Header & Footer (hidden on auth pages)
     if (isAuthPage) {
@@ -78,7 +78,7 @@ export class Router {
     // 3. Swap in real content
     this.container.innerHTML = await handler(...params);
 
-    // 4. Sidebar toggle
+    // 4. Sidebar toggle (only on non-auth pages)
     const main = document.getElementById('main');
     if (main) {
       main.classList.toggle('sidebar-visible', showSidebar);
@@ -118,7 +118,7 @@ export class Router {
   }
 
   attachEventHandlers() {
-      // Login form
+    // Login form
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
       const newForm = loginForm.cloneNode(true);
@@ -184,6 +184,7 @@ export class Router {
         }
       });
     }
+
     // Create event form
     const createForm = document.getElementById('create-event-form');
     if (createForm) {
