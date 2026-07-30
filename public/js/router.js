@@ -20,7 +20,7 @@ const routes = {
 };
 
 const LOADING_PLACEHOLDER = `
-  <div class="min-h-[60vh] flex flex-col items-center justify-center text-gray-400">
+  <div class="flex flex-col items-center justify-center text-gray-400" style="min-height:inherit">
     <div class="w-8 h-8 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin mb-3"></div>
     <span class="text-sm">Loading...</span>
   </div>
@@ -54,10 +54,8 @@ export class Router {
   async render(path) {
     const isAuthPage = path === '/login' || path === '/register';
 
-    // 1. Show loading on non-auth pages (auth pages render instantly)
-    if (!isAuthPage) {
-      this.container.innerHTML = LOADING_PLACEHOLDER;
-    }
+    // 1. INSTANTLY show loading spinner on ALL pages so nothing flashes blank
+    this.container.innerHTML = LOADING_PLACEHOLDER;
 
     const user = await Auth.me();
     const { handler, params } = this.matchRoute(path);
