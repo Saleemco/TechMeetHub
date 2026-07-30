@@ -3,8 +3,8 @@ import { Input, getIcon } from '../components.js';
 
 export function LoginPage({ redirect = '/' } = {}) {
   return `
-    <div class="page-transition min-h-[calc(100vh-64px)] flex items-center justify-center px-4">
-      <div class="w-full max-w-md">
+    <div class="page-transition min-h-[100dvh] flex items-center justify-center px-4 -my-6">
+      <div class="w-full max-w-md py-12">
         <div class="text-center mb-8">
           <div class="w-12 h-12 rounded-lg bg-blue-600 flex items-center justify-center mx-auto mb-4">
             <span class="text-white font-bold text-lg">TM</span>
@@ -21,7 +21,10 @@ export function LoginPage({ redirect = '/' } = {}) {
               Remember me
             </label>
           </div>
-          <button type="submit" class="w-full py-2.5 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors">Sign In</button>
+          <button type="submit" id="login-btn" class="w-full py-2.5 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+            <span id="login-btn-text">Sign In</span>
+            <span id="login-btn-spinner" class="hidden w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+          </button>
           <div class="mt-6 text-center text-sm text-gray-500">
             Don't have an account? <a href="/register" data-navigate class="text-blue-600 hover:text-blue-800 transition-colors">Create one</a>
           </div>

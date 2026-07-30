@@ -20,7 +20,7 @@ const routes = {
 };
 
 const LOADING_PLACEHOLDER = `
-  <div class="flex flex-col items-center justify-center text-gray-400" style="min-height:calc(100vh - 64px - 80px)">
+  <div class="min-h-[60vh] flex flex-col items-center justify-center text-gray-400">
     <div class="w-8 h-8 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin mb-3"></div>
     <span class="text-sm">Loading...</span>
   </div>
@@ -52,17 +52,28 @@ export class Router {
   }
 
   async render(path) {
-    // 1. INSTANTLY show loading state so #main is never empty
-    this.container.innerHTML = LOADING_PLACEHOLDER;
+    const isAuthPage = path === '/login' || path === '/register';
+
+    // 1. Show loading on non-auth pages (auth pages render instantly)
+    if (!isAuthPage) {
+      this.container.innerHTML = LOADING_PLACEHOLDER;
+    }
 
     const user = await Auth.me();
     const { handler, params } = this.matchRoute(path);
     const isHomePage = path === '/' || path === '/home';
     const showSidebar = user || !isHomePage;
 
-    // 2. Render header & footer
-    this.header.innerHTML = Header(user);
-    this.footer.innerHTML = Footer();
+    // 2. Header & Footer (hidden on auth pages)
+    if (isAuthPage) {
+      document.body.classList.add('auth-page');
+      this.header.innerHTML = '';
+      this.footer.innerHTML = '';
+    } else {
+      document.body.classList.remove('auth-page');
+      this.header.innerHTML = Header(user);
+      this.footer.innerHTML = Footer();
+    }
 
     // 3. Swap in real content
     this.container.innerHTML = await handler(...params);
@@ -77,7 +88,7 @@ export class Router {
     this.updateSidebarActive(path);
     this.currentRoute = path;
 
-    // 5. Reveal footer now that first render is complete
+    // 5. Reveal footer/header on first render
     if (!this._hasRendered) {
       this._hasRendered = true;
       document.getElementById('app')?.classList.add('app-ready');
@@ -107,7 +118,7 @@ export class Router {
   }
 
   attachEventHandlers() {
-    // Login form
+      // Login form
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
       const newForm = loginForm.cloneNode(true);
@@ -115,6 +126,15 @@ export class Router {
       newForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         e.stopPropagation();
+        
+        const btn = newForm.querySelector('#login-btn');
+        const btnText = newForm.querySelector('#login-btn-text');
+        const btnSpinner = newForm.querySelector('#login-btn-spinner');
+        
+        if (btn) btn.disabled = true;
+        if (btnText) btnText.textContent = 'Signing in...';
+        if (btnSpinner) btnSpinner.classList.remove('hidden');
+        
         const formData = new FormData(newForm);
         try {
           await Auth.login(formData.get('email'), formData.get('password'));
@@ -122,6 +142,9 @@ export class Router {
           this.navigateTo('/dashboard');
         } catch (err) {
           showToast('Invalid email or password', 'error');
+          if (btn) btn.disabled = false;
+          if (btnText) btnText.textContent = 'Sign In';
+          if (btnSpinner) btnSpinner.classList.add('hidden');
         }
       });
     }
@@ -134,21 +157,33 @@ export class Router {
       newForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         e.stopPropagation();
+        
         const data = Object.fromEntries(new FormData(newForm).entries());
         if (data.password !== data.confirmPassword) {
           showToast('Passwords do not match', 'error');
           return;
         }
+        
+        const btn = newForm.querySelector('#register-btn');
+        const btnText = newForm.querySelector('#register-btn-text');
+        const btnSpinner = newForm.querySelector('#register-btn-spinner');
+        
+        if (btn) btn.disabled = true;
+        if (btnText) btnText.textContent = 'Creating account...';
+        if (btnSpinner) btnSpinner.classList.remove('hidden');
+        
         try {
           await Auth.register(data.name, data.email, data.password, data.role);
           showToast('Account created! Welcome to TechMeetHub.', 'success');
           this.navigateTo('/dashboard');
         } catch (err) {
           showToast('Email already registered', 'error');
+          if (btn) btn.disabled = false;
+          if (btnText) btnText.textContent = 'Create Account';
+          if (btnSpinner) btnSpinner.classList.add('hidden');
         }
       });
     }
-
     // Create event form
     const createForm = document.getElementById('create-event-form');
     if (createForm) {
