@@ -1,9 +1,9 @@
 // public/js/pages/LoginPage.js
-import { Input, getIcon } from '../components.js';
+import { Input } from '../components.js';
 
 export function LoginPage({ redirect = '/' } = {}) {
   return `
-    <div class="page-transition min-h-[100dvh] flex items-center justify-center px-4 -my-6">
+    <div class="min-h-[100dvh] flex items-center justify-center px-4 -my-6">
       <div class="w-full max-w-md py-12">
         <div class="text-center mb-8">
           <div class="w-12 h-12 rounded-lg bg-blue-600 flex items-center justify-center mx-auto mb-4">
