@@ -314,8 +314,7 @@ export class Router {
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
       const newInput = searchInput.cloneNode(true);
-      searchInput.parentNode.replaceChild(new
-            searchInput.parentNode.replaceChild(newInput, searchInput);
+      searchInput.parentNode.replaceChild(newInput, searchInput);
       newInput.addEventListener('input', () => this.filterEvents());
     }
 
