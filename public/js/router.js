@@ -27,9 +27,9 @@ const LOADING_PLACEHOLDER = `
 `;
 
 const AUTH_LOADING_PLACEHOLDER = `
-  <div class="flex flex-col items-center justify-center text-gray-400" style="min-height:100vh">
-    <div class="w-8 h-8 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin mb-3"></div>
-    <span class="text-sm">Loading...</span>
+  <div class="flex flex-col items-center justify-center bg-white text-gray-400" style="min-height:100dvh">
+    <div class="w-10 h-10 border-3 border-gray-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+    <span class="text-sm font-medium">Loading...</span>
   </div>
 `;
 
@@ -60,31 +60,45 @@ export class Router {
 
   async render(path) {
     const isAuthPage = path === '/login' || path === '/register';
+    const main = document.getElementById('main');
 
-    // 1. INSTANTLY show the correct loading spinner
+    // 1. Prepare layout BEFORE injecting spinner so it lands in the correct state
+    if (main) {
+      main.classList.remove('sidebar-visible');
+    }
+    if (isAuthPage) {
+      document.body.classList.add('auth-page');
+    } else {
+      document.body.classList.remove('auth-page');
+    }
+
+    // 2. Inject spinner
     this.container.innerHTML = isAuthPage ? AUTH_LOADING_PLACEHOLDER : LOADING_PLACEHOLDER;
 
+    // 3. FORCE BROWSER TO PAINT THE SPINNER before we overwrite it.
+    //    Reading offsetHeight triggers layout, and rAF yields to the paint cycle.
+    this.container.offsetHeight; 
+    await new Promise(resolve => requestAnimationFrame(resolve));
+
+    // 4. Now fetch data (this is the brief moment the spinner is visible)
     const user = await Auth.me();
     const { handler, params } = this.matchRoute(path);
     const isHomePage = path === '/' || path === '/home';
     const showSidebar = (user || !isHomePage) && !isAuthPage;
 
-    // 2. Header & Footer (hidden on auth pages)
+    // 5. Header & Footer
     if (isAuthPage) {
-      document.body.classList.add('auth-page');
       this.header.innerHTML = '';
       this.footer.innerHTML = '';
     } else {
-      document.body.classList.remove('auth-page');
       this.header.innerHTML = Header(user);
       this.footer.innerHTML = Footer();
     }
 
-    // 3. Swap in real content
+    // 6. Swap in real content
     this.container.innerHTML = await handler(...params);
 
-    // 4. Sidebar toggle (only on non-auth pages)
-    const main = document.getElementById('main');
+    // 7. Sidebar toggle (only on non-auth pages)
     if (main) {
       main.classList.toggle('sidebar-visible', showSidebar);
     }
@@ -93,7 +107,7 @@ export class Router {
     this.updateSidebarActive(path);
     this.currentRoute = path;
 
-    // 5. Reveal footer/header on first render
+    // 8. Reveal footer/header on first render
     if (!this._hasRendered) {
       this._hasRendered = true;
       document.getElementById('app')?.classList.add('app-ready');
