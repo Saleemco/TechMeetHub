@@ -30,15 +30,18 @@ async function AdminDashboard() {
   const upcomingEvents = allEvents
     .filter(e => e.date >= new Date().toISOString().split('T')[0])
     .sort((a, b) => a.date.localeCompare(b.date))
-    .slice(0, 4);
+    .slice(0, 5);
+
+  const recentUsers = allUsers.slice(0, 5);
 
   return `
     <div class="page-transition">
       <div class="mb-8">
         <h1 class="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-        <p class="text-gray-500 text-sm mt-1">Overview of platform activity</p>
+        <p class="text-gray-500 text-sm mt-1">Platform overview and management</p>
       </div>
 
+      <!-- Stats Row -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         ${StatCard({ icon: 'calendar', value: totalEvents, label: 'Total Events', color: 'blue', change: '+12 this month' })}
         ${StatCard({ icon: 'users', value: totalAttendees.toLocaleString(), label: 'Total Attendees', color: 'green', change: '+18.5%' })}
@@ -46,6 +49,7 @@ async function AdminDashboard() {
         ${StatCard({ icon: 'clock', value: adminStats.upcomingEvents || 0, label: 'Upcoming Events', color: 'purple', change: '+12' })}
       </div>
 
+      <!-- User Breakdown Row -->
       <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         <div class="bg-white rounded-xl p-5 border border-gray-200 hover:shadow-md transition-shadow">
           <div class="flex items-center gap-3 mb-2">
@@ -82,40 +86,122 @@ async function AdminDashboard() {
         </div>
       </div>
 
-      <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div class="flex items-center justify-between p-4 border-b border-gray-200">
-          <h2 class="text-lg font-semibold text-gray-900">Upcoming Events</h2>
-          <a href="/events" data-navigate class="text-sm text-blue-600 hover:text-blue-800 transition-colors">View All</a>
+      <!-- Quick Actions -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+        <a href="/events" data-navigate class="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all">
+          <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">${getIcon('calendar', 18)}</div>
+          <div>
+            <div class="text-sm font-semibold text-gray-900">All Events</div>
+            <div class="text-xs text-gray-500">Manage events</div>
+          </div>
+        </a>
+        <a href="/create" data-navigate class="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all">
+          <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">${getIcon('plus', 18)}</div>
+          <div>
+            <div class="text-sm font-semibold text-gray-900">Create Event</div>
+            <div class="text-xs text-gray-500">New event</div>
+          </div>
+        </a>
+        <a href="/profile" data-navigate class="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all">
+          <div class="w-10 h-10 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">${getIcon('user', 18)}</div>
+          <div>
+            <div class="text-sm font-semibold text-gray-900">My Profile</div>
+            <div class="text-xs text-gray-500">Edit profile</div>
+          </div>
+        </a>
+        <button onclick="window.logout()" class="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-red-300 hover:shadow-md transition-all text-left w-full">
+          <div class="w-10 h-10 rounded-lg bg-red-50 text-red-600 flex items-center justify-center">${getIcon('logout', 18)}</div>
+          <div>
+            <div class="text-sm font-semibold text-gray-900">Logout</div>
+            <div class="text-xs text-gray-500">End session</div>
+          </div>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        <!-- Upcoming Events Table -->
+        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div class="flex items-center justify-between p-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Upcoming Events</h2>
+            <a href="/events" data-navigate class="text-sm text-blue-600 hover:text-blue-800 transition-colors">View All</a>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-gray-500 bg-gray-50 border-b border-gray-200">
+                  <th class="px-4 py-3 font-medium">Event</th>
+                  <th class="px-4 py-3 font-medium hidden md:table-cell">Date</th>
+                  <th class="px-4 py-3 font-medium hidden lg:table-cell">Organizer</th>
+                  <th class="px-4 py-3 font-medium">Attendees</th>
+                  <th class="px-4 py-3 font-medium text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${upcomingEvents.length > 0 ? upcomingEvents.map(e => `
+                  <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <td class="px-4 py-3 font-medium text-gray-900 cursor-pointer" onclick="window.navigateTo('/events/${e.id}')">${e.title}</td>
+                    <td class="px-4 py-3 text-gray-500 hidden md:table-cell cursor-pointer" onclick="window.navigateTo('/events/${e.id}')">${new Date(e.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                    <td class="px-4 py-3 text-gray-500 hidden lg:table-cell cursor-pointer" onclick="window.navigateTo('/events/${e.id}')">${e.organizer?.name || 'Unknown'}</td>
+                    <td class="px-4 py-3 text-gray-500 cursor-pointer" onclick="window.navigateTo('/events/${e.id}')">${e.attendees?.length || 0} / ${e.capacity}</td>
+                    <td class="px-4 py-3 text-right">
+                      <button onclick="window.deleteEventAdmin('${e.id}')" class="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Delete event">
+                        ${getIcon('trash', 14)}
+                      </button>
+                    </td>
+                  </tr>
+                `).join('') : `
+                  <tr>
+                    <td colspan="5" class="px-4 py-8 text-center text-gray-500">No upcoming events</td>
+                  </tr>
+                `}
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="text-left text-gray-500 bg-gray-50 border-b border-gray-200">
-                <th class="px-4 py-3 font-medium">Event</th>
-                <th class="px-4 py-3 font-medium hidden md:table-cell">Date</th>
-                <th class="px-4 py-3 font-medium hidden lg:table-cell">Organizer</th>
-                <th class="px-4 py-3 font-medium">Attendees</th>
-                <th class="px-4 py-3 font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${upcomingEvents.length > 0 ? upcomingEvents.map(e => `
-                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.navigateTo('/events/${e.id}')">
-                  <td class="px-4 py-3 font-medium text-gray-900">${e.title}</td>
-                  <td class="px-4 py-3 text-gray-500 hidden md:table-cell">${new Date(e.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-                  <td class="px-4 py-3 text-gray-500 hidden lg:table-cell">${e.organizer?.name || 'Unknown'}</td>
-                  <td class="px-4 py-3 text-gray-500">${e.attendees?.length || 0} / ${e.capacity}</td>
-                  <td class="px-4 py-3">
-                    <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-600 border border-emerald-200">Published</span>
-                  </td>
+
+        <!-- Recent Users Table -->
+        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div class="flex items-center justify-between p-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Recent Users</h2>
+            <span class="text-sm text-gray-500">${totalUsers} total</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-gray-500 bg-gray-50 border-b border-gray-200">
+                  <th class="px-4 py-3 font-medium">User</th>
+                  <th class="px-4 py-3 font-medium">Role</th>
+                  <th class="px-4 py-3 font-medium hidden md:table-cell">Email</th>
+                  <th class="px-4 py-3 font-medium text-right">Actions</th>
                 </tr>
-              `).join('') : `
-                <tr>
-                  <td colspan="5" class="px-4 py-8 text-center text-gray-500">No upcoming events</td>
-                </tr>
-              `}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                ${recentUsers.length > 0 ? recentUsers.map(u => `
+                  <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <td class="px-4 py-3">
+                      <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-full ${u.initialsColor || 'bg-gray-400'} avatar-initials text-xs text-white flex items-center justify-center">${u.avatar || '?'}</div>
+                        <span class="font-medium text-gray-900">${u.name || 'Unknown'}</span>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium capitalize ${u.role === 'admin' ? 'bg-red-50 text-red-600 border border-red-200' : u.role === 'organizer' ? 'bg-amber-50 text-amber-600 border border-amber-200' : 'bg-blue-50 text-blue-600 border border-blue-200'}">${u.role || 'participant'}</span>
+                    </td>
+                    <td class="px-4 py-3 text-gray-500 hidden md:table-cell">${u.email || '-'}</td>
+                    <td class="px-4 py-3 text-right">
+                      <button onclick="window.deleteUser('${u.id}')" class="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Delete user">
+                        ${getIcon('trash', 14)}
+                      </button>
+                    </td>
+                  </tr>
+                `).join('') : `
+                  <tr>
+                    <td colspan="4" class="px-4 py-8 text-center text-gray-500">No users found</td>
+                  </tr>
+                `}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -137,7 +223,7 @@ async function OrganizerDashboard(user) {
   const upcomingEvents = hosting
     .filter(e => e.date >= now)
     .sort((a, b) => a.date.localeCompare(b.date))
-    .slice(0, 4);
+    .slice(0, 5);
 
   return `
     <div class="page-transition">
@@ -173,18 +259,23 @@ async function OrganizerDashboard(user) {
                 <th class="px-4 py-3 font-medium hidden md:table-cell">Date</th>
                 <th class="px-4 py-3 font-medium">Attendees</th>
                 <th class="px-4 py-3 font-medium hidden lg:table-cell">Revenue</th>
-                <th class="px-4 py-3 font-medium">Status</th>
+                <th class="px-4 py-3 font-medium text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               ${upcomingEvents.length > 0 ? upcomingEvents.map(e => `
-                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.navigateTo('/events/${e.id}')">
-                  <td class="px-4 py-3 font-medium text-gray-900">${e.title}</td>
-                  <td class="px-4 py-3 text-gray-500 hidden md:table-cell">${new Date(e.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-                  <td class="px-4 py-3 text-gray-500">${e.attendees?.length || 0} / ${e.capacity}</td>
-                  <td class="px-4 py-3 text-gray-500 hidden lg:table-cell">$${(e.attendees?.length || 0) * 25}</td>
-                  <td class="px-4 py-3">
-                    <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-600 border border-emerald-200">Published</span>
+                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                  <td class="px-4 py-3 font-medium text-gray-900 cursor-pointer" onclick="window.navigateTo('/events/${e.id}')">${e.title}</td>
+                  <td class="px-4 py-3 text-gray-500 hidden md:table-cell cursor-pointer" onclick="window.navigateTo('/events/${e.id}')">${new Date(e.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                  <td class="px-4 py-3 text-gray-500 cursor-pointer" onclick="window.navigateTo('/events/${e.id}')">${e.attendees?.length || 0} / ${e.capacity}</td>
+                  <td class="px-4 py-3 text-gray-500 hidden lg:table-cell cursor-pointer" onclick="window.navigateTo('/events/${e.id}')">$${(e.attendees?.length || 0) * 25}</td>
+                  <td class="px-4 py-3 text-right">
+                    <button onclick="window.navigateTo('/create?edit=${e.id}')" class="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors mr-1" title="Edit event">
+                      ${getIcon('wrench', 14)}
+                    </button>
+                    <button onclick="window.deleteEvent('${e.id}')" class="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Delete event">
+                      ${getIcon('trash', 14)}
+                    </button>
                   </td>
                 </tr>
               `).join('') : `
