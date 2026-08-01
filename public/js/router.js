@@ -33,6 +33,9 @@ const AUTH_LOADING_PLACEHOLDER = `
   </div>
 `;
 
+// Minimum time the spinner stays visible on auth pages (ms)
+const MIN_AUTH_LOADING = 400;
+
 export class Router {
   constructor() {
     this.currentRoute = '/';
@@ -62,7 +65,7 @@ export class Router {
     const isAuthPage = path === '/login' || path === '/register';
     const main = document.getElementById('main');
 
-    // 1. Prepare layout BEFORE injecting spinner so it lands in the correct state
+    // 1. Prepare layout BEFORE injecting spinner
     if (main) {
       main.classList.remove('sidebar-visible');
     }
@@ -72,21 +75,28 @@ export class Router {
       document.body.classList.remove('auth-page');
     }
 
-    // 2. Inject spinner
+    // 2. Inject spinner immediately
     this.container.innerHTML = isAuthPage ? AUTH_LOADING_PLACEHOLDER : LOADING_PLACEHOLDER;
 
-    // 3. FORCE BROWSER TO PAINT THE SPINNER before we overwrite it.
-    //    Reading offsetHeight triggers layout, and rAF yields to the paint cycle.
-    this.container.offsetHeight; 
+    // 3. Start timer and force browser paint
+    const startTime = Date.now();
+    this.container.offsetHeight;
     await new Promise(resolve => requestAnimationFrame(resolve));
 
-    // 4. Now fetch data (this is the brief moment the spinner is visible)
+    // 4. Fetch data (this is usually instant for auth pages)
     const user = await Auth.me();
     const { handler, params } = this.matchRoute(path);
     const isHomePage = path === '/' || path === '/home';
     const showSidebar = (user || !isHomePage) && !isAuthPage;
 
-    // 5. Header & Footer
+    // 5. Enforce minimum spinner display time so users actually see it
+    const elapsed = Date.now() - startTime;
+    const remaining = Math.max(0, MIN_AUTH_LOADING - elapsed);
+    if (remaining > 0) {
+      await new Promise(resolve => setTimeout(resolve, remaining));
+    }
+
+    // 6. Header & Footer
     if (isAuthPage) {
       this.header.innerHTML = '';
       this.footer.innerHTML = '';
@@ -95,10 +105,10 @@ export class Router {
       this.footer.innerHTML = Footer();
     }
 
-    // 6. Swap in real content
+    // 7. Swap in real content
     this.container.innerHTML = await handler(...params);
 
-    // 7. Sidebar toggle (only on non-auth pages)
+    // 8. Sidebar toggle (only on non-auth pages)
     if (main) {
       main.classList.toggle('sidebar-visible', showSidebar);
     }
@@ -107,7 +117,7 @@ export class Router {
     this.updateSidebarActive(path);
     this.currentRoute = path;
 
-    // 8. Reveal footer/header on first render
+    // 9. Reveal footer/header on first render
     if (!this._hasRendered) {
       this._hasRendered = true;
       document.getElementById('app')?.classList.add('app-ready');
