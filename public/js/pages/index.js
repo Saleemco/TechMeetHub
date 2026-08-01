@@ -8,4 +8,6 @@ export { CreateEventPage } from './CreateEventPage.js';
 export { DashboardPage } from './DashboardPage.js';
 export { ProfilePage } from './ProfilePage.js';
 export { NotFoundPage } from './NotFoundPage.js';
+export { AdminUsersPage } from './AdminUsersPage.js';
+export { AdminEventsPage } from './AdminEventsPage.js';
 export { requireAuth, requireRole } from './auth.js';

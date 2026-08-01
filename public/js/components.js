@@ -220,15 +220,18 @@ export function DashboardHeader(user) {
 }
 
 // ========== SIDEBAR (role-based navigation) ==========
+// ========== SIDEBAR (role-based navigation) ==========
 export function Sidebar(user) {
   if (!user) return '';
   const role = user.role || 'participant';
 
   const navItems = {
     admin: [
-      { href: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
-      { href: '/events',    label: 'All Events', icon: 'calendar' },
-      { href: '/profile',   label: 'Profile',    icon: 'user' },
+      { href: '/dashboard',     label: 'Dashboard',      icon: 'dashboard' },
+      { href: '/admin/events',  label: 'All Events',     icon: 'calendar' },
+      { href: '/admin/users',   label: 'Manage Users',   icon: 'users' },
+      { href: '/create',        label: 'Create Event',   icon: 'plus' },
+      { href: '/profile',       label: 'Profile',        icon: 'user' },
     ],
     organizer: [
       { href: '/dashboard', label: 'Dashboard',    icon: 'dashboard' },
@@ -273,7 +276,6 @@ export function Sidebar(user) {
     </div>
   `;
 }
-
 // ========== FOOTER (centered, fixed newsletter) ==========
 export function Footer() {
   return `

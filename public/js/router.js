@@ -1,7 +1,8 @@
 // public/js/router.js
 import { 
   HomePage, EventsPage, EventDetailPage, CreateEventPage, 
-  DashboardPage, ProfilePage, LoginPage, RegisterPage, NotFoundPage 
+  DashboardPage, ProfilePage, LoginPage, RegisterPage, NotFoundPage,
+  AdminUsersPage, AdminEventsPage
 } from './pages/index.js';
 import { Auth, Data } from './data.js';
 import { Header, Footer, showToast, Sidebar, DashboardHeader } from './components.js';
@@ -17,6 +18,8 @@ const routes = {
   '/login': LoginPage,
   '/register': RegisterPage,
   '/admin': DashboardPage,
+  '/admin/users': AdminUsersPage,
+  '/admin/events': AdminEventsPage,
 };
 
 const LOADING_PLACEHOLDER = `
@@ -67,11 +70,9 @@ export class Router {
     const isAuthPage = cleanPath === '/login' || cleanPath === '/register';
     const main = document.getElementById('main');
 
-    // 1. Kill any padding transition BEFORE touching classes so nothing slides
     if (main) {
       main.style.transition = 'none';
       main.classList.remove('sidebar-visible');
-      // Force reflow so the browser commits the padding change instantly
       void main.offsetHeight;
     }
 
@@ -81,29 +82,24 @@ export class Router {
       document.body.classList.remove('auth-page');
     }
 
-    // 2. Inject spinner
     this.container.innerHTML = isAuthPage ? AUTH_LOADING_PLACEHOLDER : LOADING_PLACEHOLDER;
     this.container.offsetHeight;
 
-    // 3. Start timer and let browser paint
     const startTime = Date.now();
     await new Promise(resolve => requestAnimationFrame(resolve));
 
-    // 4. Fetch data
     const user = await Auth.me();
     const { handler, params } = this.matchRoute(path);
     const isHomePage = cleanPath === '/' || cleanPath === '/home';
     const isDashboardRoute = !!user && !isAuthPage && !isHomePage;
     const showSidebar = isDashboardRoute;
 
-    // 5. Enforce minimum spinner time
     const elapsed = Date.now() - startTime;
     const remaining = Math.max(0, MIN_AUTH_LOADING - elapsed);
     if (remaining > 0) {
       await new Promise(resolve => setTimeout(resolve, remaining));
     }
 
-    // 6. Header, Footer & Sidebar
     if (isAuthPage) {
       this.header.innerHTML = '';
       this.footer.innerHTML = '';
@@ -112,7 +108,6 @@ export class Router {
         this.sidebar.classList.add('hidden');
       }
     } else if (isDashboardRoute) {
-      // Dashboard pages: minimal header + sidebar, no public nav
       this.header.innerHTML = DashboardHeader(user);
       this.footer.innerHTML = '';
       if (this.sidebar) {
@@ -120,7 +115,6 @@ export class Router {
         this.sidebar.classList.remove('hidden');
       }
     } else {
-      // Public pages: full header + footer, no sidebar
       this.header.innerHTML = Header(user);
       this.footer.innerHTML = Footer();
       if (this.sidebar) {
@@ -129,10 +123,8 @@ export class Router {
       }
     }
 
-    // 7. Swap in real content
     this.container.innerHTML = await handler(...params);
 
-    // 8. Restore transition and toggle sidebar layout
     if (main) {
       main.style.transition = '';
       main.classList.toggle('sidebar-visible', showSidebar);
@@ -142,7 +134,6 @@ export class Router {
     this.updateSidebarActive(path);
     this.currentRoute = path;
 
-    // 9. Reveal footer/header on first render
     if (!this._hasRendered) {
       this._hasRendered = true;
       document.getElementById('app')?.classList.add('app-ready');
@@ -172,7 +163,6 @@ export class Router {
   }
 
   attachEventHandlers() {
-    // Login form
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
       const newForm = loginForm.cloneNode(true);
@@ -203,7 +193,6 @@ export class Router {
       });
     }
 
-    // Register form
     const registerForm = document.getElementById('register-form');
     if (registerForm) {
       const newForm = registerForm.cloneNode(true);
@@ -239,7 +228,6 @@ export class Router {
       });
     }
 
-    // Create event form
     const createForm = document.getElementById('create-event-form');
     if (createForm) {
       const newForm = createForm.cloneNode(true);
@@ -300,7 +288,6 @@ export class Router {
       });
     }
 
-    // Profile form
     const profileForm = document.getElementById('profile-form');
     if (profileForm) {
       const newForm = profileForm.cloneNode(true);
@@ -324,11 +311,11 @@ export class Router {
       });
     }
 
-    // Search / filter listeners
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
       const newInput = searchInput.cloneNode(true);
-      searchInput.parentNode.replaceChild(newInput, searchInput);
+      searchInput.parentNode.replaceChild(new
+            searchInput.parentNode.replaceChild(newInput, searchInput);
       newInput.addEventListener('input', () => this.filterEvents());
     }
 
