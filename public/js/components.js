@@ -96,7 +96,7 @@ export function getCategoryIcon(catId, size = 16) {
   return cat ? getIcon(cat.icon, size) : getIcon('zap', size);
 }
 
-// ========== HEADER ==========
+// ========== HEADER (public pages) ==========
 export function Header(user = null) {
   const isLoggedIn = !!user;
   const role = user?.role || '';
@@ -186,7 +186,94 @@ window.toggleMobileNav = function() {
   if (nav) nav.classList.toggle('hidden');
 };
 
-// ========== FOOTER (centered content) ==========
+// ========== DASHBOARD HEADER (minimal — no public nav links) ==========
+export function DashboardHeader(user) {
+  return `
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16">
+      <div class="h-full flex items-center justify-between px-4 lg:px-6">
+        <!-- Left: hamburger (mobile) + logo -->
+        <div class="flex items-center gap-3">
+          <button onclick="window.toggleSidebar()" class="lg:hidden p-2 rounded-lg text-gray-600 hover:text-teal-900 hover:bg-gray-100 transition-colors">
+            ${getIcon('menu', 22)}
+          </button>
+          <a href="/" data-navigate class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-teal-900 flex items-center justify-center border border-teal-800">
+              <div class="text-orange-400">${getIcon('calendar', 16)}</div>
+            </div>
+            <span class="text-base font-bold text-teal-900 tracking-tight hidden sm:inline">TechMeetHub</span>
+          </a>
+        </div>
+
+        <!-- Right: user + logout -->
+        <div class="flex items-center gap-3">
+          <a href="/profile" data-navigate class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors">
+            <div class="w-7 h-7 rounded-full ${user?.initialsColor || 'bg-teal-900'} avatar-initials text-xs text-white flex items-center justify-center">${user?.avatar || '?'}</div>
+            <span class="text-sm text-gray-700 hidden sm:inline">${user?.name || 'User'}</span>
+          </a>
+          <button onclick="window.logout()" class="p-2 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors" title="Logout">
+            ${getIcon('logout', 18)}
+          </button>
+        </div>
+      </div>
+    </nav>
+  `;
+}
+
+// ========== SIDEBAR (role-based navigation) ==========
+export function Sidebar(user) {
+  if (!user) return '';
+  const role = user.role || 'participant';
+
+  const navItems = {
+    admin: [
+      { href: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
+      { href: '/events',    label: 'All Events', icon: 'calendar' },
+      { href: '/profile',   label: 'Profile',    icon: 'user' },
+    ],
+    organizer: [
+      { href: '/dashboard', label: 'Dashboard',    icon: 'dashboard' },
+      { href: '/events',    label: 'My Events',    icon: 'calendar' },
+      { href: '/create',    label: 'Create Event', icon: 'plus' },
+      { href: '/profile',   label: 'Profile',      icon: 'user' },
+    ],
+    participant: [
+      { href: '/dashboard', label: 'Dashboard',      icon: 'dashboard' },
+      { href: '/events',    label: 'Browse Events',  icon: 'calendar' },
+      { href: '/profile',   label: 'Profile',        icon: 'user' },
+    ],
+  };
+
+  const items = navItems[role] || navItems.participant;
+
+  return `
+    <div class="h-full flex flex-col">
+      <div class="p-4 border-b border-gray-200">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full ${user?.initialsColor || 'bg-teal-900'} avatar-initials text-sm text-white flex items-center justify-center shrink-0">${user?.avatar || '?'}</div>
+          <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-900 truncate">${user?.name || 'User'}</p>
+            <p class="text-xs text-gray-500 capitalize">${role}</p>
+          </div>
+        </div>
+      </div>
+      <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
+        ${items.map(item => `
+          <a href="${item.href}" data-navigate data-route="${item.href}" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:text-teal-900 hover:bg-gray-50 transition-colors">
+            ${getIcon(item.icon, 18)}
+            <span>${item.label}</span>
+          </a>
+        `).join('')}
+      </nav>
+      <div class="p-3 border-t border-gray-200">
+        <button onclick="window.logout()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 transition-colors">
+          ${getIcon('logout', 18)}
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
 // ========== FOOTER (centered, fixed newsletter) ==========
 export function Footer() {
   return `
@@ -254,6 +341,7 @@ export function Footer() {
     </div>
   `;
 }
+
 // ========== TOAST ==========
 export function showToast(message, type = 'success') {
   let container = document.getElementById('toast-container');

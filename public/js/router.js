@@ -4,7 +4,7 @@ import {
   DashboardPage, ProfilePage, LoginPage, RegisterPage, NotFoundPage 
 } from './pages/index.js';
 import { Auth, Data } from './data.js';
-import { Header, Footer, showToast } from './components.js';
+import { Header, Footer, showToast, Sidebar, DashboardHeader } from './components.js';
 
 const routes = {
   '/': HomePage,
@@ -42,6 +42,7 @@ export class Router {
     this.container = document.getElementById('main');
     this.header = document.getElementById('header');
     this.footer = document.getElementById('footer');
+    this.sidebar = document.getElementById('sidebar');
     this._hasRendered = false;
   }
 
@@ -61,7 +62,8 @@ export class Router {
   }
 
   async render(path) {
-    const isAuthPage = path === '/login' || path === '/register';
+    const cleanPath = path.split('?')[0];
+    const isAuthPage = cleanPath === '/login' || cleanPath === '/register';
     const main = document.getElementById('main');
 
     // 1. Kill any padding transition BEFORE touching classes so nothing slides
@@ -89,8 +91,10 @@ export class Router {
     // 4. Fetch data
     const user = await Auth.me();
     const { handler, params } = this.matchRoute(path);
-    const isHomePage = path === '/' || path === '/home';
-    const showSidebar = (user || !isHomePage) && !isAuthPage;
+    const isHomePage = cleanPath === '/' || cleanPath === '/home';
+    const dashboardRoutes = ['/dashboard', '/admin', '/profile', '/create'];
+    const isDashboardRoute = dashboardRoutes.includes(cleanPath);
+    const showSidebar = isDashboardRoute && !!user;
 
     // 5. Enforce minimum spinner time
     const elapsed = Date.now() - startTime;
@@ -99,19 +103,36 @@ export class Router {
       await new Promise(resolve => setTimeout(resolve, remaining));
     }
 
-    // 6. Header & Footer
+    // 6. Header, Footer & Sidebar
     if (isAuthPage) {
       this.header.innerHTML = '';
       this.footer.innerHTML = '';
+      if (this.sidebar) {
+        this.sidebar.innerHTML = '';
+        this.sidebar.classList.add('hidden');
+      }
+    } else if (isDashboardRoute && user) {
+      // Dashboard pages: minimal header + sidebar, no public nav
+      this.header.innerHTML = DashboardHeader(user);
+      this.footer.innerHTML = '';
+      if (this.sidebar) {
+        this.sidebar.innerHTML = Sidebar(user);
+        this.sidebar.classList.remove('hidden');
+      }
     } else {
+      // Public pages: full header + footer, no sidebar
       this.header.innerHTML = Header(user);
       this.footer.innerHTML = Footer();
+      if (this.sidebar) {
+        this.sidebar.innerHTML = '';
+        this.sidebar.classList.add('hidden');
+      }
     }
 
     // 7. Swap in real content
     this.container.innerHTML = await handler(...params);
 
-    // 8. Restore transition and toggle sidebar (only on non-auth pages)
+    // 8. Restore transition and toggle sidebar layout
     if (main) {
       main.style.transition = '';
       main.classList.toggle('sidebar-visible', showSidebar);
@@ -349,7 +370,8 @@ export class Router {
       eventsEmpty?.classList.add('hidden');
       const user = await Auth.me();
       const { EventCard } = await import('./components.js');
-      eventsGrid.innerHTML = (await Promise.all(events.map((event, i) => EventCard(event, i, user)))).join('');
+      eventsGrid.innerHTML
+            eventsGrid.innerHTML = (await Promise.all(events.map((event, i) => EventCard(event, i, user)))).join('');
     }
   }
 
