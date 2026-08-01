@@ -27,13 +27,12 @@ const LOADING_PLACEHOLDER = `
 `;
 
 const AUTH_LOADING_PLACEHOLDER = `
-  <div class="flex flex-col items-center justify-center bg-white text-gray-400" style="min-height:100dvh">
-    <div class="w-10 h-10 border-3 border-gray-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+  <div class="flex flex-col items-center justify-center bg-white text-gray-500" style="min-height:100dvh">
+    <div class="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
     <span class="text-sm font-medium">Loading...</span>
   </div>
 `;
 
-// Minimum time the spinner stays visible on auth pages (ms)
 const MIN_AUTH_LOADING = 400;
 
 export class Router {
@@ -65,31 +64,35 @@ export class Router {
     const isAuthPage = path === '/login' || path === '/register';
     const main = document.getElementById('main');
 
-    // 1. Prepare layout BEFORE injecting spinner
+    // 1. Kill any padding transition BEFORE touching classes so nothing slides
     if (main) {
+      main.style.transition = 'none';
       main.classList.remove('sidebar-visible');
+      // Force reflow so the browser commits the padding change instantly
+      void main.offsetHeight;
     }
+
     if (isAuthPage) {
       document.body.classList.add('auth-page');
     } else {
       document.body.classList.remove('auth-page');
     }
 
-    // 2. Inject spinner immediately
+    // 2. Inject spinner
     this.container.innerHTML = isAuthPage ? AUTH_LOADING_PLACEHOLDER : LOADING_PLACEHOLDER;
-
-    // 3. Start timer and force browser paint
-    const startTime = Date.now();
     this.container.offsetHeight;
+
+    // 3. Start timer and let browser paint
+    const startTime = Date.now();
     await new Promise(resolve => requestAnimationFrame(resolve));
 
-    // 4. Fetch data (this is usually instant for auth pages)
+    // 4. Fetch data
     const user = await Auth.me();
     const { handler, params } = this.matchRoute(path);
     const isHomePage = path === '/' || path === '/home';
     const showSidebar = (user || !isHomePage) && !isAuthPage;
 
-    // 5. Enforce minimum spinner display time so users actually see it
+    // 5. Enforce minimum spinner time
     const elapsed = Date.now() - startTime;
     const remaining = Math.max(0, MIN_AUTH_LOADING - elapsed);
     if (remaining > 0) {
@@ -108,8 +111,9 @@ export class Router {
     // 7. Swap in real content
     this.container.innerHTML = await handler(...params);
 
-    // 8. Sidebar toggle (only on non-auth pages)
+    // 8. Restore transition and toggle sidebar (only on non-auth pages)
     if (main) {
+      main.style.transition = '';
       main.classList.toggle('sidebar-visible', showSidebar);
     }
 
