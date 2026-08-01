@@ -71,9 +71,7 @@ export class Router {
     const main = document.getElementById('main');
 
     if (main) {
-      main.style.transition = 'none';
       main.classList.remove('sidebar-visible');
-      void main.offsetHeight;
     }
 
     if (isAuthPage) {
@@ -126,7 +124,6 @@ export class Router {
     this.container.innerHTML = await handler(...params);
 
     if (main) {
-      main.style.transition = '';
       main.classList.toggle('sidebar-visible', showSidebar);
     }
 
