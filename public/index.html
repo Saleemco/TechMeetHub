@@ -47,8 +47,6 @@
     body.auth-page #app {
       min-height: 100vh;
     }
-    /* CRITICAL: on auth pages, #main must fill viewport, have NO padding,
-       and NO transition so it doesn't slide when sidebar is removed */
     body.auth-page #main {
       min-height: 100vh !important;
       padding: 0 !important;
@@ -75,7 +73,12 @@
       overflow-x: hidden;
     }
 
-    #main.sidebar-visible { padding-left: 256px; }
+    /* Sidebar padding only on desktop */
+    @media (min-width: 1024px) {
+      #main.sidebar-visible {
+        padding-left: 256px;
+      }
+    }
 
     /* Hide header & footer until first render */
     #header, #footer {
@@ -122,6 +125,12 @@
     .sidebar-link.active { color: #2563EB; background: #EFF6FF; }
     .sidebar-link.active svg { color: #2563EB; }
 
+    @media (max-width: 640px) {
+      body { padding-top: 56px; }
+      #app { min-height: calc(100vh - 56px); }
+      #main { min-height: calc(100vh - 56px - 100px); }
+    }
+
     .max-w-7xl { max-width: 80rem; }
     .container, .max-w-*, .w-full { max-width: 100%; }
     img, svg, video, iframe { max-width: 100%; }
@@ -135,6 +144,13 @@
 <body>
   <div id="app">
     <header id="header"></header>
+    
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed top-16 left-0 bottom-0 w-64 bg-white border-r border-gray-200 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out hidden"></aside>
+    
+    <!-- Mobile sidebar overlay -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden" onclick="window.closeSidebar()"></div>
+    
     <main id="main" class="px-4 sm:px-6 lg:px-8 py-6"></main>
     <footer id="footer"></footer>
   </div>
