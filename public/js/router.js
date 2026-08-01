@@ -20,7 +20,14 @@ const routes = {
 };
 
 const LOADING_PLACEHOLDER = `
-  <div class="flex flex-col items-center justify-center text-gray-400" style="min-height:inherit">
+  <div class="flex flex-col items-center justify-center text-gray-400" style="min-height:60vh">
+    <div class="w-8 h-8 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin mb-3"></div>
+    <span class="text-sm">Loading...</span>
+  </div>
+`;
+
+const AUTH_LOADING_PLACEHOLDER = `
+  <div class="flex flex-col items-center justify-center text-gray-400" style="min-height:100vh">
     <div class="w-8 h-8 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin mb-3"></div>
     <span class="text-sm">Loading...</span>
   </div>
@@ -54,8 +61,8 @@ export class Router {
   async render(path) {
     const isAuthPage = path === '/login' || path === '/register';
 
-    // 1. INSTANTLY show loading spinner on ALL pages so nothing flashes blank
-    this.container.innerHTML = LOADING_PLACEHOLDER;
+    // 1. INSTANTLY show the correct loading spinner
+    this.container.innerHTML = isAuthPage ? AUTH_LOADING_PLACEHOLDER : LOADING_PLACEHOLDER;
 
     const user = await Auth.me();
     const { handler, params } = this.matchRoute(path);
