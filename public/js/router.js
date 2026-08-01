@@ -57,6 +57,7 @@ export class Router {
   }
 
   async navigateTo(path) {
+    if (window.closeSidebar) window.closeSidebar();
     window.history.pushState({}, '', path);
     await this.render(path);
   }
@@ -92,9 +93,8 @@ export class Router {
     const user = await Auth.me();
     const { handler, params } = this.matchRoute(path);
     const isHomePage = cleanPath === '/' || cleanPath === '/home';
-    const dashboardRoutes = ['/dashboard', '/admin', '/profile', '/create'];
-    const isDashboardRoute = dashboardRoutes.includes(cleanPath);
-    const showSidebar = isDashboardRoute && !!user;
+    const isDashboardRoute = !!user && !isAuthPage && !isHomePage;
+    const showSidebar = isDashboardRoute;
 
     // 5. Enforce minimum spinner time
     const elapsed = Date.now() - startTime;
@@ -111,7 +111,7 @@ export class Router {
         this.sidebar.innerHTML = '';
         this.sidebar.classList.add('hidden');
       }
-    } else if (isDashboardRoute && user) {
+    } else if (isDashboardRoute) {
       // Dashboard pages: minimal header + sidebar, no public nav
       this.header.innerHTML = DashboardHeader(user);
       this.footer.innerHTML = '';
@@ -359,7 +359,18 @@ export class Router {
     const category = categoryFilter?.value || 'all';
     const status = statusFilter?.value || 'all';
 
-    let events = query ? await Data.searchEvents(query) : await Data.getEvents();
+    const user = await Auth.me();
+    let events;
+    if (query) {
+      events = await Data.searchEvents(query);
+    } else if (user?.role === 'organizer') {
+      events = await Data.getHostingEvents();
+    } else if (user?.role === 'admin') {
+      events = await Data.getAdminEvents();
+    } else {
+      events = await Data.getEvents();
+    }
+
     if (category !== 'all') events = events.filter(e => e.category === category);
     if (status !== 'all') events = events.filter(e => e.status === status);
 
@@ -368,10 +379,8 @@ export class Router {
       eventsEmpty?.classList.remove('hidden');
     } else {
       eventsEmpty?.classList.add('hidden');
-      const user = await Auth.me();
       const { EventCard } = await import('./components.js');
-      eventsGrid.innerHTML
-            eventsGrid.innerHTML = (await Promise.all(events.map((event, i) => EventCard(event, i, user)))).join('');
+      eventsGrid.innerHTML = (await Promise.all(events.map((event, i) => EventCard(event, i, user)))).join('');
     }
   }
 

@@ -3,17 +3,37 @@ import { Data, Auth } from '../data.js';
 import { EventCard, EmptyState, getIcon } from '../components.js';
 
 export async function EventsPage() {
-  const [events, allCategories, user] = await Promise.all([
-    Data.getEvents(),
-    Data.getCategories(),
-    Auth.me()
+  const user = await Auth.me();
+
+  // Role-based event fetching and titles
+  let eventsPromise;
+  let pageTitle;
+  let pageSubtitle;
+
+  if (user?.role === 'organizer') {
+    eventsPromise = Data.getHostingEvents();
+    pageTitle = 'My Events';
+    pageSubtitle = 'Manage your hosted events';
+  } else if (user?.role === 'admin') {
+    eventsPromise = Data.getAdminEvents();
+    pageTitle = 'All Events';
+    pageSubtitle = 'Overview of all platform events';
+  } else {
+    eventsPromise = Data.getEvents();
+    pageTitle = 'Discover Events';
+    pageSubtitle = 'Find your next tech gathering';
+  }
+
+  const [events, allCategories] = await Promise.all([
+    eventsPromise,
+    Data.getCategories()
   ]);
 
   return `
     <div class="page-transition max-w-7xl mx-auto">
       <div class="mb-8">
-        <h1 class="text-2xl font-bold text-gray-900 mb-1">Discover Events</h1>
-        <p class="text-gray-500 text-sm">Find your next tech gathering</p>
+        <h1 class="text-2xl font-bold text-gray-900 mb-1">${pageTitle}</h1>
+        <p class="text-gray-500 text-sm">${pageSubtitle}</p>
       </div>
       
       <div class="bg-white rounded-xl p-4 border border-gray-200 mb-6">
