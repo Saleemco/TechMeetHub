@@ -207,11 +207,17 @@ function FeatureCard(icon, title, description, href, linkLabel) {
 
 function HeroImage() {
   return `
-    <div class="relative overflow-hidden shadow-xl">
+    <div class="relative overflow-hidden shadow-xl bg-teal-800 rounded-lg">
       <img
         src="/img/hero-conference.png"
         alt="Tech conference audience watching a speaker on stage"
         class="w-full h-52 sm:h-64 md:h-72 lg:h-80 object-cover rounded-lg"
+        width="800"
+        height="400"
+        fetchpriority="high"
+        loading="eager"
+        decoding="async"
+        onerror="this.style.display='none'; this.parentElement.classList.add('bg-gradient-to-br', 'from-teal-800', 'to-teal-950');"
       />
       <div class="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm px-4 py-2 text-white text-sm font-semibold hidden md:block rounded-lg">
         Building the Next Generation

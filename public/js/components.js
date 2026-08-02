@@ -220,7 +220,6 @@ export function DashboardHeader(user) {
 }
 
 // ========== SIDEBAR (role-based navigation) ==========
-// ========== SIDEBAR (role-based navigation) ==========
 export function Sidebar(user) {
   if (!user) return '';
   const role = user.role || 'participant';
@@ -276,6 +275,7 @@ export function Sidebar(user) {
     </div>
   `;
 }
+
 // ========== FOOTER (centered, fixed newsletter) ==========
 export function Footer() {
   return `
@@ -490,8 +490,15 @@ export async function EventCard(event, index = 0, user = null) {
 
   return `
     <div class="bg-white rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition-shadow">
-      <div class="h-40 relative">
-        <img src="${event.image || 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&h=400&fit=crop'}" alt="${event.title}" class="w-full h-full object-cover" />
+      <div class="h-40 relative bg-gray-100">
+        <img src="${event.image || 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&h=200&fit=crop&q=80'}" 
+             alt="${event.title}" 
+             class="w-full h-full object-cover" 
+             width="400" 
+             height="200"
+             loading="lazy" 
+             decoding="async"
+             onerror="this.parentElement.classList.add('bg-gray-200'); this.style.display='none';" />
         <div class="absolute inset-0 bg-gradient-to-t from-gray-900/40 via-transparent to-transparent"></div>
         <div class="absolute top-3 right-3">
           <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium ${isFull ? 'bg-red-100 text-red-600 border border-red-200' : 'bg-emerald-100 text-emerald-600 border border-emerald-200'}">${isFull ? 'Full' : `${spotsLeft} spots`}</span>
@@ -527,7 +534,14 @@ export function EventListItem(event, isAttending = false) {
   const date = formatDate(event.date);
   return `
     <div class="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 hover:shadow-md transition-all cursor-pointer" onclick="window.navigateTo('/events/${event.id}')">
-      <img src="${event.image || 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=200&h=200&fit=crop'}" alt="" class="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+      <img src="${event.image || 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=100&h=100&fit=crop&q=80'}" 
+           alt="" 
+           class="w-12 h-12 rounded-lg object-cover flex-shrink-0 bg-gray-100" 
+           width="100" 
+           height="100"
+           loading="lazy" 
+           decoding="async"
+           onerror="this.style.display='none';" />
       <div class="flex-1 min-w-0">
         <h4 class="font-medium text-gray-900 truncate">${event.title}</h4>
         <div class="flex items-center gap-3 text-xs text-gray-500 mt-0.5">
