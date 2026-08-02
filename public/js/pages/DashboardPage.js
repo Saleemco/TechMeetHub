@@ -35,7 +35,7 @@ async function AdminDashboard() {
   const recentUsers = allUsers.slice(0, 5);
 
   return `
-    <div class="page-transition">
+    <div class="page-transition max-w-7xl mx-auto">
       <div class="mb-8">
         <h1 class="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
         <p class="text-gray-500 text-sm mt-1">Platform overview and management</p>
@@ -88,7 +88,7 @@ async function AdminDashboard() {
 
       <!-- Quick Actions -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-        <a href="/events" data-navigate class="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all">
+        <a href="/admin/events" data-navigate class="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all">
           <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">${getIcon('calendar', 18)}</div>
           <div>
             <div class="text-sm font-semibold text-gray-900">All Events</div>
@@ -102,20 +102,20 @@ async function AdminDashboard() {
             <div class="text-xs text-gray-500">New event</div>
           </div>
         </a>
+        <a href="/admin/users" data-navigate class="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all">
+          <div class="w-10 h-10 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">${getIcon('users', 18)}</div>
+          <div>
+            <div class="text-sm font-semibold text-gray-900">Manage Users</div>
+            <div class="text-xs text-gray-500">${totalUsers} users</div>
+          </div>
+        </a>
         <a href="/profile" data-navigate class="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all">
-          <div class="w-10 h-10 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">${getIcon('user', 18)}</div>
+          <div class="w-10 h-10 rounded-lg bg-gray-50 text-gray-600 flex items-center justify-center">${getIcon('user', 18)}</div>
           <div>
             <div class="text-sm font-semibold text-gray-900">My Profile</div>
             <div class="text-xs text-gray-500">Edit profile</div>
           </div>
         </a>
-        <button onclick="window.logout()" class="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-red-300 hover:shadow-md transition-all text-left w-full">
-          <div class="w-10 h-10 rounded-lg bg-red-50 text-red-600 flex items-center justify-center">${getIcon('logout', 18)}</div>
-          <div>
-            <div class="text-sm font-semibold text-gray-900">Logout</div>
-            <div class="text-xs text-gray-500">End session</div>
-          </div>
-        </button>
       </div>
 
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
@@ -123,7 +123,7 @@ async function AdminDashboard() {
         <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
           <div class="flex items-center justify-between p-4 border-b border-gray-200">
             <h2 class="text-lg font-semibold text-gray-900">Upcoming Events</h2>
-            <a href="/events" data-navigate class="text-sm text-blue-600 hover:text-blue-800 transition-colors">View All</a>
+            <a href="/admin/events" data-navigate class="text-sm text-blue-600 hover:text-blue-800 transition-colors">View All</a>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
@@ -163,7 +163,7 @@ async function AdminDashboard() {
         <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
           <div class="flex items-center justify-between p-4 border-b border-gray-200">
             <h2 class="text-lg font-semibold text-gray-900">Recent Users</h2>
-            <span class="text-sm text-gray-500">${totalUsers} total</span>
+            <a href="/admin/users" data-navigate class="text-sm text-blue-600 hover:text-blue-800 transition-colors">View All</a>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
@@ -226,7 +226,7 @@ async function OrganizerDashboard(user) {
     .slice(0, 5);
 
   return `
-    <div class="page-transition">
+    <div class="page-transition max-w-7xl mx-auto">
       <div class="mb-8">
         <div class="flex items-center justify-between">
           <div>
@@ -303,7 +303,7 @@ async function ParticipantDashboard(user) {
   const past = attending.filter(e => e.date < now);
 
   return `
-    <div class="page-transition">
+    <div class="page-transition max-w-7xl mx-auto">
       <div class="mb-8">
         <h1 class="text-2xl font-bold text-gray-900">Welcome back, ${user.name}! 👋</h1>
         <p class="text-gray-500 text-sm mt-1">Discover and manage events you're attending</p>

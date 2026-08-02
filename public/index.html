@@ -69,14 +69,13 @@
       flex: 1 0 auto;
       min-height: calc(100vh - 64px - 100px);
       padding-left: 0;
-      /* NO transition here — prevents slide-in bug */
       overflow-x: hidden;
     }
 
-    /* Sidebar padding only on desktop */
+    /* Sidebar margin (not padding) so Tailwind px- stays symmetrical */
     @media (min-width: 1024px) {
       #main.sidebar-visible {
-        padding-left: 256px;
+        margin-left: 256px;
       }
     }
 
