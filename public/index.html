@@ -72,10 +72,12 @@
       overflow-x: hidden;
     }
 
-    /* Sidebar margin (not padding) so Tailwind px- stays symmetrical */
+    /* Sidebar layout: margin (not padding) so Tailwind px- stays symmetrical */
     @media (min-width: 1024px) {
       #main.sidebar-visible {
         margin-left: 256px;
+        padding-left: 48px;
+        padding-right: 48px;
       }
     }
 

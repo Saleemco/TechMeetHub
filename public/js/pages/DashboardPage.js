@@ -35,14 +35,14 @@ async function AdminDashboard() {
   const recentUsers = allUsers.slice(0, 5);
 
   return `
-    <div class="page-transition max-w-7xl mx-auto">
+    <div class="page-transition">
       <div class="mb-8">
         <h1 class="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
         <p class="text-gray-500 text-sm mt-1">Platform overview and management</p>
       </div>
 
       <!-- Stats Row -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
         ${StatCard({ icon: 'calendar', value: totalEvents, label: 'Total Events', color: 'blue', change: '+12 this month' })}
         ${StatCard({ icon: 'users', value: totalAttendees.toLocaleString(), label: 'Total Attendees', color: 'green', change: '+18.5%' })}
         ${StatCard({ icon: 'user', value: totalUsers, label: 'Total Users', color: 'amber', change: '+12.3%' })}
@@ -50,9 +50,9 @@ async function AdminDashboard() {
       </div>
 
       <!-- User Breakdown Row -->
-      <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        <div class="bg-white rounded-xl p-5 border border-gray-200 hover:shadow-md transition-shadow">
-          <div class="flex items-center gap-3 mb-2">
+      <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
+        <div class="bg-white rounded-xl p-4 border border-gray-200 hover:shadow-md transition-shadow">
+          <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center">
               ${getIcon('users', 14)}
             </div>
@@ -62,8 +62,8 @@ async function AdminDashboard() {
             </div>
           </div>
         </div>
-        <div class="bg-white rounded-xl p-5 border border-gray-200 hover:shadow-md transition-shadow">
-          <div class="flex items-center gap-3 mb-2">
+        <div class="bg-white rounded-xl p-4 border border-gray-200 hover:shadow-md transition-shadow">
+          <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center">
               ${getIcon('briefcase', 14)}
             </div>
@@ -73,8 +73,8 @@ async function AdminDashboard() {
             </div>
           </div>
         </div>
-        <div class="bg-white rounded-xl p-5 border border-gray-200 hover:shadow-md transition-shadow">
-          <div class="flex items-center gap-3 mb-2">
+        <div class="bg-white rounded-xl p-4 border border-gray-200 hover:shadow-md transition-shadow">
+          <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-lg bg-red-50 text-red-600 border border-red-200 flex items-center justify-center">
               ${getIcon('shield', 14)}
             </div>
@@ -118,7 +118,7 @@ async function AdminDashboard() {
         </a>
       </div>
 
-      <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <!-- Upcoming Events Table -->
         <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
           <div class="flex items-center justify-between p-4 border-b border-gray-200">
@@ -226,7 +226,7 @@ async function OrganizerDashboard(user) {
     .slice(0, 5);
 
   return `
-    <div class="page-transition max-w-7xl mx-auto">
+    <div class="page-transition">
       <div class="mb-8">
         <div class="flex items-center justify-between">
           <div>
@@ -239,7 +239,7 @@ async function OrganizerDashboard(user) {
         </div>
       </div>
 
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
         ${StatCard({ icon: 'calendar', value: hosting.length, label: 'My Events', color: 'blue' })}
         ${StatCard({ icon: 'users', value: totalAttendees, label: 'Total Attendees', color: 'green', change: '+16%' })}
         ${StatCard({ icon: 'check', value: upcoming.length, label: 'Upcoming', color: 'amber' })}
@@ -303,13 +303,13 @@ async function ParticipantDashboard(user) {
   const past = attending.filter(e => e.date < now);
 
   return `
-    <div class="page-transition max-w-7xl mx-auto">
+    <div class="page-transition">
       <div class="mb-8">
         <h1 class="text-2xl font-bold text-gray-900">Welcome back, ${user.name}! 👋</h1>
         <p class="text-gray-500 text-sm mt-1">Discover and manage events you're attending</p>
       </div>
 
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
         ${StatCard({ icon: 'calendar', value: attending.length, label: 'My Registrations', color: 'blue' })}
         ${StatCard({ icon: 'check', value: upcoming.length, label: 'Upcoming Events', color: 'green' })}
         ${StatCard({ icon: 'award', value: past.length, label: 'Attended', color: 'amber' })}
