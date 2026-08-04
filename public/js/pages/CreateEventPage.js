@@ -1,113 +1,149 @@
-// public/js/pages/CreateEventPage.js
-import { Input, getIcon } from '../components.js';
+import { Data, Auth } from '../data.js';
+import { getIcon, Input, Button } from '../components.js';
 
-export function CreateEventPage() {
-  const allCategories = [
-    { id: 'hackathon', label: 'Hackathon' }, { id: 'meetup', label: 'Meetup' },
-    { id: 'workshop', label: 'Workshop' }, { id: 'conference', label: 'Conference' },
-    { id: 'webinar', label: 'Webinar' }, { id: 'social', label: 'Social' },
-  ];
-  const params = new URLSearchParams(window.location.search);
-  const editId = params.get('edit');
+export async function CreateEventPage() {
+  const user = await Auth.me();
+  if (!user) {
+    return `
+      <div class="page-transition max-w-7xl mx-auto text-center py-20 px-4">
+        <h2 class="text-xl font-bold text-gray-900 mb-2">Authentication Required</h2>
+        <p class="text-gray-500 mb-4">Please login to create an event.</p>
+        <a href="/login" data-navigate class="px-4 py-2 rounded-lg bg-teal-900 text-white text-sm font-medium hover:bg-teal-800 transition-colors">Go to Login</a>
+      </div>
+    `;
+  }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const editId = urlParams.get('edit');
+  let event = null;
+  if (editId) {
+    event = await Data.getEvent(editId);
+    if (!event || (event.organizer_id !== user.id && user.role !== 'admin')) {
+      return `<div class="page-transition max-w-7xl mx-auto p-4 text-center text-red-600">You don't have permission to edit this event.</div>`;
+    }
+  }
+
+  const categories = await Data.getCategories();
 
   return `
-    <div class="page-transition max-w-3xl mx-auto">
-      <div class="mb-8">
-        <h1 class="text-2xl font-bold text-gray-900 mb-1">${editId ? 'Edit Event' : 'Create New Event'}</h1>
-        <p class="text-gray-500 text-sm">${editId ? 'Update your event details' : 'Host a new event for the tech community'}</p>
+    <div class="page-transition max-w-3xl mx-auto px-4 sm:px-6">
+      <div class="mb-6">
+        <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">${editId ? 'Edit Event' : 'Create New Event'}</h1>
+        <p class="text-gray-500 text-sm mt-1">${editId ? 'Update your event details below.' : 'Fill in the details to publish your event.'}</p>
       </div>
-      <form id="create-event-form" class="bg-white rounded-xl p-6 md:p-8 border border-gray-200">
+
+      <form id="create-event-form" class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 lg:p-8 space-y-6">
+        
+        <!-- Basic Info -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          ${Input({ label: 'Event Title', name: 'title', placeholder: 'e.g., React Advanced Patterns Workshop', required: true })}
-          <div>
+          ${Input({ label: 'Event Title', name: 'title', placeholder: 'e.g. React Conference 2026', value: event?.title || '', required: true })}
+          
+          <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-1.5">Category <span class="text-red-500">*</span></label>
-            <select name="category" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors">
-              <option value="" disabled selected>Select a category</option>
-              ${allCategories.map(c => `<option value="${c.id}">${c.label}</option>`).join('')}
+            <select name="category" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 focus:outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100 transition-colors">
+              <option value="">Select category</option>
+              ${categories.map(c => `<option value="${c.id}" ${event?.category === c.id ? 'selected' : ''}>${c.label}</option>`).join('')}
             </select>
           </div>
         </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          ${Input({ label: 'Date', name: 'date', type: 'date', required: true })}
-          ${Input({ label: 'Time', name: 'time', type: 'time', required: true })}
-        </div>
-        ${Input({ label: 'Location', name: 'location', placeholder: 'e.g., San Francisco, CA or Online (Zoom)', required: true })}
-        ${Input({ label: 'Capacity', name: 'capacity', type: 'number', placeholder: 'e.g., 100', required: true, min: 1 })}
-        ${Input({ label: 'Description', name: 'description', type: 'textarea', placeholder: 'Describe your event, what attendees will learn, and any prerequisites...', required: true, rows: 5 })}
-        
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Speakers</label>
-          <div id="speakers-container">
-            <div class="speaker-entry grid grid-cols-1 md:grid-cols-3 gap-3 mb-3 p-3 rounded-lg bg-gray-50">
-              <input type="text" name="speaker_name_0" placeholder="Speaker Name" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" />
-              <input type="text" name="speaker_role_0" placeholder="Role / Title" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" />
-              <input type="text" name="speaker_topic_0" placeholder="Topic" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" />
-            </div>
-          </div>
-          <button type="button" onclick="window.addSpeakerField()" class="text-sm text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1">
-            ${getIcon('plus', 14)} Add Speaker
-          </button>
-          <p class="text-xs text-gray-500 mt-1">Add speakers for your event (optional)</p>
+          ${Input({ label: 'Date', name: 'date', type: 'date', value: event?.date || '', required: true })}
+          ${Input({ label: 'Time', name: 'time', type: 'time', value: event?.time || '', required: true })}
         </div>
 
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Agenda</label>
-          <div id="agenda-container">
-            <div class="agenda-entry grid grid-cols-1 md:grid-cols-3 gap-3 mb-3 p-3 rounded-lg bg-gray-50">
-              <input type="text" name="agenda_time_0" placeholder="Time (e.g., 09:00)" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" />
-              <input type="text" name="agenda_title_0" placeholder="Title (e.g., Opening Keynote)" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" />
-              <select name="agenda_type_0" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors">
-                <option value="social">Social</option>
-                <option value="keynote">Keynote</option>
-                <option value="work">Work</option>
-              </select>
-            </div>
-          </div>
-          <button type="button" onclick="window.addAgendaField()" class="text-sm text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1">
-            ${getIcon('plus', 14)} Add Agenda Item
-          </button>
-          <p class="text-xs text-gray-500 mt-1">Add agenda items for your event (optional)</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          ${Input({ label: 'Location', name: 'location', placeholder: 'e.g. San Francisco, CA', value: event?.location || '', required: true })}
+          ${Input({ label: 'Capacity', name: 'capacity', type: 'number', placeholder: 'e.g. 100', value: event?.capacity || '', required: true, min: 1 })}
         </div>
 
-        ${Input({ label: 'Tags', name: 'tags', placeholder: 'e.g., React, JavaScript, AI, Web3', required: false })}
-        
-        <div class="flex items-center gap-3 pt-4 border-t border-gray-200">
-          <button type="submit" class="px-6 py-2.5 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors">${editId ? 'Update Event' : 'Create Event'}</button>
-          <a href="/events" data-navigate class="px-6 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-colors">Cancel</a>
+        ${Input({ label: 'Description', name: 'description', type: 'textarea', placeholder: 'Describe your event...', value: event?.description || '', required: true, rows: 5 })}
+        ${Input({ label: 'Tags (comma separated)', name: 'tags', placeholder: 'javascript, webdev, networking', value: event?.tags?.join(', ') || '' })}
+        ${Input({ label: 'Image URL', name: 'image', placeholder: 'https://...', value: event?.image || '' })}
+
+        <!-- Speakers -->
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-semibold text-gray-900">Speakers</h3>
+            <button type="button" onclick="window.addSpeaker()" class="text-xs font-medium text-teal-800 hover:text-orange-500 transition-colors flex items-center gap-1">
+              ${getIcon('plus', 12)} Add Speaker
+            </button>
+          </div>
+          <div id="speakers-container" class="space-y-3">
+            ${(event?.speakers || []).map((s, i) => SpeakerEntry(i, s)).join('') || SpeakerEntry(0)}
+          </div>
+        </div>
+
+        <!-- Agenda -->
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-semibold text-gray-900">Agenda</h3>
+            <button type="button" onclick="window.addAgenda()" class="text-xs font-medium text-teal-800 hover:text-orange-500 transition-colors flex items-center gap-1">
+              ${getIcon('plus', 12)} Add Agenda Item
+            </button>
+          </div>
+          <div id="agenda-container" class="space-y-3">
+            ${(event?.agenda || []).map((a, i) => AgendaEntry(i, a)).join('') || AgendaEntry(0)}
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row items-center gap-3 pt-4 border-t border-gray-200">
+          ${Button({ label: editId ? 'Update Event' : 'Create Event', type: 'submit', variant: 'primary', fullWidth: true, icon: getIcon('check', 16) })}
+          <a href="/events" data-navigate class="w-full sm:w-auto text-center px-4 py-2.5 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300 transition-colors">Cancel</a>
         </div>
       </form>
     </div>
   `;
 }
 
-window.addSpeakerField = function() {
-  const container = document.getElementById('speakers-container');
-  if (!container) return;
-  const index = container.children.length;
-  const entry = document.createElement('div');
-  entry.className = 'speaker-entry grid grid-cols-1 md:grid-cols-3 gap-3 mb-3 p-3 rounded-lg bg-gray-50';
-  entry.innerHTML = `
-    <input type="text" name="speaker_name_${index}" placeholder="Speaker Name" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" />
-    <input type="text" name="speaker_role_${index}" placeholder="Role / Title" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" />
-    <input type="text" name="speaker_topic_${index}" placeholder="Topic" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" />
+function SpeakerEntry(index, speaker = {}) {
+  return `
+    <div class="speaker-entry grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 rounded-lg bg-gray-50 border border-gray-100">
+      <input type="text" name="speaker_name_${index}" placeholder="Name" value="${speaker.name || ''}" class="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:border-teal-700" />
+      <input type="text" name="speaker_role_${index}" placeholder="Role" value="${speaker.role || ''}" class="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:border-teal-700" />
+      <div class="flex gap-2">
+        <input type="text" name="speaker_topic_${index}" placeholder="Topic" value="${speaker.topic || ''}" class="flex-1 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:border-teal-700" />
+        <button type="button" onclick="this.closest('.speaker-entry').remove()" class="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Remove">
+          ${getIcon('x', 14)}
+        </button>
+      </div>
+    </div>
   `;
-  container.appendChild(entry);
+}
+
+function AgendaEntry(index, item = {}) {
+  return `
+    <div class="agenda-entry grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 rounded-lg bg-gray-50 border border-gray-100">
+      <input type="time" name="agenda_time_${index}" value="${item.time || ''}" class="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:border-teal-700" />
+      <input type="text" name="agenda_title_${index}" placeholder="Session title" value="${item.title || ''}" class="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:border-teal-700" />
+      <div class="flex gap-2">
+        <select name="agenda_type_${index}" class="flex-1 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:border-teal-700">
+          <option value="social" ${item.type === 'social' ? 'selected' : ''}>Social</option>
+          <option value="talk" ${item.type === 'talk' ? 'selected' : ''}>Talk</option>
+          <option value="workshop" ${item.type === 'workshop' ? 'selected' : ''}>Workshop</option>
+          <option value="break" ${item.type === 'break' ? 'selected' : ''}>Break</option>
+        </select>
+        <button type="button" onclick="this.closest('.agenda-entry').remove()" class="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Remove">
+          ${getIcon('x', 14)}
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+window.addSpeaker = function() {
+  const container = document.getElementById('speakers-container');
+  const index = container.children.length;
+  const div = document.createElement('div');
+  div.innerHTML = SpeakerEntry(index);
+  container.appendChild(div.firstElementChild);
 };
 
-window.addAgendaField = function() {
+window.addAgenda = function() {
   const container = document.getElementById('agenda-container');
-  if (!container) return;
   const index = container.children.length;
-  const entry = document.createElement('div');
-  entry.className = 'agenda-entry grid grid-cols-1 md:grid-cols-3 gap-3 mb-3 p-3 rounded-lg bg-gray-50';
-  entry.innerHTML = `
-    <input type="text" name="agenda_time_${index}" placeholder="Time (e.g., 09:00)" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" />
-    <input type="text" name="agenda_title_${index}" placeholder="Title (e.g., Opening Keynote)" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" />
-    <select name="agenda_type_${index}" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors">
-      <option value="social">Social</option>
-      <option value="keynote">Keynote</option>
-      <option value="work">Work</option>
-    </select>
-  `;
-  container.appendChild(entry);
+  const div = document.createElement('div');
+  div.innerHTML = AgendaEntry(index);
+  container.appendChild(div.firstElementChild);
 };

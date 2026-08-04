@@ -22,21 +22,21 @@ export async function HomePage() {
       <div class="page-transition -mt-6">
 
         <!-- Hero Section -->
-        <section class="relative bg-teal-900 -mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden min-h-[calc(100vh-56px)] sm:min-h-[calc(100vh-64px)] lg:min-h-0 flex items-center">
+        <section class="relative bg-teal-900 -mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden min-h-[50vh] sm:min-h-[60vh] lg:min-h-0 flex items-center">
           <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-10 md:py-14 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center">
             <div class="max-w-xl">
-              <h1 class="text-3xl sm:text-4xl md:text-[2.75rem] font-extrabold text-white leading-tight mb-3">
+              <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-extrabold text-white leading-tight mb-3">
                 Plan, Manage and Grow
                 Your <span class="text-orange-400">Tech Events</span> with Ease
               </h1>
-              <p class="text-teal-100/80 text-base md:text-lg mb-6 max-w-md">
+              <p class="text-teal-100/80 text-sm sm:text-base md:text-lg mb-6 max-w-md">
                 TechMeetHub is the all-in-one platform for creating, managing and scaling impactful tech events — from meetups to global conferences.
               </p>
-              <div class="flex flex-wrap items-center gap-4">
-                <a href="/register" data-navigate class="px-6 py-3 rounded-lg text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors flex items-center gap-2">
+              <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+                <a href="/register" data-navigate class="px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors flex items-center gap-2">
                   Create an Event ${getIcon('arrowRight', 16)}
                 </a>
-                <a href="/events" data-navigate class="px-6 py-3 rounded-lg text-sm font-semibold bg-transparent text-white border border-white/40 hover:bg-white/10 transition-colors flex items-center gap-2">
+                <a href="/events" data-navigate class="px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm font-semibold bg-transparent text-white border border-white/40 hover:bg-white/10 transition-colors flex items-center gap-2">
                   Browse Events ${getIcon('calendar', 16)}
                 </a>
               </div>
@@ -49,7 +49,7 @@ export async function HomePage() {
 
         <!-- Stats Bar -->
         <section class="bg-gray-100 -mx-4 sm:-mx-6 lg:-mx-8">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-6 grid grid-cols-2 lg:grid-cols-4 divide-y-0 gap-y-6">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-6 sm:py-8 grid grid-cols-2 lg:grid-cols-4 gap-y-6 gap-x-4">
             ${StatItem('users', `${(stats?.totalAttendees || 10000).toLocaleString()}+`, 'Event Attendees')}
             ${StatItem('calendar', `${stats?.totalEvents || 350}+`, 'Events Hosted')}
             ${StatItem('building', `${stats?.totalPartners || 120}+`, 'Partner Organizations')}
@@ -57,67 +57,67 @@ export async function HomePage() {
           </div>
         </section>
 
-        <!-- Content wrapper: breakout + centered inner container -->
+        <!-- Content wrapper -->
         <div class="-mx-4 sm:-mx-6 lg:-mx-8">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
 
             <!-- About Section -->
             <section id="about" class="py-10 md:py-14">
-              <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 items-center">
                 <div>
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+                  <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4">
                     Empowering Tech Communities Worldwide
                   </h2>
                   <div class="w-16 h-1 bg-orange-500 mb-4 rounded-full"></div>
-                  <p class="text-gray-600 leading-relaxed mb-4">
+                  <p class="text-gray-600 text-sm sm:text-base leading-relaxed mb-4">
                     TechMeetHub was built by event organizers, for event organizers. We understand the challenges of bringing the tech community together — from planning and promotion to ticketing and post-event engagement.
                   </p>
-                  <p class="text-gray-600 leading-relaxed mb-6">
+                  <p class="text-gray-600 text-sm sm:text-base leading-relaxed mb-6">
                     Our platform streamlines every step of the event lifecycle, helping you focus on what matters most: creating meaningful experiences that connect, educate and inspire.
                   </p>
                   <div class="flex flex-wrap gap-6">
                     <div>
-                      <div class="text-2xl font-bold text-teal-900">2019</div>
-                      <div class="text-sm text-gray-500">Founded</div>
+                      <div class="text-xl sm:text-2xl font-bold text-teal-900">2019</div>
+                      <div class="text-xs sm:text-sm text-gray-500">Founded</div>
                     </div>
                     <div>
-                      <div class="text-2xl font-bold text-teal-900">50K+</div>
-                      <div class="text-sm text-gray-500">Community Members</div>
+                      <div class="text-xl sm:text-2xl font-bold text-teal-900">50K+</div>
+                      <div class="text-xs sm:text-sm text-gray-500">Community Members</div>
                     </div>
                     <div>
-                      <div class="text-2xl font-bold text-teal-900">100+</div>
-                      <div class="text-sm text-gray-500">Cities Worldwide</div>
+                      <div class="text-xl sm:text-2xl font-bold text-teal-900">100+</div>
+                      <div class="text-xs sm:text-sm text-gray-500">Cities Worldwide</div>
                     </div>
                   </div>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                  <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <div class="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 mb-3">
-                      ${getIcon('users', 24)}
+                <div class="grid grid-cols-2 gap-3 sm:gap-4">
+                  <div class="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 mb-3">
+                      ${getIcon('users', 20)}
                     </div>
-                    <h4 class="font-semibold text-gray-900">Community First</h4>
-                    <p class="text-sm text-gray-500">Built with input from organizers worldwide</p>
+                    <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Community First</h4>
+                    <p class="text-xs sm:text-sm text-gray-500">Built with input from organizers worldwide</p>
                   </div>
-                  <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <div class="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 mb-3">
-                      ${getIcon('trend', 24)}
+                  <div class="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 mb-3">
+                      ${getIcon('trend', 20)}
                     </div>
-                    <h4 class="font-semibold text-gray-900">Grow Together</h4>
-                    <p class="text-sm text-gray-500">Tools that scale with your community</p>
+                    <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Grow Together</h4>
+                    <p class="text-xs sm:text-sm text-gray-500">Tools that scale with your community</p>
                   </div>
-                  <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <div class="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 mb-3">
-                      ${getIcon('shield', 24)}
+                  <div class="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 mb-3">
+                      ${getIcon('shield', 20)}
                     </div>
-                    <h4 class="font-semibold text-gray-900">Trusted & Secure</h4>
-                    <p class="text-sm text-gray-500">Enterprise-grade reliability</p>
+                    <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Trusted & Secure</h4>
+                    <p class="text-xs sm:text-sm text-gray-500">Enterprise-grade reliability</p>
                   </div>
-                  <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <div class="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 mb-3">
-                      ${getIcon('globe', 24)}
+                  <div class="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 mb-3">
+                      ${getIcon('globe', 20)}
                     </div>
-                    <h4 class="font-semibold text-gray-900">Global Reach</h4>
-                    <p class="text-sm text-gray-500">Connect with techies worldwide</p>
+                    <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Global Reach</h4>
+                    <p class="text-xs sm:text-sm text-gray-500">Connect with techies worldwide</p>
                   </div>
                 </div>
               </div>
@@ -125,13 +125,13 @@ export async function HomePage() {
 
             <!-- Feature Highlights -->
             <section class="py-10 md:py-14 text-center">
-              <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+              <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2">
                 Everything You Need to Run Successful Tech Events
               </h2>
               <div class="w-16 h-1 bg-orange-500 mx-auto mb-3 rounded-full"></div>
-              <p class="text-gray-500 mb-10">Powerful tools to help you create memorable experiences for your community.</p>
+              <p class="text-gray-500 text-sm sm:text-base mb-8 sm:mb-10">Powerful tools to help you create memorable experiences for your community.</p>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 text-left">
                 ${FeatureCard('calendar', 'Easy Event Creation', 'Set up and publish your events in minutes with our streamlined tools.', '/register', 'Create Event')}
                 ${FeatureCard('mic', 'Manage Speakers & Sessions', 'Organize your agenda, speakers and schedules all in one place.', '/register', 'Explore Features')}
                 ${FeatureCard('users', 'Seamless Registration', 'Handle attendee registrations, RSVPs and check-ins with ease.', '/register', 'See How It Works')}
@@ -140,9 +140,9 @@ export async function HomePage() {
             </section>
 
             <!-- Featured Events -->
-            <section id="events" class="mb-12">
+            <section id="events" class="mb-10 sm:mb-12">
               ${SectionTitle({ title: 'Featured Events', subtitle: "Hand-picked events you don't want to miss", action: { href: '/events', label: 'View All' } })}
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 ${(featured || []).length > 0 ? (await Promise.all(featured.map((event, i) => EventCard(event, i, user)))).join('') : `
                   <div class="col-span-full text-center text-gray-500 py-8">No featured events</div>
                 `}
@@ -150,9 +150,9 @@ export async function HomePage() {
             </section>
 
             <!-- Upcoming Events -->
-            <section class="mb-16">
+            <section class="mb-12 sm:mb-16">
               ${SectionTitle({ title: 'Upcoming Events', subtitle: 'Mark your calendar for these upcoming tech gatherings', action: { href: '/events', label: 'View All' } })}
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 ${(upcoming || []).slice(0, 4).length > 0 ? (await Promise.all(upcoming.slice(0, 4).map((event, i) => EventCard(event, i, user)))).join('') : `
                   <div class="col-span-full text-center text-gray-500 py-8">No upcoming events</div>
                 `}
@@ -167,7 +167,7 @@ export async function HomePage() {
   } catch (error) {
     console.error('HomePage error:', error);
     return `
-      <div class="page-transition max-w-7xl mx-auto py-16 text-center">
+      <div class="page-transition max-w-7xl mx-auto py-16 text-center px-4">
         <div class="text-red-500 mb-4">Something went wrong loading the homepage.</div>
         <div class="text-gray-500 text-sm">${error.message}</div>
         <button onclick="window.location.reload()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg">Refresh</button>
@@ -179,12 +179,12 @@ export async function HomePage() {
 function StatItem(icon, value, label) {
   return `
     <div class="flex items-center gap-3 justify-center lg:justify-start">
-      <div class="w-11 h-11 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 shrink-0">
-        ${getIcon(icon, 20)}
+      <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-teal-100 flex items-center justify-center text-teal-800 shrink-0">
+        ${getIcon(icon, 18)}
       </div>
       <div>
-        <div class="text-xl font-bold text-gray-900">${value}</div>
-        <div class="text-sm text-gray-500">${label}</div>
+        <div class="text-lg sm:text-xl font-bold text-gray-900">${value}</div>
+        <div class="text-xs sm:text-sm text-gray-500">${label}</div>
       </div>
     </div>
   `;
@@ -192,14 +192,14 @@ function StatItem(icon, value, label) {
 
 function FeatureCard(icon, title, description, href, linkLabel) {
   return `
-    <div class="bg-white rounded-xl border border-gray-200 p-6 text-center hover:shadow-md transition-shadow">
-      <div class="w-14 h-14 rounded-full bg-teal-50 flex items-center justify-center mx-auto mb-4 text-teal-800">
-        ${getIcon(icon, 26)}
+    <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 text-center sm:text-left hover:shadow-md transition-shadow">
+      <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-teal-50 flex items-center justify-center mx-auto sm:mx-0 mb-3 sm:mb-4 text-teal-800">
+        ${getIcon(icon, 22)}
       </div>
-      <h3 class="font-bold text-gray-900 mb-2">${title}</h3>
-      <p class="text-sm text-gray-500 mb-4">${description}</p>
-      <a href="${href}" data-navigate class="inline-flex items-center gap-1 text-teal-800 text-sm font-semibold hover:text-orange-500 transition-colors">
-        ${linkLabel} ${getIcon('arrowRight', 14)}
+      <h3 class="font-bold text-gray-900 text-sm sm:text-base mb-2">${title}</h3>
+      <p class="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">${description}</p>
+      <a href="${href}" data-navigate class="inline-flex items-center gap-1 text-teal-800 text-xs sm:text-sm font-semibold hover:text-orange-500 transition-colors">
+        ${linkLabel} ${getIcon('arrowRight', 12)}
       </a>
     </div>
   `;
@@ -211,7 +211,7 @@ function HeroImage() {
       <img
         src="/img/hero-conference.png"
         alt="Tech conference audience watching a speaker on stage"
-        class="w-full h-52 sm:h-64 md:h-72 lg:h-80 object-cover rounded-lg"
+        class="w-full h-48 sm:h-56 md:h-64 lg:h-80 object-cover rounded-lg"
         width="800"
         height="400"
         fetchpriority="high"
@@ -219,7 +219,7 @@ function HeroImage() {
         decoding="async"
         onerror="this.style.display='none'; this.parentElement.classList.add('bg-gradient-to-br', 'from-teal-800', 'to-teal-950');"
       />
-      <div class="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm px-4 py-2 text-white text-sm font-semibold hidden md:block rounded-lg">
+      <div class="absolute bottom-3 sm:bottom-4 right-3 sm:right-4 bg-black/50 backdrop-blur-sm px-3 sm:px-4 py-1.5 sm:py-2 text-white text-xs sm:text-sm font-semibold hidden sm:block rounded-lg">
         Building the Next Generation
       </div>
     </div>
