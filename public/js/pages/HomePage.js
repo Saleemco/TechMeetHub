@@ -6,7 +6,6 @@ export async function HomePage() {
   console.log('HomePage rendering...');
 
   try {
-    // Fetch all data safely
     let stats = {}, featured = [], upcoming = [], allCategories = [], user = null;
     
     try { stats = await Data.getStats(); } catch (e) { console.warn('getStats failed:', e); }
@@ -15,7 +14,6 @@ export async function HomePage() {
     try { allCategories = await Data.getCategories(); } catch (e) { console.warn('getCategories failed:', e); }
     try { user = await Auth.me(); } catch (e) { console.warn('Auth.me failed:', e); }
 
-    // Safe defaults
     stats = stats || {};
     featured = Array.isArray(featured) ? featured : [];
     upcoming = Array.isArray(upcoming) ? upcoming : [];
@@ -38,7 +36,7 @@ export async function HomePage() {
                 <a href="/register" data-navigate class="px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors flex items-center gap-2 shadow-lg">
                   Start a Club Event ${getIcon('arrowRight', 16)}
                 </a>
-                <a href="/events" data-navigate class="px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg text-sm font-semibold bg-transparent text-white border border-white/40 hover:bg-white/10 transition-colors flex items-center gap-2">
+                <a href="/login" data-navigate class="px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg text-sm font-semibold bg-transparent text-white border border-white/40 hover:bg-white/10 transition-colors flex items-center gap-2">
                   Browse Campus Events ${getIcon('calendar', 16)}
                 </a>
               </div>
@@ -147,7 +145,6 @@ export async function HomePage() {
       <div class="page-transition max-w-7xl mx-auto py-16 text-center px-4">
         <div class="text-red-500 mb-4 text-lg font-semibold">Unable to load homepage</div>
         <div class="text-gray-500 text-sm mb-4">${error?.message || 'Unknown error'}</div>
-        <pre class="text-left text-xs bg-gray-100 p-4 rounded-lg overflow-auto max-w-lg mx-auto mb-4">${error?.stack || ''}</pre>
         <button onclick="window.location.reload()" class="mt-2 px-6 py-2 bg-teal-900 text-white rounded-lg hover:bg-teal-800 transition-colors">Reload Page</button>
       </div>
     `;

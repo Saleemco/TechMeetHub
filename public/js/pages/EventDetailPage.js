@@ -1,13 +1,57 @@
 import { Data, Auth } from '../data.js';
 import { getIcon, formatFullDate, formatTime } from '../components.js';
 
+// Deterministic color palette for generated avatars
+const AVATAR_COLORS = [
+  'bg-red-500', 'bg-orange-500', 'bg-amber-500', 'bg-green-500',
+  'bg-emerald-500', 'bg-teal-500', 'bg-cyan-500', 'bg-blue-500',
+  'bg-indigo-500', 'bg-violet-500', 'bg-purple-500', 'bg-fuchsia-500',
+  'bg-pink-500', 'bg-rose-500', 'bg-sky-500', 'bg-lime-500'
+];
+
+// Generate a consistent index from a string ID
+function hashIndex(str, max) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return Math.abs(hash) % max;
+}
+
+// Generate a deterministic avatar from a user ID
+function generateAvatar(id) {
+  const idStr = String(id);
+  // Pick a consistent color
+  const color = AVATAR_COLORS[hashIndex(idStr, AVATAR_COLORS.length)];
+  // Generate initials: first char of ID + second char if available, or just first char
+  const initial = idStr.charAt(0).toUpperCase();
+  return { name: `Student ${initial}`, avatar: initial, initialsColor: color };
+}
+
 export async function EventDetailPage(id) {
-  const [event, user, allUsers] = await Promise.all([
-    Data.getEvent(id),
-    Auth.me(),
-    Data.getAdminUsers().catch(() => [])
-  ]);
-  
+  let event = null;
+  let user = null;
+  let allUsers = [];
+
+  try {
+    event = await Data.getEvent(id);
+  } catch (e) {
+    console.error('Failed to load event:', e);
+  }
+
+  try {
+    user = await Auth.me();
+  } catch (e) {
+    console.error('Auth failed:', e);
+  }
+
+  // Try to fetch users, but don't fail if we're not admin
+  try {
+    allUsers = await Data.getAdminUsers();
+  } catch (e) {
+    console.log('Admin users not available (expected for non-admins):', e.message);
+  }
+
   if (!event) {
     return `
       <div class="page-transition max-w-7xl mx-auto text-center py-20 px-4">
@@ -19,22 +63,66 @@ export async function EventDetailPage(id) {
     `;
   }
 
-  // Build a lookup map of user ID -> user object
-  const userMap = new Map(allUsers.map(u => [u.id, u]));
-  
-  // Resolve attendee IDs to actual user objects
-  const resolvedAttendees = (event.attendees || []).map(attendeeId => {
-    if (typeof attendeeId === 'object' && attendeeId.id) return attendeeId;
-    return userMap.get(attendeeId) || { id: attendeeId, name: 'User', avatar: '?', initialsColor: 'bg-gray-300' };
-  });
+  // Build lookup map from admin API (will be empty for non-admins)
+  const userMap = new Map();
+  if (Array.isArray(allUsers)) {
+    allUsers.forEach(u => {
+      if (u && u.id) userMap.set(String(u.id), u);
+    });
+  }
 
-  const isAttending = user?.id && event.attendees?.includes(user.id);
-  const isOrganizer = user?.id === event.organizer_id;
+  // Resolve attendees
+  const rawAttendees = Array.isArray(event.attendees) ? event.attendees : [];
+  
+  const resolvedAttendees = rawAttendees.map((attendee, index) => {
+    // Case 1: Already a full object with data
+    if (attendee && typeof attendee === 'object' && attendee.id) {
+      return {
+        id: String(attendee.id),
+        name: attendee.name || attendee.email || `Student ${index + 1}`,
+        avatar: (attendee.avatar || attendee.name?.charAt(0) || 'S').toUpperCase(),
+        initialsColor: attendee.initialsColor || generateAvatar(attendee.id).initialsColor
+      };
+    }
+    
+    // Case 2: String/number ID
+    if (attendee) {
+      const idStr = String(attendee);
+      const found = userMap.get(idStr);
+      if (found) {
+        return {
+          id: idStr,
+          name: found.name || found.email || `Student ${index + 1}`,
+          avatar: (found.avatar || found.name?.charAt(0) || idStr.charAt(0)).toUpperCase(),
+          initialsColor: found.initialsColor || generateAvatar(idStr).initialsColor
+        };
+      }
+      // No user data available — generate deterministic avatar from ID
+      const generated = generateAvatar(idStr);
+      return {
+        id: idStr,
+        name: generated.name,
+        avatar: generated.avatar,
+        initialsColor: generated.initialsColor
+      };
+    }
+    
+    return null;
+  }).filter(Boolean);
+
+  // Check if current user is attending
+  const userIdStr = user?.id ? String(user.id) : null;
+  const isAttending = userIdStr ? rawAttendees.some(a => {
+    if (a && typeof a === 'object' && a.id) return String(a.id) === userIdStr;
+    return String(a) === userIdStr;
+  }) : false;
+
+  const isOrganizer = userIdStr === String(event.organizer_id || '');
   const isAdmin = user?.role === 'admin';
   const canEdit = isOrganizer || isAdmin;
   const date = formatFullDate(event.date);
   const time = formatTime(event.time);
-  const spotsLeft = (event.capacity || 0) - (event.attendees?.length || 0);
+  const spotsLeft = Math.max(0, (event.capacity || 0) - rawAttendees.length);
   const isFull = spotsLeft <= 0;
 
   return `
@@ -46,7 +134,7 @@ export async function EventDetailPage(id) {
              class="w-full h-full object-cover"
              width="1200"
              height="600"
-             fetchpriority="high"
+             loading="eager"
              decoding="async"
              onerror="this.style.display='none'" />
         <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
@@ -131,13 +219,15 @@ export async function EventDetailPage(id) {
             ${resolvedAttendees.length > 0 ? `
               <div class="flex flex-wrap gap-2">
                 ${resolvedAttendees.slice(0, 12).map(u => `
-                  <div class="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-full pl-1 pr-3 py-1">
-                    <div class="w-7 h-7 rounded-full ${u.initialsColor || 'bg-teal-900'} avatar-initials text-xs text-white flex items-center justify-center">${u.avatar || u.name?.charAt(0) || '?'}</div>
-                    <span class="text-xs font-medium text-gray-700 truncate max-w-[80px] sm:max-w-[120px]">${u.name || 'User'}</span>
+                  <div class="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-full pl-1 pr-3 py-1 hover:bg-gray-100 transition-colors cursor-default" title="${u.name}">
+                    <div class="w-7 h-7 rounded-full ${u.initialsColor} avatar-initials text-xs text-white flex items-center justify-center shrink-0">
+                      ${u.avatar}
+                    </div>
+                    <span class="text-xs font-medium text-gray-700 truncate max-w-[80px] sm:max-w-[120px]">${u.name}</span>
                   </div>
                 `).join('')}
                 ${resolvedAttendees.length > 12 ? `
-                  <div class="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-500">+${resolvedAttendees.length - 12}</div>
+                  <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-600">+${resolvedAttendees.length - 12}</div>
                 ` : ''}
               </div>
             ` : '<p class="text-sm text-gray-500">No attendees yet. Be the first to register!</p>'}
@@ -150,7 +240,7 @@ export async function EventDetailPage(id) {
           <!-- Action Card -->
           <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 lg:sticky lg:top-20">
             <div class="text-center mb-4">
-              <div class="text-3xl font-bold text-gray-900 mb-1">${spotsLeft > 0 ? spotsLeft : 0}</div>
+              <div class="text-3xl font-bold text-gray-900 mb-1">${spotsLeft}</div>
               <div class="text-sm text-gray-500">spots remaining</div>
             </div>
 
