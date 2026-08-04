@@ -2,9 +2,10 @@ import { Data, Auth } from '../data.js';
 import { getIcon, formatFullDate, formatTime } from '../components.js';
 
 export async function EventDetailPage(id) {
-  const [event, user] = await Promise.all([
+  const [event, user, allUsers] = await Promise.all([
     Data.getEvent(id),
-    Auth.me()
+    Auth.me(),
+    Data.getAdminUsers().catch(() => [])
   ]);
   
   if (!event) {
@@ -17,6 +18,15 @@ export async function EventDetailPage(id) {
       </div>
     `;
   }
+
+  // Build a lookup map of user ID -> user object
+  const userMap = new Map(allUsers.map(u => [u.id, u]));
+  
+  // Resolve attendee IDs to actual user objects
+  const resolvedAttendees = (event.attendees || []).map(attendeeId => {
+    if (typeof attendeeId === 'object' && attendeeId.id) return attendeeId;
+    return userMap.get(attendeeId) || { id: attendeeId, name: 'User', avatar: '?', initialsColor: 'bg-gray-300' };
+  });
 
   const isAttending = user?.id && event.attendees?.includes(user.id);
   const isOrganizer = user?.id === event.organizer_id;
@@ -114,15 +124,21 @@ export async function EventDetailPage(id) {
 
           <!-- Attendees -->
           <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
               <h2 class="text-lg font-semibold text-gray-900">Attendees</h2>
-              <span class="text-sm text-gray-500">${event.attendees?.length || 0} / ${event.capacity || 0} registered</span>
+              <span class="text-sm text-gray-500">${resolvedAttendees.length} / ${event.capacity || 0} registered</span>
             </div>
-            ${event.attendees?.length ? `
+            ${resolvedAttendees.length > 0 ? `
               <div class="flex flex-wrap gap-2">
-                ${event.attendees.map(() => `
-                  <div class="w-8 h-8 rounded-full bg-gray-200 avatar-initials text-xs text-white flex items-center justify-center">?</div>
+                ${resolvedAttendees.slice(0, 12).map(u => `
+                  <div class="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-full pl-1 pr-3 py-1">
+                    <div class="w-7 h-7 rounded-full ${u.initialsColor || 'bg-teal-900'} avatar-initials text-xs text-white flex items-center justify-center">${u.avatar || u.name?.charAt(0) || '?'}</div>
+                    <span class="text-xs font-medium text-gray-700 truncate max-w-[80px] sm:max-w-[120px]">${u.name || 'User'}</span>
+                  </div>
                 `).join('')}
+                ${resolvedAttendees.length > 12 ? `
+                  <div class="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-500">+${resolvedAttendees.length - 12}</div>
+                ` : ''}
               </div>
             ` : '<p class="text-sm text-gray-500">No attendees yet. Be the first to register!</p>'}
           </div>
