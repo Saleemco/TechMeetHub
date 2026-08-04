@@ -47,15 +47,8 @@ export async function HomePage() {
           </div>
         </section>
 
-        <!-- Stats Bar -->
-        <section class="bg-gray-100 -mx-4 sm:-mx-6 lg:-mx-8">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-6 sm:py-8 grid grid-cols-2 lg:grid-cols-4 gap-y-6 gap-x-4">
-            ${StatItem('users', `${(stats?.totalAttendees || 10000).toLocaleString()}+`, 'Event Attendees')}
-            ${StatItem('calendar', `${stats?.totalEvents || 350}+`, 'Events Hosted')}
-            ${StatItem('building', `${stats?.totalPartners || 120}+`, 'Partner Organizations')}
-            ${StatItem('globe', `${stats?.citiesReached || 15}+`, 'Cities Reached')}
-          </div>
-        </section>
+   
+        
 
         <!-- Content wrapper -->
         <div class="-mx-4 sm:-mx-6 lg:-mx-8">
