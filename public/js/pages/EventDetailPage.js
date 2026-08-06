@@ -21,9 +21,7 @@ function hashIndex(str, max) {
 // Generate a deterministic avatar from a user ID
 function generateAvatar(id) {
   const idStr = String(id);
-  // Pick a consistent color
   const color = AVATAR_COLORS[hashIndex(idStr, AVATAR_COLORS.length)];
-  // Generate initials: first char of ID + second char if available, or just first char
   const initial = idStr.charAt(0).toUpperCase();
   return { name: `Student ${initial}`, avatar: initial, initialsColor: color };
 }
@@ -31,7 +29,6 @@ function generateAvatar(id) {
 export async function EventDetailPage(id) {
   let event = null;
   let user = null;
-  let allUsers = [];
 
   try {
     event = await Data.getEvent(id);
@@ -45,13 +42,6 @@ export async function EventDetailPage(id) {
     console.error('Auth failed:', e);
   }
 
-  // Try to fetch users, but don't fail if we're not admin
-  try {
-    allUsers = await Data.getAdminUsers();
-  } catch (e) {
-    console.log('Admin users not available (expected for non-admins):', e.message);
-  }
-
   if (!event) {
     return `
       <div class="page-transition max-w-7xl mx-auto text-center py-20 px-4">
@@ -63,41 +53,44 @@ export async function EventDetailPage(id) {
     `;
   }
 
-  // Build lookup map from admin API (will be empty for non-admins)
-  const userMap = new Map();
-  if (Array.isArray(allUsers)) {
-    allUsers.forEach(u => {
-      if (u && u.id) userMap.set(String(u.id), u);
+  // Build lookup map from attendeeDetails (returned by the server for everyone,
+  // not just admins — see GET /api/events/:id)
+  const attendeeDetailsMap = new Map();
+  if (Array.isArray(event.attendeeDetails)) {
+    event.attendeeDetails.forEach(u => {
+      if (u && u.id) attendeeDetailsMap.set(String(u.id), u);
     });
   }
 
   // Resolve attendees
   const rawAttendees = Array.isArray(event.attendees) ? event.attendees : [];
-  
+
   const resolvedAttendees = rawAttendees.map((attendee, index) => {
     // Case 1: Already a full object with data
     if (attendee && typeof attendee === 'object' && attendee.id) {
+      const idStr = String(attendee.id);
+      const found = attendeeDetailsMap.get(idStr);
       return {
-        id: String(attendee.id),
-        name: attendee.name || attendee.email || `Student ${index + 1}`,
-        avatar: (attendee.avatar || attendee.name?.charAt(0) || 'S').toUpperCase(),
-        initialsColor: attendee.initialsColor || generateAvatar(attendee.id).initialsColor
+        id: idStr,
+        name: attendee.name || found?.name || attendee.email || `Student ${index + 1}`,
+        avatar: (attendee.avatar || found?.avatar || attendee.name?.charAt(0) || 'S').toUpperCase(),
+        initialsColor: attendee.initialsColor || found?.initialsColor || generateAvatar(idStr).initialsColor
       };
     }
-    
+
     // Case 2: String/number ID
     if (attendee) {
       const idStr = String(attendee);
-      const found = userMap.get(idStr);
+      const found = attendeeDetailsMap.get(idStr);
       if (found) {
         return {
           id: idStr,
-          name: found.name || found.email || `Student ${index + 1}`,
+          name: found.name || `Student ${index + 1}`,
           avatar: (found.avatar || found.name?.charAt(0) || idStr.charAt(0)).toUpperCase(),
           initialsColor: found.initialsColor || generateAvatar(idStr).initialsColor
         };
       }
-      // No user data available — generate deterministic avatar from ID
+      // No matching detail — generate deterministic avatar from ID
       const generated = generateAvatar(idStr);
       return {
         id: idStr,
@@ -106,7 +99,7 @@ export async function EventDetailPage(id) {
         initialsColor: generated.initialsColor
       };
     }
-    
+
     return null;
   }).filter(Boolean);
 
@@ -117,7 +110,7 @@ export async function EventDetailPage(id) {
     return String(a) === userIdStr;
   }) : false;
 
-  const isOrganizer = userIdStr === String(event.organizer_id || '');
+  const isOrganizer = userIdStr === String(event.organizer_id || event.organizer?.id || '');
   const isAdmin = user?.role === 'admin';
   const canEdit = isOrganizer || isAdmin;
   const date = formatFullDate(event.date);
