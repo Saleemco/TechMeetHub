@@ -885,7 +885,8 @@ app.post('/api/events', requireAuth, requireRole(['organizer', 'admin']), asyncH
         JSON.stringify(newEvent.speakers), JSON.stringify(newEvent.agenda), newEvent.status
       ]
     );
-    req.user.eventsHosting.push(newEvent.id);
+    // Note: hosting lookups for DB mode go through organizer_id (see
+    // GET /api/user/events/hosting), so no in-memory bookkeeping is needed here.
   } else {
     dataStore.events.unshift(newEvent);
     req.user.eventsHosting.push(newEvent.id);
