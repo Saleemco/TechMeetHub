@@ -1,6 +1,21 @@
 import { Data, Auth } from '../data.js';
 import { getIcon, Input, Button } from '../components.js';
 
+const AGENDA_TITLES = [
+  'Registration & Check-in',
+  'Opening Keynote',
+  'Networking Break',
+  'Workshop Session',
+  'Panel Discussion',
+  'Lunch Break',
+  'Fireside Chat',
+  'Product Demo',
+  'Q&A Session',
+  'Sponsor Showcase',
+  'Closing Remarks',
+  'Networking Mixer',
+];
+
 export async function CreateEventPage() {
   const user = await Auth.me();
   if (!user) {
@@ -59,20 +74,6 @@ export async function CreateEventPage() {
 
         ${Input({ label: 'Description', name: 'description', type: 'textarea', placeholder: 'Describe your event...', value: event?.description || '', required: true, rows: 5 })}
         ${Input({ label: 'Tags (comma separated)', name: 'tags', placeholder: 'javascript, webdev, networking', value: event?.tags?.join(', ') || '' })}
-        ${Input({ label: 'Image URL', name: 'image', placeholder: 'https://...', value: event?.image || '' })}
-
-        <!-- Speakers -->
-        <div>
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-sm font-semibold text-gray-900">Speakers</h3>
-            <button type="button" onclick="window.addSpeaker()" class="text-xs font-medium text-teal-800 hover:text-orange-500 transition-colors flex items-center gap-1">
-              ${getIcon('plus', 12)} Add Speaker
-            </button>
-          </div>
-          <div id="speakers-container" class="space-y-3">
-            ${(event?.speakers || []).map((s, i) => SpeakerEntry(i, s)).join('') || SpeakerEntry(0)}
-          </div>
-        </div>
 
         <!-- Agenda -->
         <div>
@@ -97,26 +98,14 @@ export async function CreateEventPage() {
   `;
 }
 
-function SpeakerEntry(index, speaker = {}) {
-  return `
-    <div class="speaker-entry grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 rounded-lg bg-gray-50 border border-gray-100">
-      <input type="text" name="speaker_name_${index}" placeholder="Name" value="${speaker.name || ''}" class="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:border-teal-700" />
-      <input type="text" name="speaker_role_${index}" placeholder="Role" value="${speaker.role || ''}" class="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:border-teal-700" />
-      <div class="flex gap-2">
-        <input type="text" name="speaker_topic_${index}" placeholder="Topic" value="${speaker.topic || ''}" class="flex-1 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:border-teal-700" />
-        <button type="button" onclick="this.closest('.speaker-entry').remove()" class="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Remove">
-          ${getIcon('x', 14)}
-        </button>
-      </div>
-    </div>
-  `;
-}
-
 function AgendaEntry(index, item = {}) {
   return `
     <div class="agenda-entry grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 rounded-lg bg-gray-50 border border-gray-100">
       <input type="time" name="agenda_time_${index}" value="${item.time || ''}" class="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:border-teal-700" />
-      <input type="text" name="agenda_title_${index}" placeholder="Session title" value="${item.title || ''}" class="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:border-teal-700" />
+      <select name="agenda_title_${index}" class="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:border-teal-700">
+        <option value="">Select item</option>
+        ${AGENDA_TITLES.map(title => `<option value="${title}" ${item.title === title ? 'selected' : ''}>${title}</option>`).join('')}
+      </select>
       <div class="flex gap-2">
         <select name="agenda_type_${index}" class="flex-1 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:border-teal-700">
           <option value="social" ${item.type === 'social' ? 'selected' : ''}>Social</option>
@@ -131,14 +120,6 @@ function AgendaEntry(index, item = {}) {
     </div>
   `;
 }
-
-window.addSpeaker = function() {
-  const container = document.getElementById('speakers-container');
-  const index = container.children.length;
-  const div = document.createElement('div');
-  div.innerHTML = SpeakerEntry(index);
-  container.appendChild(div.firstElementChild);
-};
 
 window.addAgenda = function() {
   const container = document.getElementById('agenda-container');

@@ -12,6 +12,22 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
+// ===== ASYNC ERROR HANDLING =====
+// Wraps async route/middleware functions so a rejected promise (e.g. a
+// failed DB query) is turned into a normal error response instead of an
+// unhandled promise rejection, which crashes the Node process (and looks
+// like a 502 from the client).
+function asyncHandler(fn) {
+  return (req, res, next) => {
+    Promise.resolve(fn(req, res, next)).catch((err) => {
+      console.error('Route error:', err);
+      if (!res.headersSent) {
+        res.status(500).json({ error: 'Internal server error' });
+      }
+    });
+  };
+}
+
 // ===== DEBUG ENDPOINTS =====
 app.get('/debug-files', (req, res) => {
   const fs = require('fs');
@@ -571,14 +587,14 @@ async function getUserFromToken(token) {
 
 const sessions = new Map();
 
-async function requireAuth(req, res, next) {
+const requireAuth = asyncHandler(async (req, res, next) => {
   const token = req.headers.authorization?.replace('Bearer ', '') || req.query.token;
   const user = await getUserFromToken(token);
   if (!user) return res.status(401).json({ error: 'Unauthorized' });
   req.user = user;
   req.token = token;
   next();
-}
+});
 
 function requireRole(roles) {
   return (req, res, next) => {
@@ -590,7 +606,7 @@ function requireRole(roles) {
 
 // ===== AUTH ENDPOINTS =====
 
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   console.log('🔐 Login attempt:', email);
@@ -623,9 +639,9 @@ app.post('/api/auth/login', async (req, res) => {
   const token = await createSession(user.id);
   const { password: _, ...userWithoutPassword } = user;
   res.json({ token, user: userWithoutPassword });
-});
+}));
 
-app.post('/api/auth/register', async (req, res) => {
+app.post('/api/auth/register', asyncHandler(async (req, res) => {
   const { name, email, password, role } = req.body;
 
   if (!name || !email || !password) {
@@ -675,16 +691,16 @@ app.post('/api/auth/register', async (req, res) => {
   const token = await createSession(newUser.id);
   const { password: _, ...userWithoutPassword } = newUser;
   res.status(201).json({ token, user: userWithoutPassword });
-});
+}));
 
-app.post('/api/auth/logout', requireAuth, async (req, res) => {
+app.post('/api/auth/logout', requireAuth, asyncHandler(async (req, res) => {
   if (useDatabase) {
     await pool.query('DELETE FROM sessions WHERE token = $1', [req.token]);
   } else {
     sessions.delete(req.token);
   }
   res.json({ message: 'Logged out' });
-});
+}));
 
 app.get('/api/auth/me', requireAuth, (req, res) => {
   const { password: _, ...userWithoutPassword } = req.user;
@@ -693,7 +709,7 @@ app.get('/api/auth/me', requireAuth, (req, res) => {
 
 // ===== PUBLIC EVENTS API =====
 
-app.get('/api/events', async (req, res) => {
+app.get('/api/events', asyncHandler(async (req, res) => {
   const { category, status, q } = req.query;
   
   let events;
@@ -748,9 +764,9 @@ app.get('/api/events', async (req, res) => {
   }));
   
   res.json({ events: transformedEvents });
-});
+}));
 
-app.get('/api/events/:id', async (req, res) => {
+app.get('/api/events/:id', asyncHandler(async (req, res) => {
   let event;
   if (useDatabase) {
     const result = await pool.query('SELECT * FROM events WHERE id = $1', [req.params.id]);
@@ -796,13 +812,13 @@ app.get('/api/events/:id', async (req, res) => {
       agenda: event.agenda || [],
     }
   });
-});
+}));
 
 app.get('/api/categories', (req, res) => {
   res.json({ categories: dataStore.categories });
 });
 
-app.get('/api/stats', async (req, res) => {
+app.get('/api/stats', asyncHandler(async (req, res) => {
   let totalEvents, totalAttendees, totalUsers, totalOrganizers;
   
   if (useDatabase) {
@@ -828,11 +844,11 @@ app.get('/api/stats', async (req, res) => {
     totalUsers,
     totalOrganizers,
   });
-});
+}));
 
 // ===== PROTECTED EVENTS API =====
 
-app.post('/api/events', requireAuth, requireRole(['organizer', 'admin']), async (req, res) => {
+app.post('/api/events', requireAuth, requireRole(['organizer', 'admin']), asyncHandler(async (req, res) => {
   const { title, category, date, time, location, capacity, description, tags } = req.body;
   if (!title || !category || !date || !location || !capacity) {
     return res.status(400).json({ error: 'Missing required fields' });
@@ -865,7 +881,8 @@ app.post('/api/events', requireAuth, requireRole(['organizer', 'admin']), async 
         newEvent.id, newEvent.title, newEvent.description, newEvent.date, newEvent.time,
         newEvent.location, newEvent.category, newEvent.image,
         newEvent.organizer.id, newEvent.organizer.name, newEvent.organizer.avatar, newEvent.organizer.initialsColor,
-        newEvent.attendees, newEvent.capacity, newEvent.tags, newEvent.speakers, newEvent.agenda, newEvent.status
+        newEvent.attendees, newEvent.capacity, newEvent.tags,
+        JSON.stringify(newEvent.speakers), JSON.stringify(newEvent.agenda), newEvent.status
       ]
     );
     req.user.eventsHosting.push(newEvent.id);
@@ -875,9 +892,9 @@ app.post('/api/events', requireAuth, requireRole(['organizer', 'admin']), async 
   }
 
   res.status(201).json({ event: newEvent });
-});
+}));
 
-app.put('/api/events/:id', requireAuth, async (req, res) => {
+app.put('/api/events/:id', requireAuth, asyncHandler(async (req, res) => {
   let event;
   if (useDatabase) {
     const result = await pool.query('SELECT * FROM events WHERE id = $1', [req.params.id]);
@@ -917,9 +934,9 @@ app.put('/api/events/:id', requireAuth, async (req, res) => {
   }
 
   res.json({ event });
-});
+}));
 
-app.delete('/api/events/:id', requireAuth, async (req, res) => {
+app.delete('/api/events/:id', requireAuth, asyncHandler(async (req, res) => {
   let event;
   if (useDatabase) {
     const result = await pool.query('SELECT * FROM events WHERE id = $1', [req.params.id]);
@@ -942,11 +959,11 @@ app.delete('/api/events/:id', requireAuth, async (req, res) => {
   }
 
   res.json({ message: 'Event deleted' });
-});
+}));
 
 // ===== RSVP =====
 
-app.post('/api/events/:id/rsvp', requireAuth, requireRole(['participant', 'organizer', 'admin']), async (req, res) => {
+app.post('/api/events/:id/rsvp', requireAuth, requireRole(['participant', 'organizer', 'admin']), asyncHandler(async (req, res) => {
   let event;
   if (useDatabase) {
     const result = await pool.query('SELECT * FROM events WHERE id = $1', [req.params.id]);
@@ -983,9 +1000,9 @@ app.post('/api/events/:id/rsvp', requireAuth, requireRole(['participant', 'organ
   }
 
   res.json({ attending: !attending, event: { ...event, attendees } });
-});
+}));
 
-app.get('/api/events/:id/rsvp', requireAuth, async (req, res) => {
+app.get('/api/events/:id/rsvp', requireAuth, asyncHandler(async (req, res) => {
   let event;
   if (useDatabase) {
     const result = await pool.query('SELECT * FROM events WHERE id = $1', [req.params.id]);
@@ -997,7 +1014,7 @@ app.get('/api/events/:id/rsvp', requireAuth, async (req, res) => {
   if (!event) return res.status(404).json({ error: 'Event not found' });
   const attendees = event.attendees || [];
   res.json({ attending: attendees.includes(req.user.id) });
-});
+}));
 
 // ===== USER PROFILE API =====
 
@@ -1006,7 +1023,7 @@ app.get('/api/user', requireAuth, (req, res) => {
   res.json({ user });
 });
 
-app.put('/api/user', requireAuth, async (req, res) => {
+app.put('/api/user', requireAuth, asyncHandler(async (req, res) => {
   const { name, email, bio, skills } = req.body;
   const updates = {};
   if (name) updates.name = name;
@@ -1027,9 +1044,9 @@ app.put('/api/user', requireAuth, async (req, res) => {
 
   const { password: _, ...user } = req.user;
   res.json({ user });
-});
+}));
 
-app.get('/api/user/events/attending', requireAuth, async (req, res) => {
+app.get('/api/user/events/attending', requireAuth, asyncHandler(async (req, res) => {
   let events;
   if (useDatabase) {
     const userEvents = req.user.events_attending || [];
@@ -1042,9 +1059,9 @@ app.get('/api/user/events/attending', requireAuth, async (req, res) => {
     events = dataStore.events.filter(e => req.user.eventsAttending.includes(e.id));
   }
   res.json({ events });
-});
+}));
 
-app.get('/api/user/events/hosting', requireAuth, async (req, res) => {
+app.get('/api/user/events/hosting', requireAuth, asyncHandler(async (req, res) => {
   let events;
   if (useDatabase) {
     const result = await pool.query('SELECT * FROM events WHERE organizer_id = $1', [req.user.id]);
@@ -1053,11 +1070,11 @@ app.get('/api/user/events/hosting', requireAuth, async (req, res) => {
     events = dataStore.events.filter(e => e.organizer.id === req.user.id);
   }
   res.json({ events });
-});
+}));
 
 // ===== ADMIN API =====
 
-app.get('/api/admin/users', requireAuth, requireRole(['admin']), async (req, res) => {
+app.get('/api/admin/users', requireAuth, requireRole(['admin']), asyncHandler(async (req, res) => {
   let users;
   if (useDatabase) {
     const result = await pool.query('SELECT id, name, email, role, avatar, initials_color, bio, skills, joined_date FROM users');
@@ -1069,9 +1086,9 @@ app.get('/api/admin/users', requireAuth, requireRole(['admin']), async (req, res
     });
   }
   res.json({ users });
-});
+}));
 
-app.get('/api/admin/events', requireAuth, requireRole(['admin']), async (req, res) => {
+app.get('/api/admin/events', requireAuth, requireRole(['admin']), asyncHandler(async (req, res) => {
   let events;
   if (useDatabase) {
     const result = await pool.query('SELECT * FROM events');
@@ -1080,9 +1097,9 @@ app.get('/api/admin/events', requireAuth, requireRole(['admin']), async (req, re
     events = dataStore.events;
   }
   res.json({ events });
-});
+}));
 
-app.get('/api/admin/stats', requireAuth, requireRole(['admin']), async (req, res) => {
+app.get('/api/admin/stats', requireAuth, requireRole(['admin']), asyncHandler(async (req, res) => {
   const now = new Date().toISOString().split('T')[0];
   let stats;
   
@@ -1120,9 +1137,9 @@ app.get('/api/admin/stats', requireAuth, requireRole(['admin']), async (req, res
   }
 
   res.json(stats);
-});
+}));
 
-app.delete('/api/admin/users/:id', requireAuth, requireRole(['admin']), async (req, res) => {
+app.delete('/api/admin/users/:id', requireAuth, requireRole(['admin']), asyncHandler(async (req, res) => {
   if (req.params.id === req.user.id) {
     return res.status(400).json({ error: 'Cannot delete yourself' });
   }
@@ -1134,9 +1151,9 @@ app.delete('/api/admin/users/:id', requireAuth, requireRole(['admin']), async (r
     dataStore.users.splice(idx, 1);
   }
   res.json({ message: 'User deleted' });
-});
+}));
 
-app.delete('/api/admin/events/:id', requireAuth, requireRole(['admin']), async (req, res) => {
+app.delete('/api/admin/events/:id', requireAuth, requireRole(['admin']), asyncHandler(async (req, res) => {
   if (useDatabase) {
     await pool.query('DELETE FROM events WHERE id = $1', [req.params.id]);
   } else {
@@ -1145,7 +1162,7 @@ app.delete('/api/admin/events/:id', requireAuth, requireRole(['admin']), async (
     dataStore.events.splice(idx, 1);
   }
   res.json({ message: 'Event deleted' });
-});
+}));
 
 // ===== SPA FALLBACK =====
 app.get('*', (req, res) => {
@@ -1153,6 +1170,16 @@ app.get('*', (req, res) => {
     return res.status(404).json({ error: 'API endpoint not found' });
   }
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// ===== GLOBAL ERROR HANDLER (safety net) =====
+// Catches any error that reaches here (e.g. sync errors thrown in
+// non-async middleware) instead of letting Express's default handler
+// take down the connection.
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  if (res.headersSent) return next(err);
+  res.status(500).json({ error: 'Internal server error' });
 });
 
 const server = app.listen(PORT, '0.0.0.0', () => {
