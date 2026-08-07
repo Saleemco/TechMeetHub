@@ -1089,6 +1089,19 @@ app.get('/api/admin/users', requireAuth, requireRole(['admin']), asyncHandler(as
   res.json({ users });
 }));
 
+app.delete('/api/admin/users', requireAuth, requireRole(['admin']), asyncHandler(async (req, res) => {
+  // Note: users.organizer_id has ON DELETE CASCADE, so deleting non-admin
+  // users also deletes any events they organized (and detaches attendees).
+  if (useDatabase) {
+    await pool.query("DELETE FROM users WHERE role != 'admin'");
+  } else {
+    const removedIds = dataStore.users.filter(u => u.role !== 'admin').map(u => u.id);
+    dataStore.users = dataStore.users.filter(u => u.role === 'admin');
+    dataStore.events = dataStore.events.filter(e => !removedIds.includes(e.organizer?.id));
+  }
+  res.json({ message: 'All non-admin users deleted' });
+}));
+
 app.get('/api/admin/events', requireAuth, requireRole(['admin']), asyncHandler(async (req, res) => {
   let events;
   if (useDatabase) {

@@ -271,6 +271,10 @@ export const Data = {
     await apiDelete(`/admin/users/${id}`);
   },
 
+  async deleteAllUsers() {
+    await apiDelete('/admin/users');
+  },
+
   async deleteEventAdmin(id) {
     await apiDelete(`/admin/events/${id}`);
   },

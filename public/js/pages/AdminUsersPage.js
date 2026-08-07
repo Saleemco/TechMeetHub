@@ -1,6 +1,6 @@
 // public/js/pages/AdminUsersPage.js
 import { Data, Auth } from '../data.js';
-import { getIcon } from '../components.js';
+import { getIcon, showToast } from '../components.js';
 import { LoginPage } from './LoginPage.js';
 
 export async function AdminUsersPage() {
@@ -20,6 +20,7 @@ export async function AdminUsersPage() {
   }
 
   const allUsers = await Data.getAdminUsers();
+  const nonAdminCount = allUsers.filter(u => u.role !== 'admin').length;
 
   return `
     <div class="page-transition max-w-7xl mx-auto">
@@ -28,9 +29,19 @@ export async function AdminUsersPage() {
           <h1 class="text-2xl font-bold text-gray-900">All Users</h1>
           <p class="text-gray-500 text-sm mt-1">${allUsers.length} registered users</p>
         </div>
-        <a href="/dashboard" data-navigate class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300 transition-colors flex items-center gap-2">
-          ${getIcon('arrowLeft', 16)} Back to Dashboard
-        </a>
+        <div class="flex items-center gap-2">
+          <button
+            onclick="window.deleteAllUsers()"
+            ${nonAdminCount === 0 ? 'disabled' : ''}
+            class="px-4 py-2 rounded-lg text-sm font-medium bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition-colors flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-red-50"
+            title="${nonAdminCount === 0 ? 'No non-admin users to delete' : 'Delete all non-admin users'}"
+          >
+            ${getIcon('trash', 16)} Delete All Users
+          </button>
+          <a href="/dashboard" data-navigate class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300 transition-colors flex items-center gap-2">
+            ${getIcon('arrowLeft', 16)} Back to Dashboard
+          </a>
+        </div>
       </div>
 
       <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -85,3 +96,22 @@ export async function AdminUsersPage() {
     </div>
   `;
 }
+
+window.deleteAllUsers = async function() {
+  const confirmed = confirm(
+    'Delete ALL non-admin users? This also deletes every event hosted by an organizer and removes all attendees. This cannot be undone.'
+  );
+  if (!confirmed) return;
+
+  try {
+    await Data.deleteAllUsers();
+    showToast('All non-admin users deleted', 'success');
+    if (window.router) {
+      await window.router.render(window.location.pathname);
+    } else {
+      window.location.reload();
+    }
+  } catch (err) {
+    showToast('Error: ' + (err.message || 'Failed to delete users'), 'error');
+  }
+};
