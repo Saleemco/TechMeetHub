@@ -405,7 +405,24 @@ if (process.env.DATABASE_URL) {
 // ===== INITIALIZE DATABASE TABLES =====
 async function initializeDatabase() {
   try {
-    // Drop existing tables to start fresh
+    // Only set up the schema once. Without this check, every server
+    // restart (e.g. Render spinning down an idle free-tier service and
+    // restarting it on the next request) would drop all tables and
+    // reseed from scratch, wiping out any real data.
+    const checkResult = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_schema = 'public' AND table_name = 'users'
+      )
+    `);
+    const tablesExist = checkResult.rows[0].exists;
+
+    if (tablesExist) {
+      console.log('✅ Database already initialized, skipping reseed');
+      return;
+    }
+
+    // Drop existing tables to start fresh (first run only)
     await pool.query(`DROP TABLE IF EXISTS sessions CASCADE`);
     await pool.query(`DROP TABLE IF EXISTS events CASCADE`);
     await pool.query(`DROP TABLE IF EXISTS users CASCADE`);
