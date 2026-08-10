@@ -225,12 +225,15 @@ async function OrganizerDashboard(user) {
     .sort((a, b) => a.date.localeCompare(b.date))
     .slice(0, 5);
 
+  // Get user's first name
+  const firstName = user.name ? user.name.split(' ')[0] : 'User';
+
   return `
     <div class="page-transition">
       <div class="mb-6 sm:mb-8">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
           <div>
-            <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Organizer Dashboard</h1>
+            <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Welcome back, ${firstName}! 👋</h1>
             <p class="text-gray-500 text-sm mt-1">Manage your events and track performance</p>
           </div>
           <a href="/create" data-navigate class="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
@@ -300,10 +303,13 @@ async function ParticipantDashboard(user) {
   const upcoming = attending.filter(e => e.date >= now);
   const past = attending.filter(e => e.date < now);
 
+  // Get user's first name
+  const firstName = user.name ? user.name.split(' ')[0] : 'User';
+
   return `
     <div class="page-transition">
       <div class="mb-6 sm:mb-8">
-        <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Welcome back, ${user.name}! 👋</h1>
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Welcome back, ${firstName}! 👋</h1>
         <p class="text-gray-500 text-sm mt-1">Discover and manage events you're attending</p>
       </div>
 
