@@ -258,7 +258,6 @@ async function OrganizerDashboard(user) {
                 <th class="px-3 sm:px-4 py-2.5 sm:py-3 font-medium">Event</th>
                 <th class="px-3 sm:px-4 py-2.5 sm:py-3 font-medium hidden md:table-cell">Date</th>
                 <th class="px-3 sm:px-4 py-2.5 sm:py-3 font-medium">Attendees</th>
-                <th class="px-3 sm:px-4 py-2.5 sm:py-3 font-medium hidden lg:table-cell">Revenue</th>
                 <th class="px-3 sm:px-4 py-2.5 sm:py-3 font-medium text-right">Actions</th>
               </tr>
             </thead>
@@ -268,7 +267,6 @@ async function OrganizerDashboard(user) {
                   <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-medium text-gray-900 cursor-pointer truncate max-w-[120px] sm:max-w-none" onclick="window.navigateTo('/events/${e.id}')">${e.title}</td>
                   <td class="px-3 sm:px-4 py-2.5 sm:py-3 text-gray-500 hidden md:table-cell cursor-pointer whitespace-nowrap" onclick="window.navigateTo('/events/${e.id}')">${new Date(e.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
                   <td class="px-3 sm:px-4 py-2.5 sm:py-3 text-gray-500 cursor-pointer whitespace-nowrap" onclick="window.navigateTo('/events/${e.id}')">${e.attendees?.length || 0} / ${e.capacity}</td>
-                  <td class="px-3 sm:px-4 py-2.5 sm:py-3 text-gray-500 hidden lg:table-cell cursor-pointer" onclick="window.navigateTo('/events/${e.id}')">$${(e.attendees?.length || 0) * 25}</td>
                   <td class="px-3 sm:px-4 py-2.5 sm:py-3 text-right">
                     <button onclick="window.navigateTo('/create?edit=${e.id}')" class="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors mr-1" title="Edit event">
                       ${getIcon('wrench', 14)}
@@ -280,7 +278,7 @@ async function OrganizerDashboard(user) {
                 </tr>
               `).join('') : `
                 <tr>
-                  <td colspan="5" class="px-4 py-8 text-center text-gray-500">No upcoming events</td>
+                  <td colspan="4" class="px-4 py-8 text-center text-gray-500">No upcoming events</td>
                 </tr>
               `}
             </tbody>
