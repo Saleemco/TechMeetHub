@@ -1,4 +1,3 @@
-// public/js/pages/index.js
 export { HomePage } from './HomePage.js';
 export { EventsPage } from './EventsPage.js';
 export { EventDetailPage } from './EventDetailPage.js';
@@ -10,4 +9,6 @@ export { ProfilePage } from './ProfilePage.js';
 export { NotFoundPage } from './NotFoundPage.js';
 export { AdminUsersPage } from './AdminUsersPage.js';
 export { AdminEventsPage } from './AdminEventsPage.js';
+export { ReportsPage } from './ReportsPage.js';
+export { NotificationsPage } from './NotificationsPage.js';
 export { requireAuth, requireRole } from './auth.js';

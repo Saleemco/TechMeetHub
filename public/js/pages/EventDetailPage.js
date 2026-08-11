@@ -1,3 +1,4 @@
+
 import { Data, Auth } from '../data.js';
 import { getIcon, formatFullDate, formatTime } from '../components.js';
 
@@ -9,7 +10,6 @@ const AVATAR_COLORS = [
   'bg-pink-500', 'bg-rose-500', 'bg-sky-500', 'bg-lime-500'
 ];
 
-// Generate a consistent index from a string ID
 function hashIndex(str, max) {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -18,7 +18,6 @@ function hashIndex(str, max) {
   return Math.abs(hash) % max;
 }
 
-// Generate a deterministic avatar from a user ID
 function generateAvatar(id) {
   const idStr = String(id);
   const color = AVATAR_COLORS[hashIndex(idStr, AVATAR_COLORS.length)];
@@ -29,6 +28,7 @@ function generateAvatar(id) {
 export async function EventDetailPage(id) {
   let event = null;
   let user = null;
+  let attendanceRecords = [];
 
   try {
     event = await Data.getEvent(id);
@@ -42,6 +42,19 @@ export async function EventDetailPage(id) {
     console.error('Auth failed:', e);
   }
 
+  // Load attendance if user is organizer/admin
+  const isOrganizer = user?.id === String(event?.organizer_id || event?.organizer?.id || '');
+  const isAdmin = user?.role === 'admin';
+  const canManage = isOrganizer || isAdmin;
+
+  if (canManage && event) {
+    try {
+      attendanceRecords = await Data.getAttendance(id);
+    } catch (e) {
+      console.error('Failed to load attendance:', e);
+    }
+  }
+
   if (!event) {
     return `
       <div class="page-transition max-w-7xl mx-auto text-center py-20 px-4">
@@ -53,8 +66,6 @@ export async function EventDetailPage(id) {
     `;
   }
 
-  // Build lookup map from attendeeDetails (returned by the server for everyone,
-  // not just admins — see GET /api/events/:id)
   const attendeeDetailsMap = new Map();
   if (Array.isArray(event.attendeeDetails)) {
     event.attendeeDetails.forEach(u => {
@@ -62,11 +73,9 @@ export async function EventDetailPage(id) {
     });
   }
 
-  // Resolve attendees
   const rawAttendees = Array.isArray(event.attendees) ? event.attendees : [];
 
   const resolvedAttendees = rawAttendees.map((attendee, index) => {
-    // Case 1: Already a full object with data
     if (attendee && typeof attendee === 'object' && attendee.id) {
       const idStr = String(attendee.id);
       const found = attendeeDetailsMap.get(idStr);
@@ -77,8 +86,6 @@ export async function EventDetailPage(id) {
         initialsColor: attendee.initialsColor || found?.initialsColor || generateAvatar(idStr).initialsColor
       };
     }
-
-    // Case 2: String/number ID
     if (attendee) {
       const idStr = String(attendee);
       const found = attendeeDetailsMap.get(idStr);
@@ -90,33 +97,28 @@ export async function EventDetailPage(id) {
           initialsColor: found.initialsColor || generateAvatar(idStr).initialsColor
         };
       }
-      // No matching detail — generate deterministic avatar from ID
       const generated = generateAvatar(idStr);
-      return {
-        id: idStr,
-        name: generated.name,
-        avatar: generated.avatar,
-        initialsColor: generated.initialsColor
-      };
+      return { id: idStr, name: generated.name, avatar: generated.avatar, initialsColor: generated.initialsColor };
     }
-
     return null;
   }).filter(Boolean);
 
-  // Check if current user is attending
+  const attendanceMap = new Map();
+  attendanceRecords.forEach(a => attendanceMap.set(String(a.user_id), a.status));
+
   const userIdStr = user?.id ? String(user.id) : null;
   const isAttending = userIdStr ? rawAttendees.some(a => {
     if (a && typeof a === 'object' && a.id) return String(a.id) === userIdStr;
     return String(a) === userIdStr;
   }) : false;
 
-  const isOrganizer = userIdStr === String(event.organizer_id || event.organizer?.id || '');
-  const isAdmin = user?.role === 'admin';
   const canEdit = isOrganizer || isAdmin;
   const date = formatFullDate(event.date);
   const time = formatTime(event.time);
   const spotsLeft = Math.max(0, (event.capacity || 0) - rawAttendees.length);
   const isFull = spotsLeft <= 0;
+  const attendanceCount = attendanceRecords.filter(a => a.status === 'present').length;
+  const attendanceRate = rawAttendees.length > 0 ? Math.round((attendanceCount / rawAttendees.length) * 100) : 0;
 
   return `
     <div class="page-transition max-w-7xl mx-auto px-4 sm:px-6">
@@ -139,10 +141,10 @@ export async function EventDetailPage(id) {
 
       <!-- Main Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        
+
         <!-- Left Column -->
         <div class="lg:col-span-2 space-y-4 sm:space-y-6">
-          
+
           <!-- Event Info -->
           <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
             <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-sm text-gray-500 mb-4">
@@ -156,10 +158,10 @@ export async function EventDetailPage(id) {
                 ${getIcon('mapPin', 14)} ${event.location}
               </span>
             </div>
-            
+
             <h2 class="text-lg font-semibold text-gray-900 mb-2">About this event</h2>
             <p class="text-gray-600 leading-relaxed text-sm sm:text-base whitespace-pre-line">${event.description || 'No description available.'}</p>
-            
+
             ${event.tags?.length ? `
               <div class="mt-4 flex flex-wrap gap-2">
                 ${event.tags.map(tag => `<span class="tag-pill">${tag}</span>`).join('')}
@@ -225,11 +227,55 @@ export async function EventDetailPage(id) {
               </div>
             ` : '<p class="text-sm text-gray-500">No attendees yet. Be the first to register!</p>'}
           </div>
+
+          <!-- Attendance Management (Organizer/Admin only) -->
+          ${canManage ? `
+            <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+                <div>
+                  <h2 class="text-lg font-semibold text-gray-900">Attendance Management</h2>
+                  <p class="text-sm text-gray-500">Mark who attended this event</p>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="text-sm font-medium text-gray-700">${attendanceCount} / ${resolvedAttendees.length} marked</span>
+                  <span class="inline-block px-2 py-1 rounded-full text-xs font-medium ${attendanceRate >= 70 ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : attendanceRate >= 40 ? 'bg-amber-50 text-amber-600 border border-amber-200' : 'bg-red-50 text-red-600 border border-red-200'}">${attendanceRate}% rate</span>
+                </div>
+              </div>
+
+              ${resolvedAttendees.length > 0 ? `
+                <form id="attendance-form" data-event-id="${event.id}">
+                  <div class="space-y-2 max-h-80 overflow-y-auto pr-1">
+                    ${resolvedAttendees.map(u => {
+                      const isMarked = attendanceMap.get(u.id) === 'present';
+                      return `
+                        <label class="flex items-center gap-3 p-2.5 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer">
+                          <input type="checkbox" data-attendance data-user-id="${u.id}" ${isMarked ? 'checked' : ''} class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                          <div class="w-8 h-8 rounded-full ${u.initialsColor} avatar-initials text-xs text-white flex items-center justify-center shrink-0">${u.avatar}</div>
+                          <span class="text-sm font-medium text-gray-900 flex-1">${u.name}</span>
+                          <span class="text-xs text-gray-400">${isMarked ? 'Present' : 'Not marked'}</span>
+                        </label>
+                      `;
+                    }).join('')}
+                  </div>
+                </form>
+                <div class="mt-4 flex gap-2">
+                  <button data-download-csv data-event-id="${event.id}" class="px-3 py-2 rounded-lg text-xs font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200 transition-colors flex items-center gap-1">
+                    ${getIcon('download', 12)} Export CSV
+                  </button>
+                  <a href="/notifications?event=${event.id}" data-navigate class="px-3 py-2 rounded-lg text-xs font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 transition-colors flex items-center gap-1">
+                    ${getIcon('mail', 12)} Email Attendees
+                  </a>
+                </div>
+              ` : `
+                <p class="text-sm text-gray-500">No registered attendees to mark.</p>
+              `}
+            </div>
+          ` : ''}
         </div>
 
         <!-- Right Column (Sidebar) -->
         <div class="space-y-4 sm:space-y-6">
-          
+
           <!-- Action Card -->
           <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 lg:sticky lg:top-20">
             <div class="text-center mb-4">
@@ -274,6 +320,30 @@ export async function EventDetailPage(id) {
               </div>
             </div>
           </div>
+
+          <!-- Attendance Stats (visible to all) -->
+          ${resolvedAttendees.length > 0 ? `
+            <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+              <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">Attendance Stats</h3>
+              <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-500">Registered</span>
+                  <span class="text-sm font-semibold text-gray-900">${resolvedAttendees.length}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-500">Attended</span>
+                  <span class="text-sm font-semibold text-gray-900">${attendanceCount}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-500">Attendance Rate</span>
+                  <span class="text-sm font-semibold ${attendanceRate >= 70 ? 'text-emerald-600' : attendanceRate >= 40 ? 'text-amber-600' : 'text-red-600'}">${attendanceRate}%</span>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-2 mt-2">
+                  <div class="bg-blue-600 h-2 rounded-full transition-all" style="width: ${attendanceRate}%"></div>
+                </div>
+              </div>
+            </div>
+          ` : ''}
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@
 import { 
   HomePage, EventsPage, EventDetailPage, CreateEventPage, 
   DashboardPage, ProfilePage, LoginPage, RegisterPage, NotFoundPage,
-  AdminUsersPage, AdminEventsPage
+  AdminUsersPage, AdminEventsPage, ReportsPage, NotificationsPage
 } from './pages/index.js';
 import { Auth, Data } from './data.js';
 import { Header, Footer, showToast, Sidebar, DashboardHeader } from './components.js';
@@ -20,6 +20,8 @@ const routes = {
   '/admin': DashboardPage,
   '/admin/users': AdminUsersPage,
   '/admin/events': AdminEventsPage,
+  '/reports': ReportsPage,
+  '/notifications': NotificationsPage,
 };
 
 const LOADING_PLACEHOLDER = `
@@ -69,16 +71,9 @@ export class Router {
     const cleanPath = path.split('?')[0];
     const isAuthPage = cleanPath === '/login' || cleanPath === '/register';
     const main = document.getElementById('main');
-
-    if (main) {
-      main.classList.remove('sidebar-visible');
-    }
-
-    if (isAuthPage) {
-      document.body.classList.add('auth-page');
-    } else {
-      document.body.classList.remove('auth-page');
-    }
+    if (main) main.classList.remove('sidebar-visible');
+    if (isAuthPage) document.body.classList.add('auth-page');
+    else document.body.classList.remove('auth-page');
 
     this.container.innerHTML = isAuthPage ? AUTH_LOADING_PLACEHOLDER : LOADING_PLACEHOLDER;
     this.container.offsetHeight;
@@ -94,39 +89,24 @@ export class Router {
 
     const elapsed = Date.now() - startTime;
     const remaining = Math.max(0, MIN_AUTH_LOADING - elapsed);
-    if (remaining > 0) {
-      await new Promise(resolve => setTimeout(resolve, remaining));
-    }
+    if (remaining > 0) await new Promise(resolve => setTimeout(resolve, remaining));
 
     if (isAuthPage) {
       this.header.innerHTML = '';
       this.footer.innerHTML = '';
-      if (this.sidebar) {
-        this.sidebar.innerHTML = '';
-        this.sidebar.classList.add('hidden');
-      }
+      if (this.sidebar) { this.sidebar.innerHTML = ''; this.sidebar.classList.add('hidden'); }
     } else if (isDashboardRoute) {
       this.header.innerHTML = DashboardHeader(user);
       this.footer.innerHTML = '';
-      if (this.sidebar) {
-        this.sidebar.innerHTML = Sidebar(user);
-        this.sidebar.classList.remove('hidden');
-      }
+      if (this.sidebar) { this.sidebar.innerHTML = Sidebar(user); this.sidebar.classList.remove('hidden'); }
     } else {
       this.header.innerHTML = Header(user);
       this.footer.innerHTML = Footer();
-      if (this.sidebar) {
-        this.sidebar.innerHTML = '';
-        this.sidebar.classList.add('hidden');
-      }
+      if (this.sidebar) { this.sidebar.innerHTML = ''; this.sidebar.classList.add('hidden'); }
     }
 
     this.container.innerHTML = await handler(...params);
-
-    if (main) {
-      main.classList.toggle('sidebar-visible', showSidebar);
-    }
-
+    if (main) main.classList.toggle('sidebar-visible', showSidebar);
     this.updateActiveNav(path);
     this.updateSidebarActive(path);
     this.currentRoute = path;
@@ -165,17 +145,13 @@ export class Router {
       const newForm = loginForm.cloneNode(true);
       loginForm.parentNode.replaceChild(newForm, loginForm);
       newForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
+        e.preventDefault(); e.stopPropagation();
         const btn = newForm.querySelector('#login-btn');
         const btnText = newForm.querySelector('#login-btn-text');
         const btnSpinner = newForm.querySelector('#login-btn-spinner');
-        
         if (btn) btn.disabled = true;
         if (btnText) btnText.textContent = 'Signing in...';
         if (btnSpinner) btnSpinner.classList.remove('hidden');
-        
         const formData = new FormData(newForm);
         try {
           await Auth.login(formData.get('email'), formData.get('password'));
@@ -195,23 +171,15 @@ export class Router {
       const newForm = registerForm.cloneNode(true);
       registerForm.parentNode.replaceChild(newForm, registerForm);
       newForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
+        e.preventDefault(); e.stopPropagation();
         const data = Object.fromEntries(new FormData(newForm).entries());
-        if (data.password !== data.confirmPassword) {
-          showToast('Passwords do not match', 'error');
-          return;
-        }
-        
+        if (data.password !== data.confirmPassword) { showToast('Passwords do not match', 'error'); return; }
         const btn = newForm.querySelector('#register-btn');
         const btnText = newForm.querySelector('#register-btn-text');
         const btnSpinner = newForm.querySelector('#register-btn-spinner');
-        
         if (btn) btn.disabled = true;
         if (btnText) btnText.textContent = 'Creating account...';
         if (btnSpinner) btnSpinner.classList.remove('hidden');
-        
         try {
           await Auth.register(data.name, data.email, data.password, data.role);
           showToast('Account created! Welcome to TechMeetHub.', 'success');
@@ -230,15 +198,11 @@ export class Router {
       const newForm = createForm.cloneNode(true);
       createForm.parentNode.replaceChild(newForm, createForm);
       newForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); e.stopPropagation();
         const data = Object.fromEntries(new FormData(newForm).entries());
-
         if (!data.title || !data.category || !data.date || !data.time || !data.location || !data.capacity || !data.description) {
-          showToast('Please fill in all required fields.', 'error');
-          return;
+          showToast('Please fill in all required fields.', 'error'); return;
         }
-
         const speakers = [];
         document.querySelectorAll('.speaker-entry').forEach(entry => {
           const name = entry.querySelector('input[name^="speaker_name_"]')?.value?.trim();
@@ -246,7 +210,6 @@ export class Router {
           const topic = entry.querySelector('input[name^="speaker_topic_"]')?.value?.trim();
           if (name) speakers.push({ name, role: role || 'Speaker', topic: topic || '' });
         });
-
         const agenda = [];
         document.querySelectorAll('.agenda-entry').forEach(entry => {
           const time = entry.querySelector('input[name^="agenda_time_"]')?.value?.trim();
@@ -254,20 +217,13 @@ export class Router {
           const type = entry.querySelector('select[name^="agenda_type_"]')?.value || 'social';
           if (time && title) agenda.push({ time, title, type });
         });
-
         const eventData = {
-          title: data.title.trim(),
-          category: data.category,
-          date: data.date,
-          time: data.time,
-          location: data.location.trim(),
-          capacity: parseInt(data.capacity, 10),
+          title: data.title.trim(), category: data.category, date: data.date, time: data.time,
+          location: data.location.trim(), capacity: parseInt(data.capacity, 10),
           description: data.description.trim(),
           tags: data.tags ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
-          speakers,
-          agenda,
+          speakers, agenda,
         };
-
         const editId = new URLSearchParams(window.location.search).get('edit');
         try {
           if (editId) {
@@ -279,9 +235,7 @@ export class Router {
             showToast('Event created!', 'success');
             this.navigateTo('/events/' + newEvent.id);
           }
-        } catch (err) {
-          showToast('Error: ' + (err.message || 'Unknown error'), 'error');
-        }
+        } catch (err) { showToast('Error: ' + (err.message || 'Unknown error'), 'error'); }
       });
     }
 
@@ -290,21 +244,13 @@ export class Router {
       const newForm = profileForm.cloneNode(true);
       profileForm.parentNode.replaceChild(newForm, profileForm);
       newForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); e.stopPropagation();
         const data = Object.fromEntries(new FormData(newForm).entries());
         try {
-          await Data.updateUser({
-            name: data.name.trim(),
-            email: data.email.trim(),
-            bio: data.bio.trim(),
-            skills: data.skills ? data.skills.split(',').map(s => s.trim()).filter(Boolean) : [],
-          });
+          await Data.updateUser({ name: data.name.trim(), email: data.email.trim(), bio: data.bio.trim(), skills: data.skills ? data.skills.split(',').map(s => s.trim()).filter(Boolean) : [] });
           showToast('Profile updated!', 'success');
           await this.render(this.currentRoute);
-        } catch (err) {
-          showToast('Error updating profile', 'error');
-        }
+        } catch (err) { showToast('Error updating profile', 'error'); }
       });
     }
 
@@ -328,6 +274,71 @@ export class Router {
       statusFilter.parentNode.replaceChild(newFilter, statusFilter);
       newFilter.addEventListener('change', () => this.filterEvents());
     }
+
+    // ===== NEW: Attendance form handler =====
+    const attendanceForm = document.getElementById('attendance-form');
+    if (attendanceForm) {
+      attendanceForm.addEventListener('change', async (e) => {
+        if (e.target.matches('input[type="checkbox"][data-attendance]')) {
+          const eventId = attendanceForm.dataset.eventId;
+          const userId = e.target.dataset.userId;
+          const checked = e.target.checked;
+          try {
+            if (checked) {
+              await Data.markAttendance(eventId, userId, 'present');
+              showToast('Attendance marked', 'success');
+            } else {
+              await Data.unmarkAttendance(eventId, userId);
+              showToast('Attendance removed', 'success');
+            }
+          } catch (err) {
+            showToast('Error: ' + err.message, 'error');
+            e.target.checked = !checked;
+          }
+        }
+      });
+    }
+
+    // ===== NEW: Notification form handler =====
+    const notificationForm = document.getElementById('notification-form');
+    if (notificationForm) {
+      const newForm = notificationForm.cloneNode(true);
+      notificationForm.parentNode.replaceChild(newForm, notificationForm);
+      newForm.addEventListener('submit', async (e) => {
+        e.preventDefault(); e.stopPropagation();
+        const btn = newForm.querySelector('#send-notif-btn');
+        const btnText = newForm.querySelector('#send-notif-btn-text');
+        const btnSpinner = newForm.querySelector('#send-notif-btn-spinner');
+        if (btn) btn.disabled = true;
+        if (btnText) btnText.textContent = 'Sending...';
+        if (btnSpinner) btnSpinner.classList.remove('hidden');
+        const data = Object.fromEntries(new FormData(newForm).entries());
+        try {
+          const result = await Data.sendNotification({
+            eventId: data.eventId, subject: data.subject, message: data.message, type: data.type || 'announcement',
+          });
+          showToast(`Sent to ${result.count} attendees`, 'success');
+          newForm.reset();
+        } catch (err) {
+          showToast('Error: ' + (err.message || 'Failed to send'), 'error');
+        } finally {
+          if (btn) btn.disabled = false;
+          if (btnText) btnText.textContent = 'Send Notification';
+          if (btnSpinner) btnSpinner.classList.add('hidden');
+        }
+      });
+    }
+
+    // ===== NEW: Report CSV download buttons =====
+    document.querySelectorAll('[data-download-csv]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const eventId = e.currentTarget.dataset.eventId;
+        try {
+          await Data.downloadAttendanceCsv(eventId);
+          showToast('CSV downloaded', 'success');
+        } catch (err) { showToast('Download failed', 'error'); }
+      });
+    });
   }
 
   async filterEvents() {
@@ -344,15 +355,10 @@ export class Router {
 
     const user = await Auth.me();
     let events;
-    if (query) {
-      events = await Data.searchEvents(query);
-    } else if (user?.role === 'organizer') {
-      events = await Data.getHostingEvents();
-    } else if (user?.role === 'admin') {
-      events = await Data.getAdminEvents();
-    } else {
-      events = await Data.getEvents();
-    }
+    if (query) events = await Data.searchEvents(query);
+    else if (user?.role === 'organizer') events = await Data.getHostingEvents();
+    else if (user?.role === 'admin') events = await Data.getAdminEvents();
+    else events = await Data.getEvents();
 
     if (category !== 'all') events = events.filter(e => e.category === category);
     if (status !== 'all') events = events.filter(e => e.status === status);
@@ -369,15 +375,10 @@ export class Router {
 
   init() {
     window.addEventListener('popstate', () => this.render(window.location.pathname));
-
     document.addEventListener('click', (e) => {
       const link = e.target.closest('a[data-navigate]');
-      if (link) {
-        e.preventDefault();
-        this.navigateTo(link.getAttribute('href'));
-      }
+      if (link) { e.preventDefault(); this.navigateTo(link.getAttribute('href')); }
     });
-
     const path = window.location.pathname || '/';
     this.render(path);
   }

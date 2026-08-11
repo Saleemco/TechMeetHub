@@ -1,7 +1,5 @@
 // public/js/data.js
 const API_BASE = '/api';
-
-// Use consistent token key
 const TOKEN_KEY = 'techmeethub_token';
 
 function getToken() {
@@ -31,9 +29,7 @@ async function apiGet(endpoint) {
 
 async function apiPost(endpoint, body) {
   const res = await fetch(`${API_BASE}${endpoint}`, {
-    method: 'POST',
-    headers: authHeaders(),
-    body: JSON.stringify(body),
+    method: 'POST', headers: authHeaders(), body: JSON.stringify(body),
   });
   if (res.status === 401) { setToken(''); throw new Error('SESSION_EXPIRED'); }
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -42,9 +38,7 @@ async function apiPost(endpoint, body) {
 
 async function apiPut(endpoint, body) {
   const res = await fetch(`${API_BASE}${endpoint}`, {
-    method: 'PUT',
-    headers: authHeaders(),
-    body: JSON.stringify(body),
+    method: 'PUT', headers: authHeaders(), body: JSON.stringify(body),
   });
   if (res.status === 401) { setToken(''); throw new Error('SESSION_EXPIRED'); }
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -53,8 +47,7 @@ async function apiPut(endpoint, body) {
 
 async function apiDelete(endpoint) {
   const res = await fetch(`${API_BASE}${endpoint}`, { 
-    method: 'DELETE', 
-    headers: { 'Authorization': 'Bearer ' + getToken() } 
+    method: 'DELETE', headers: { 'Authorization': 'Bearer ' + getToken() } 
   });
   if (res.status === 401) { setToken(''); throw new Error('SESSION_EXPIRED'); }
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -76,15 +69,9 @@ export const Auth = {
     try {
       const data = await apiPost('/auth/login', { email, password });
       console.log('Login response:', data);
-      if (data.token) {
-        setToken(data.token);
-        console.log('Token stored:', getToken());
-      }
+      if (data.token) { setToken(data.token); console.log('Token stored:', getToken()); }
       return data;
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    }
+    } catch (error) { console.error('Login error:', error); throw error; }
   },
 
   async register(name, email, password, role) {
@@ -92,25 +79,14 @@ export const Auth = {
     try {
       const data = await apiPost('/auth/register', { name, email, password, role });
       console.log('Register response:', data);
-      if (data.token) {
-        setToken(data.token);
-        console.log('Token stored:', getToken());
-      }
+      if (data.token) { setToken(data.token); console.log('Token stored:', getToken()); }
       return data;
-    } catch (error) {
-      console.error('Register error:', error);
-      throw error;
-    }
+    } catch (error) { console.error('Register error:', error); throw error; }
   },
 
   async logout() {
-    try { 
-      await apiPost('/auth/logout', {}); 
-    } catch (e) {
-      console.log('Logout error (ignored):', e);
-    }
-    setToken('');
-    console.log('Logged out, token removed');
+    try { await apiPost('/auth/logout', {}); } catch (e) { console.log('Logout error (ignored):', e); }
+    setToken(''); console.log('Logged out, token removed');
   },
 
   async me() {
@@ -121,35 +97,21 @@ export const Auth = {
       const data = await apiGet('/auth/me');
       console.log('Auth.me response:', data);
       return data.user;
-    } catch (error) {
-      console.log('Auth.me error:', error.message);
-      setToken('');
-      return null;
-    }
+    } catch (error) { console.log('Auth.me error:', error.message); setToken(''); return null; }
   },
 
-  isLoggedIn() {
-    const token = !!getToken();
-    console.log('isLoggedIn:', token);
-    return token;
-  },
-
-  getToken() {
-    return getToken();
-  },
+  isLoggedIn() { const token = !!getToken(); console.log('isLoggedIn:', token); return token; },
+  getToken() { return getToken(); },
 };
 
 export const Data = {
   async getEvents() {
     const data = await apiGet('/events');
     const events = data.events || [];
-    
-    // Ensure each event has an organizer object with fallbacks
     return events.map(event => {
       if (!event.organizer) {
         event.organizer = {
-          id: event.organizer_id || '',
-          name: event.organizer_name || 'Unknown Organizer',
+          id: event.organizer_id || '', name: event.organizer_name || 'Unknown Organizer',
           avatar: event.organizer_avatar || '?',
           initialsColor: event.organizer_initials_color || 'bg-gradient-to-br from-brand-500 to-violet-600'
         };
@@ -161,16 +123,13 @@ export const Data = {
   async getEvent(id) {
     const data = await apiGet(`/events/${id}`);
     const event = data.event || null;
-    
     if (event && !event.organizer) {
       event.organizer = {
-        id: event.organizer_id || '',
-        name: event.organizer_name || 'Unknown Organizer',
+        id: event.organizer_id || '', name: event.organizer_name || 'Unknown Organizer',
         avatar: event.organizer_avatar || '?',
         initialsColor: event.organizer_initials_color || 'bg-gradient-to-br from-brand-500 to-violet-600'
       };
     }
-    
     return event;
   },
 
@@ -277,6 +236,62 @@ export const Data = {
 
   async deleteEventAdmin(id) {
     await apiDelete(`/admin/events/${id}`);
+  },
+
+  // ===== ATTENDANCE APIs =====
+  async markAttendance(eventId, userId, status = 'present') {
+    return await apiPost(`/events/${eventId}/attendance`, { userId, status });
+  },
+
+  async unmarkAttendance(eventId, userId) {
+    return await apiDelete(`/events/${eventId}/attendance/${userId}`);
+  },
+
+  async getAttendance(eventId) {
+    const data = await apiGet(`/events/${eventId}/attendance`);
+    return data.attendance || [];
+  },
+
+  async getMyAttendance() {
+    const data = await apiGet('/user/attendance');
+    return data.attendance || [];
+  },
+
+  // ===== NOTIFICATION APIs =====
+  async sendNotification({ eventId, subject, message, type = 'announcement' }) {
+    return await apiPost('/notifications/send', { eventId, subject, message, type });
+  },
+
+  async getNotifications() {
+    const data = await apiGet('/notifications');
+    return data.notifications || [];
+  },
+
+  // ===== REPORTING APIs =====
+  async getAttendanceReport(eventId) {
+    return await apiGet(`/reports/attendance/${eventId}`);
+  },
+
+  async getPlatformReport() {
+    return await apiGet('/reports/platform');
+  },
+
+  async getOrganizerReport() {
+    return await apiGet('/reports/organizer');
+  },
+
+  async downloadAttendanceCsv(eventId) {
+    const res = await fetch(`${API_BASE}/reports/attendance/${eventId}/csv`, {
+      headers: { 'Authorization': 'Bearer ' + getToken() }
+    });
+    if (!res.ok) throw new Error('Failed to download');
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `attendance-${eventId}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
   },
 };
 

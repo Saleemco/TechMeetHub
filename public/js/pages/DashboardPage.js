@@ -1,3 +1,4 @@
+
 // public/js/pages/DashboardPage.js
 import { Data, Auth } from '../data.js';
 import { EventListItem, SectionTitle, StatCard, getIcon } from '../components.js';
@@ -109,11 +110,11 @@ async function AdminDashboard() {
             <div class="text-[10px] sm:text-xs text-gray-500">${totalUsers} users</div>
           </div>
         </a>
-        <a href="/profile" data-navigate class="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all">
-          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gray-50 text-gray-600 flex items-center justify-center shrink-0">${getIcon('user', 16)}</div>
+        <a href="/reports" data-navigate class="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all">
+          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">${getIcon('fileText', 16)}</div>
           <div class="min-w-0">
-            <div class="text-xs sm:text-sm font-semibold text-gray-900 truncate">My Profile</div>
-            <div class="text-[10px] sm:text-xs text-gray-500">Edit profile</div>
+            <div class="text-xs sm:text-sm font-semibold text-gray-900 truncate">Reports</div>
+            <div class="text-[10px] sm:text-xs text-gray-500">Platform analytics</div>
           </div>
         </a>
       </div>
@@ -210,22 +211,23 @@ async function AdminDashboard() {
 
 // ========== ORGANIZER DASHBOARD ==========
 async function OrganizerDashboard(user) {
-  const [stats, hosting] = await Promise.all([
+  const [stats, hosting, myAttendanceRecords] = await Promise.all([
     Data.getStats(),
-    Data.getHostingEvents()
+    Data.getHostingEvents(),
+    Data.getMyAttendance().catch(() => [])
   ]);
-  
+
   const now = new Date().toISOString().split('T')[0];
   const upcoming = hosting.filter(e => e.date >= now);
   const past = hosting.filter(e => e.date < now);
   const totalAttendees = hosting.reduce((sum, e) => sum + (e.attendees?.length || 0), 0);
+  const totalMarked = hosting.reduce((sum, e) => sum + (e.attendance?.length || 0), 0);
 
   const upcomingEvents = hosting
     .filter(e => e.date >= now)
     .sort((a, b) => a.date.localeCompare(b.date))
     .slice(0, 5);
 
-  // Get user's first name
   const firstName = user.name ? user.name.split(' ')[0] : 'User';
 
   return `
@@ -244,9 +246,41 @@ async function OrganizerDashboard(user) {
 
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-6 sm:mb-8">
         ${StatCard({ icon: 'calendar', value: hosting.length, label: 'My Events', color: 'blue' })}
-        ${StatCard({ icon: 'users', value: totalAttendees, label: 'Attendees', color: 'green', change: '+16%' })}
-        ${StatCard({ icon: 'check', value: upcoming.length, label: 'Upcoming', color: 'amber' })}
+        ${StatCard({ icon: 'users', value: totalAttendees, label: 'Registrations', color: 'green', change: '+16%' })}
+        ${StatCard({ icon: 'check', value: totalMarked, label: 'Attendance Marked', color: 'amber' })}
         ${StatCard({ icon: 'award', value: past.length, label: 'Completed', color: 'purple' })}
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 mb-6 sm:mb-8">
+        <a href="/events" data-navigate class="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all">
+          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">${getIcon('calendar', 16)}</div>
+          <div class="min-w-0">
+            <div class="text-xs sm:text-sm font-semibold text-gray-900 truncate">My Events</div>
+            <div class="text-[10px] sm:text-xs text-gray-500">View all</div>
+          </div>
+        </a>
+        <a href="/notifications" data-navigate class="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all">
+          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">${getIcon('mail', 16)}</div>
+          <div class="min-w-0">
+            <div class="text-xs sm:text-sm font-semibold text-gray-900 truncate">Notify</div>
+            <div class="text-[10px] sm:text-xs text-gray-500">Send emails</div>
+          </div>
+        </a>
+        <a href="/reports" data-navigate class="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all">
+          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">${getIcon('fileText', 16)}</div>
+          <div class="min-w-0">
+            <div class="text-xs sm:text-sm font-semibold text-gray-900 truncate">Reports</div>
+            <div class="text-[10px] sm:text-xs text-gray-500">Analytics</div>
+          </div>
+        </a>
+        <a href="/profile" data-navigate class="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all">
+          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gray-50 text-gray-600 flex items-center justify-center shrink-0">${getIcon('user', 16)}</div>
+          <div class="min-w-0">
+            <div class="text-xs sm:text-sm font-semibold text-gray-900 truncate">Profile</div>
+            <div class="text-[10px] sm:text-xs text-gray-500">Edit profile</div>
+          </div>
+        </a>
       </div>
 
       <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -260,7 +294,8 @@ async function OrganizerDashboard(user) {
               <tr class="text-left text-gray-500 bg-gray-50 border-b border-gray-200">
                 <th class="px-3 sm:px-4 py-2.5 sm:py-3 font-medium">Event</th>
                 <th class="px-3 sm:px-4 py-2.5 sm:py-3 font-medium hidden md:table-cell">Date</th>
-                <th class="px-3 sm:px-4 py-2.5 sm:py-3 font-medium">Attendees</th>
+                <th class="px-3 sm:px-4 py-2.5 sm:py-3 font-medium">Registered</th>
+                <th class="px-3 sm:px-4 py-2.5 sm:py-3 font-medium">Attended</th>
                 <th class="px-3 sm:px-4 py-2.5 sm:py-3 font-medium text-right">Actions</th>
               </tr>
             </thead>
@@ -269,7 +304,8 @@ async function OrganizerDashboard(user) {
                 <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                   <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-medium text-gray-900 cursor-pointer truncate max-w-[120px] sm:max-w-none" onclick="window.navigateTo('/events/${e.id}')">${e.title}</td>
                   <td class="px-3 sm:px-4 py-2.5 sm:py-3 text-gray-500 hidden md:table-cell cursor-pointer whitespace-nowrap" onclick="window.navigateTo('/events/${e.id}')">${new Date(e.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-                  <td class="px-3 sm:px-4 py-2.5 sm:py-3 text-gray-500 cursor-pointer whitespace-nowrap" onclick="window.navigateTo('/events/${e.id}')">${e.attendees?.length || 0} / ${e.capacity}</td>
+                  <td class="px-3 sm:px-4 py-2.5 sm:py-3 text-gray-500 cursor-pointer whitespace-nowrap" onclick="window.navigateTo('/events/${e.id}')">${e.attendees?.length || 0}</td>
+                  <td class="px-3 sm:px-4 py-2.5 sm:py-3 text-gray-500 cursor-pointer whitespace-nowrap" onclick="window.navigateTo('/events/${e.id}')">${e.attendance?.length || 0}</td>
                   <td class="px-3 sm:px-4 py-2.5 sm:py-3 text-right">
                     <button onclick="window.navigateTo('/create?edit=${e.id}')" class="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors mr-1" title="Edit event">
                       ${getIcon('wrench', 14)}
@@ -281,7 +317,7 @@ async function OrganizerDashboard(user) {
                 </tr>
               `).join('') : `
                 <tr>
-                  <td colspan="4" class="px-4 py-8 text-center text-gray-500">No upcoming events</td>
+                  <td colspan="5" class="px-4 py-8 text-center text-gray-500">No upcoming events</td>
                 </tr>
               `}
             </tbody>
@@ -294,16 +330,17 @@ async function OrganizerDashboard(user) {
 
 // ========== PARTICIPANT DASHBOARD ==========
 async function ParticipantDashboard(user) {
-  const [stats, attending] = await Promise.all([
+  const [stats, attending, myAttendance] = await Promise.all([
     Data.getStats(),
-    Data.getAttendingEvents()
+    Data.getAttendingEvents(),
+    Data.getMyAttendance().catch(() => [])
   ]);
-  
+
   const now = new Date().toISOString().split('T')[0];
   const upcoming = attending.filter(e => e.date >= now);
   const past = attending.filter(e => e.date < now);
+  const attendedCount = myAttendance.filter(a => a.status === 'present').length;
 
-  // Get user's first name
   const firstName = user.name ? user.name.split(' ')[0] : 'User';
 
   return `
@@ -316,7 +353,7 @@ async function ParticipantDashboard(user) {
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-6 sm:mb-8">
         ${StatCard({ icon: 'calendar', value: attending.length, label: 'My Registrations', color: 'blue' })}
         ${StatCard({ icon: 'check', value: upcoming.length, label: 'Upcoming Events', color: 'green' })}
-        ${StatCard({ icon: 'award', value: past.length, label: 'Attended', color: 'amber' })}
+        ${StatCard({ icon: 'award', value: attendedCount, label: 'Attended', color: 'amber' })}
         ${StatCard({ icon: 'trend', value: stats.totalEvents || 0, label: 'Total Events', color: 'purple' })}
       </div>
 
@@ -335,6 +372,36 @@ async function ParticipantDashboard(user) {
           `}
         </div>
       </div>
+
+      ${myAttendance.length > 0 ? `
+        <div class="mt-8">
+          <h2 class="text-base sm:text-lg font-semibold text-gray-900 mb-4">My Attendance History</h2>
+          <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs sm:text-sm">
+                <thead>
+                  <tr class="text-left text-gray-500 bg-gray-50 border-b border-gray-200">
+                    <th class="px-3 sm:px-4 py-2.5 sm:py-3 font-medium">Event</th>
+                    <th class="px-3 sm:px-4 py-2.5 sm:py-3 font-medium">Date</th>
+                    <th class="px-3 sm:px-4 py-2.5 sm:py-3 font-medium">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${myAttendance.slice(0, 5).map(a => `
+                    <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-medium text-gray-900">${a.event_title || 'Unknown Event'}</td>
+                      <td class="px-3 sm:px-4 py-2.5 sm:py-3 text-gray-500 whitespace-nowrap">${a.event_date ? new Date(a.event_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '-'}</td>
+                      <td class="px-3 sm:px-4 py-2.5 sm:py-3">
+                        <span class="inline-block px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium capitalize ${a.status === 'present' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'}">${a.status}</span>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      ` : ''}
     </div>
   `;
 }
