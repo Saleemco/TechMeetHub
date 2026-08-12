@@ -251,24 +251,28 @@ console.log(`   👤 ${dataStore.users.length} users (1 admin, 5 organizers, 4 p
 console.log(`   📅 ${dataStore.events.length} events (5 per organizer)`);
 console.log(`   👥 Each event has 4 participants registered`);
 
-// ===== EMAIL TRANSPORTER =====
-const emailTransporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST || 'smtp.ethereal.email',
-  port: parseInt(process.env.EMAIL_PORT || '587'),
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER || '',
-    pass: process.env.EMAIL_PASS || '',
-  },
-});
+// ===== EMAIL TRANSPORTER (FIXED) =====
+const EMAIL_HOST = process.env.EMAIL_HOST || '';
+const EMAIL_USER = process.env.EMAIL_USER || '';
+const EMAIL_PASS = process.env.EMAIL_PASS || '';
+const emailEnabled = !!(EMAIL_HOST && EMAIL_USER && EMAIL_PASS);
 
-emailTransporter.verify((error) => {
-  if (error) {
-    console.log('⚠️  Email not configured. Notifications logged to console only.');
-  } else {
-    console.log('✅ Email transporter ready');
-  }
-});
+let emailTransporter = null;
+if (emailEnabled) {
+  emailTransporter = nodemailer.createTransport({
+    host: EMAIL_HOST,
+    port: parseInt(process.env.EMAIL_PORT || '587'),
+    secure: false,
+    connectionTimeout: 5000,
+    greetingTimeout: 5000,
+    socketTimeout: 5000,
+    auth: { user: EMAIL_USER, pass: EMAIL_PASS },
+  });
+  console.log('✅ Email transporter ready for:', EMAIL_HOST);
+} else {
+  console.log('⚠️  Email not configured. Notifications will log to console only.');
+  console.log('   Set EMAIL_HOST, EMAIL_USER, EMAIL_PASS env vars to enable real email.');
+}
 
 // ===== DATABASE CONNECTION =====
 let pool = null;
@@ -461,8 +465,16 @@ async function seedDatabase() {
   }
 }
 
-// ===== EMAIL HELPERS =====
+// ===== EMAIL HELPERS (FIXED) =====
 async function sendEmail({ to, subject, html, text }) {
+  if (!emailEnabled || !emailTransporter) {
+    console.log('=== EMAIL (console fallback) ===');
+    console.log('To:', to);
+    console.log('Subject:', subject);
+    console.log('================================');
+    return { success: true, messageId: 'console-' + Date.now(), logged: true };
+  }
+
   const mailOptions = { 
     from: process.env.EMAIL_FROM || 'TechMeetHub <noreply@techmeethub.dev>', 
     to, subject, html, text 
@@ -472,8 +484,8 @@ async function sendEmail({ to, subject, html, text }) {
     console.log('📧 Email sent:', info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (err) {
-    console.log('📧 Email logged (transporter not configured):', { to, subject });
-    return { success: true, messageId: 'logged-' + Date.now(), logged: true };
+    console.error('📧 Email send failed:', err.message);
+    return { success: false, error: err.message };
   }
 }
 
