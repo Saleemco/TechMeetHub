@@ -13,7 +13,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// ===== ASYNC ERROR HANDLING =====
+// =====================================================================
+// ASYNC ERROR HANDLING
+// =====================================================================
 function asyncHandler(fn) {
   return (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch((err) => {
@@ -25,7 +27,9 @@ function asyncHandler(fn) {
   };
 }
 
-// ===== DEBUG ENDPOINTS =====
+// =====================================================================
+// DEBUG ENDPOINTS
+// =====================================================================
 app.get('/debug-files', (req, res) => {
   const fs = require('fs');
   const publicDir = path.join(__dirname, 'public');
@@ -42,7 +46,7 @@ app.get('/debug-files', (req, res) => {
     } catch (e) {}
   }
   walkDir(publicDir);
-  res.json({ files: files.sort(), cwd: process.cwd(), publicDir: publicDir });
+  res.json({ files: files.sort(), cwd: process.cwd(), publicDir });
 });
 
 app.get('/debug-check/:file(*)', (req, res) => {
@@ -52,12 +56,16 @@ app.get('/debug-check/:file(*)', (req, res) => {
   else res.json({ exists: false, path: filePath });
 });
 
-// ===== HASH PASSWORD FUNCTION =====
+// =====================================================================
+// PASSWORD HASHING
+// =====================================================================
 function hashPassword(password) {
   return crypto.createHash('sha256').update(password).digest('hex');
 }
 
-// ===== DATA STORE (In-Memory) =====
+// =====================================================================
+// IN-MEMORY DATA STORE
+// =====================================================================
 let dataStore = {
   events: [],
   users: [],
@@ -70,10 +78,12 @@ let dataStore = {
     { id: 'conference', label: 'Conferences', icon: 'mic', color: 'category-conference' },
     { id: 'webinar', label: 'Webinars', icon: 'video', color: 'category-webinar' },
     { id: 'social', label: 'Social', icon: 'heart', color: 'category-social' },
-  ]
+  ],
 };
 
-// ===== SEED DATA =====
+// =====================================================================
+// SEED DATA
+// =====================================================================
 function seedData() {
   dataStore.events = [];
   dataStore.users = [];
@@ -193,7 +203,7 @@ function seedData() {
   ];
 
   let eventId = 0;
-  const allParticipantIds = participants.map(p => p.id);
+  const allParticipantIds = participants.map((p) => p.id);
 
   organizers.forEach((organizer, orgIndex) => {
     for (let i = 0; i < 5; i++) {
@@ -204,7 +214,7 @@ function seedData() {
       const eventAttendees = shuffled.slice(0, 4);
 
       const newEvent = {
-        id: 'evt-' + (++eventId),
+        id: 'evt-' + ++eventId,
         title: template.title,
         description: organizerEventDescriptions[orgIndex % organizerEventDescriptions.length] + ` Hosted by ${organizer.name}.`,
         date: getFutureDate(daysOffset),
@@ -234,8 +244,8 @@ function seedData() {
       };
 
       dataStore.events.push(newEvent);
-      eventAttendees.forEach(participantId => {
-        const participant = dataStore.users.find(u => u.id === participantId);
+      eventAttendees.forEach((participantId) => {
+        const participant = dataStore.users.find((u) => u.id === participantId);
         if (participant && participant.role === 'participant') {
           participant.eventsAttending.push(newEvent.id);
         }
@@ -245,13 +255,20 @@ function seedData() {
   });
 }
 
-seedData();
-console.log('🌱 Seeded data:');
-console.log(`   👤 ${dataStore.users.length} users (1 admin, 5 organizers, 4 participants)`);
-console.log(`   📅 ${dataStore.events.length} events (5 per organizer)`);
-console.log(`   👥 Each event has 4 participants registered`);
+// Only seed when memory is empty
+if (dataStore.users.length === 0 && dataStore.events.length === 0) {
+  seedData();
+  console.log('🌱 Seeded initial data:');
+  console.log(`   👤 ${dataStore.users.length} users (1 admin, 5 organizers, 4 participants)`);
+  console.log(`   📅 ${dataStore.events.length} events (5 per organizer)`);
+  console.log(`   👥 Each event has 4 participants registered`);
+} else {
+  console.log('📦 Data already exists, skipping seed');
+}
 
-// ===== EMAIL TRANSPORTER (FIXED) =====
+// =====================================================================
+// EMAIL TRANSPORTER
+// =====================================================================
 const EMAIL_HOST = process.env.EMAIL_HOST || '';
 const EMAIL_USER = process.env.EMAIL_USER || '';
 const EMAIL_PASS = process.env.EMAIL_PASS || '';
@@ -274,7 +291,9 @@ if (emailEnabled) {
   console.log('   Set EMAIL_HOST, EMAIL_USER, EMAIL_PASS env vars to enable real email.');
 }
 
-// ===== DATABASE CONNECTION =====
+// =====================================================================
+// DATABASE CONNECTION
+// =====================================================================
 let pool = null;
 let useDatabase = false;
 
@@ -288,6 +307,10 @@ if (process.env.DATABASE_URL) {
       if (err) {
         console.log('❌ Database connection failed, using in-memory store');
         useDatabase = false;
+        if (dataStore.users.length === 0) {
+          seedData();
+          console.log('🌱 Seeded in-memory data (DB unavailable)');
+        }
       } else {
         console.log('✅ Connected to PostgreSQL database');
         useDatabase = true;
@@ -301,9 +324,13 @@ if (process.env.DATABASE_URL) {
   }
 } else {
   console.log('📦 No DATABASE_URL found, using in-memory data store');
+  console.log('⚠️  WARNING: Data will be LOST when the server restarts!');
+  console.log('   Add a PostgreSQL database and set DATABASE_URL to persist data.');
 }
 
-// ===== INITIALIZE DATABASE TABLES =====
+// =====================================================================
+// DATABASE INITIALIZATION
+// =====================================================================
 async function initializeDatabase() {
   try {
     try {
@@ -452,7 +479,7 @@ async function seedDatabase() {
           event.location, event.category, event.image,
           event.organizer.id, event.organizer.name, event.organizer.avatar, event.organizer.initialsColor,
           event.attendees, event.attendance, event.capacity, event.tags,
-          JSON.stringify(event.speakers), JSON.stringify(event.agenda), event.status
+          JSON.stringify(event.speakers), JSON.stringify(event.agenda), event.status,
         ]
       );
     }
@@ -465,7 +492,9 @@ async function seedDatabase() {
   }
 }
 
-// ===== EMAIL HELPERS (FIXED) =====
+// =====================================================================
+// EMAIL HELPERS
+// =====================================================================
 async function sendEmail({ to, subject, html, text }) {
   if (!emailEnabled || !emailTransporter) {
     console.log('=== EMAIL (console fallback) ===');
@@ -475,9 +504,12 @@ async function sendEmail({ to, subject, html, text }) {
     return { success: true, messageId: 'console-' + Date.now(), logged: true };
   }
 
-  const mailOptions = { 
-    from: process.env.EMAIL_FROM || 'TechMeetHub <noreply@techmeethub.dev>', 
-    to, subject, html, text 
+  const mailOptions = {
+    from: process.env.EMAIL_FROM || 'TechMeetHub <noreply@techmeethub.dev>',
+    to,
+    subject,
+    html,
+    text,
   };
   try {
     const info = await emailTransporter.sendMail(mailOptions);
@@ -498,15 +530,24 @@ async function logNotification({ eventId, recipientEmail, recipientId, subject, 
       [id, eventId || null, recipientEmail, recipientId || null, subject, body, type, status]
     );
   } else {
-    dataStore.notifications.push({ 
-      id, event_id: eventId, recipient_email: recipientEmail, recipient_id: recipientId, 
-      subject, body, sent_at: new Date().toISOString(), type, status 
+    dataStore.notifications.push({
+      id,
+      event_id: eventId,
+      recipient_email: recipientEmail,
+      recipient_id: recipientId,
+      subject,
+      body,
+      sent_at: new Date().toISOString(),
+      type,
+      status,
     });
   }
   return id;
 }
 
-// ===== AUTH UTILITIES =====
+// =====================================================================
+// AUTH UTILITIES
+// =====================================================================
 function generateToken() {
   return crypto.randomBytes(32).toString('hex');
 }
@@ -515,10 +556,7 @@ async function createSession(userId) {
   const token = generateToken();
   const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
   if (useDatabase) {
-    await pool.query(
-      'INSERT INTO sessions (token, user_id, expires) VALUES ($1, $2, $3)',
-      [token, userId, expires]
-    );
+    await pool.query('INSERT INTO sessions (token, user_id, expires) VALUES ($1, $2, $3)', [token, userId, expires]);
   }
   return token;
 }
@@ -526,10 +564,7 @@ async function createSession(userId) {
 async function getUserFromToken(token) {
   if (!token) return null;
   if (useDatabase) {
-    const result = await pool.query(
-      'SELECT * FROM sessions WHERE token = $1 AND expires > NOW()',
-      [token]
-    );
+    const result = await pool.query('SELECT * FROM sessions WHERE token = $1 AND expires > NOW()', [token]);
     if (result.rows.length === 0) return null;
     const userResult = await pool.query('SELECT * FROM users WHERE id = $1', [result.rows[0].user_id]);
     return userResult.rows[0] || null;
@@ -539,7 +574,7 @@ async function getUserFromToken(token) {
       sessions.delete(token);
       return null;
     }
-    return dataStore.users.find(u => u.id === session.userId) || null;
+    return dataStore.users.find((u) => u.id === session.userId) || null;
   }
 }
 
@@ -562,7 +597,9 @@ function requireRole(roles) {
   };
 }
 
-// ===== AUTH ENDPOINTS =====
+// =====================================================================
+// AUTH ENDPOINTS
+// =====================================================================
 app.post('/api/auth/login', asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   console.log('🔐 Login attempt:', email);
@@ -573,12 +610,18 @@ app.post('/api/auth/login', asyncHandler(async (req, res) => {
     const result = await pool.query('SELECT * FROM users WHERE email = $1', [email.trim().toLowerCase()]);
     user = result.rows[0];
   } else {
-    user = dataStore.users.find(u => u.email === email.trim().toLowerCase());
+    user = dataStore.users.find((u) => u.email === email.trim().toLowerCase());
   }
-  if (!user) { console.log('❌ User not found:', email); return res.status(401).json({ error: 'Invalid email or password' }); }
+  if (!user) {
+    console.log('❌ User not found:', email);
+    return res.status(401).json({ error: 'Invalid email or password' });
+  }
 
   const hashedInput = hashPassword(password);
-  if (user.password !== hashedInput) { console.log('❌ Password mismatch'); return res.status(401).json({ error: 'Invalid email or password' }); }
+  if (user.password !== hashedInput) {
+    console.log('❌ Password mismatch');
+    return res.status(401).json({ error: 'Invalid email or password' });
+  }
 
   console.log('✅ Login successful:', user.email);
   const token = await createSession(user.id);
@@ -593,11 +636,17 @@ app.post('/api/auth/register', asyncHandler(async (req, res) => {
   const hashedPassword = hashPassword(password);
   const userId = 'user-' + Date.now();
   const newUser = {
-    id: userId, name: name.trim(), email: email.trim().toLowerCase(), password: hashedPassword,
+    id: userId,
+    name: name.trim(),
+    email: email.trim().toLowerCase(),
+    password: hashedPassword,
     role: role || 'participant',
-    avatar: name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase(),
+    avatar: name.split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase(),
     initialsColor: 'bg-gradient-to-br from-brand-500 to-violet-600',
-    bio: '', skills: [], eventsAttending: [], eventsHosting: [],
+    bio: '',
+    skills: [],
+    eventsAttending: [],
+    eventsHosting: [],
     joinedDate: new Date().toISOString().split('T')[0],
   };
 
@@ -614,7 +663,7 @@ app.post('/api/auth/register', asyncHandler(async (req, res) => {
       throw err;
     }
   } else {
-    if (dataStore.users.find(u => u.email === email)) return res.status(409).json({ error: 'Email already registered' });
+    if (dataStore.users.find((u) => u.email === email)) return res.status(409).json({ error: 'Email already registered' });
     dataStore.users.push(newUser);
   }
 
@@ -634,7 +683,9 @@ app.get('/api/auth/me', requireAuth, (req, res) => {
   res.json({ user: userWithoutPassword });
 });
 
-// ===== PUBLIC EVENTS API =====
+// =====================================================================
+// PUBLIC EVENTS API
+// =====================================================================
 app.get('/api/events', asyncHandler(async (req, res) => {
   const { category, status, q } = req.query;
   let events;
@@ -651,20 +702,27 @@ app.get('/api/events', asyncHandler(async (req, res) => {
     events = result.rows;
   } else {
     events = [...dataStore.events];
-    if (category && category !== 'all') events = events.filter(e => e.category === category);
-    if (status && status !== 'all') events = events.filter(e => e.status === status);
+    if (category && category !== 'all') events = events.filter((e) => e.category === category);
+    if (status && status !== 'all') events = events.filter((e) => e.status === status);
     if (q) {
       const query = q.toLowerCase();
-      events = events.filter(e => e.title.toLowerCase().includes(query) || e.description.toLowerCase().includes(query) || e.location.toLowerCase().includes(query) || e.tags.some(t => t.toLowerCase().includes(query)));
+      events = events.filter(
+        (e) =>
+          e.title.toLowerCase().includes(query) ||
+          e.description.toLowerCase().includes(query) ||
+          e.location.toLowerCase().includes(query) ||
+          e.tags.some((t) => t.toLowerCase().includes(query))
+      );
     }
   }
-  const transformedEvents = events.map(event => ({
+  const transformedEvents = events.map((event) => ({
     ...event,
     organizer: event.organizer || {
-      id: event.organizer_id || '', name: event.organizer_name || 'Unknown Organizer',
+      id: event.organizer_id || '',
+      name: event.organizer_name || 'Unknown Organizer',
       avatar: event.organizer_avatar || '?',
-      initialsColor: event.organizer_initials_color || 'bg-gradient-to-br from-brand-500 to-violet-600'
-    }
+      initialsColor: event.organizer_initials_color || 'bg-gradient-to-br from-brand-500 to-violet-600',
+    },
   }));
   res.json({ events: transformedEvents });
 }));
@@ -675,7 +733,7 @@ app.get('/api/events/:id', asyncHandler(async (req, res) => {
     const result = await pool.query('SELECT * FROM events WHERE id = $1', [req.params.id]);
     event = result.rows[0];
   } else {
-    event = dataStore.events.find(e => e.id === req.params.id);
+    event = dataStore.events.find((e) => e.id === req.params.id);
   }
   if (!event) return res.status(404).json({ error: 'Event not found' });
 
@@ -685,23 +743,26 @@ app.get('/api/events/:id', asyncHandler(async (req, res) => {
       const result = await pool.query('SELECT id, name, avatar, initials_color FROM users WHERE id = ANY($1)', [event.attendees]);
       attendeeDetails = result.rows;
     } else {
-      attendeeDetails = event.attendees.map(uid => {
-        const u = dataStore.users.find(user => user.id === uid);
-        if (!u) return null;
-        const { password: _, ...safe } = u;
-        return { id: safe.id, name: safe.name, avatar: safe.avatar, initialsColor: safe.initialsColor };
-      }).filter(Boolean);
+      attendeeDetails = event.attendees
+        .map((uid) => {
+          const u = dataStore.users.find((user) => user.id === uid);
+          if (!u) return null;
+          const { password: _, ...safe } = u;
+          return { id: safe.id, name: safe.name, avatar: safe.avatar, initialsColor: safe.initialsColor };
+        })
+        .filter(Boolean);
     }
   }
 
   const organizer = event.organizer || {
-    id: event.organizer_id || '', name: event.organizer_name || 'Unknown Organizer',
+    id: event.organizer_id || '',
+    name: event.organizer_name || 'Unknown Organizer',
     avatar: event.organizer_avatar || '?',
     initialsColor: event.organizer_initials_color || 'bg-gradient-to-br from-brand-500 to-violet-600',
   };
 
   res.json({
-    event: { ...event, organizer, attendeeDetails, attendees: event.attendees || [], speakers: event.speakers || [], agenda: event.agenda || [] }
+    event: { ...event, organizer, attendeeDetails, attendees: event.attendees || [], speakers: event.speakers || [], agenda: event.agenda || [] },
   });
 }));
 
@@ -723,25 +784,36 @@ app.get('/api/stats', asyncHandler(async (req, res) => {
   } else {
     totalEvents = dataStore.events.length;
     totalUsers = dataStore.users.length;
-    totalOrganizers = dataStore.users.filter(u => u.role === 'organizer').length;
+    totalOrganizers = dataStore.users.filter((u) => u.role === 'organizer').length;
     totalAttendees = dataStore.events.reduce((sum, e) => sum + (e.attendees?.length || 0), 0);
   }
   res.json({ totalEvents, totalAttendees, totalUsers, totalOrganizers });
 }));
 
-// ===== PROTECTED EVENTS API =====
+// =====================================================================
+// PROTECTED EVENTS API
+// =====================================================================
 app.post('/api/events', requireAuth, requireRole(['organizer', 'admin']), asyncHandler(async (req, res) => {
   const { title, category, date, time, location, capacity, description, tags } = req.body;
   if (!title || !category || !date || !location || !capacity) return res.status(400).json({ error: 'Missing required fields' });
 
   const newEvent = {
-    id: 'evt-' + Date.now(), title: title.trim(), description: description || '', date,
-    time: time || '', location: location.trim(), category,
+    id: 'evt-' + Date.now(),
+    title: title.trim(),
+    description: description || '',
+    date,
+    time: time || '',
+    location: location.trim(),
+    category,
     image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&h=400&fit=crop',
     organizer: { id: req.user.id, name: req.user.name, avatar: req.user.avatar, initialsColor: req.user.initialsColor },
-    attendees: [], attendance: [], capacity: parseInt(capacity, 10),
-    tags: Array.isArray(tags) ? tags : (tags ? tags.split(',').map(t => t.trim()).filter(t => t) : []),
-    status: 'upcoming', speakers: [], agenda: [],
+    attendees: [],
+    attendance: [],
+    capacity: parseInt(capacity, 10),
+    tags: Array.isArray(tags) ? tags : tags ? tags.split(',').map((t) => t.trim()).filter((t) => t) : [],
+    status: 'upcoming',
+    speakers: [],
+    agenda: [],
   };
 
   if (useDatabase) {
@@ -754,7 +826,7 @@ app.post('/api/events', requireAuth, requireRole(['organizer', 'admin']), asyncH
         newEvent.location, newEvent.category, newEvent.image,
         newEvent.organizer.id, newEvent.organizer.name, newEvent.organizer.avatar, newEvent.organizer.initialsColor,
         newEvent.attendees, newEvent.attendance, newEvent.capacity, newEvent.tags,
-        JSON.stringify(newEvent.speakers), JSON.stringify(newEvent.agenda), newEvent.status
+        JSON.stringify(newEvent.speakers), JSON.stringify(newEvent.agenda), newEvent.status,
       ]
     );
   } else {
@@ -770,7 +842,7 @@ app.put('/api/events/:id', requireAuth, asyncHandler(async (req, res) => {
     const result = await pool.query('SELECT * FROM events WHERE id = $1', [req.params.id]);
     event = result.rows[0];
   } else {
-    event = dataStore.events.find(e => e.id === req.params.id);
+    event = dataStore.events.find((e) => e.id === req.params.id);
   }
   if (!event) return res.status(404).json({ error: 'Event not found' });
   if (event.organizer_id !== req.user.id && req.user.role !== 'admin') return res.status(403).json({ error: 'You can only edit your own events' });
@@ -786,7 +858,7 @@ app.put('/api/events/:id', requireAuth, asyncHandler(async (req, res) => {
     const updatedResult = await pool.query('SELECT * FROM events WHERE id = $1', [req.params.id]);
     event = updatedResult.rows[0];
   } else {
-    const idx = dataStore.events.findIndex(e => e.id === req.params.id);
+    const idx = dataStore.events.findIndex((e) => e.id === req.params.id);
     dataStore.events[idx] = { ...event, ...req.body };
     event = dataStore.events[idx];
   }
@@ -799,24 +871,29 @@ app.delete('/api/events/:id', requireAuth, asyncHandler(async (req, res) => {
     const result = await pool.query('SELECT * FROM events WHERE id = $1', [req.params.id]);
     event = result.rows[0];
   } else {
-    event = dataStore.events.find(e => e.id === req.params.id);
+    event = dataStore.events.find((e) => e.id === req.params.id);
   }
   if (!event) return res.status(404).json({ error: 'Event not found' });
   if (event.organizer_id !== req.user.id && req.user.role !== 'admin') return res.status(403).json({ error: 'You can only delete your own events' });
 
   if (useDatabase) await pool.query('DELETE FROM events WHERE id = $1', [req.params.id]);
-  else { const idx = dataStore.events.findIndex(e => e.id === req.params.id); dataStore.events.splice(idx, 1); }
+  else {
+    const idx = dataStore.events.findIndex((e) => e.id === req.params.id);
+    dataStore.events.splice(idx, 1);
+  }
   res.json({ message: 'Event deleted' });
 }));
 
-// ===== RSVP =====
+// =====================================================================
+// RSVP
+// =====================================================================
 app.post('/api/events/:id/rsvp', requireAuth, requireRole(['participant', 'organizer', 'admin']), asyncHandler(async (req, res) => {
   let event;
   if (useDatabase) {
     const result = await pool.query('SELECT * FROM events WHERE id = $1', [req.params.id]);
     event = result.rows[0];
   } else {
-    event = dataStore.events.find(e => e.id === req.params.id);
+    event = dataStore.events.find((e) => e.id === req.params.id);
   }
   if (!event) return res.status(404).json({ error: 'Event not found' });
 
@@ -830,7 +907,7 @@ app.post('/api/events/:id/rsvp', requireAuth, requireRole(['participant', 'organ
       await pool.query('UPDATE users SET events_attending = array_remove(events_attending, $1) WHERE id = $2', [event.id, req.user.id]);
       await pool.query('UPDATE events SET attendees = $1 WHERE id = $2', [attendees, req.params.id]);
     } else {
-      req.user.eventsAttending = req.user.eventsAttending.filter(id => id !== event.id);
+      req.user.eventsAttending = req.user.eventsAttending.filter((id) => id !== event.id);
     }
   } else {
     if (attendees.length >= event.capacity) return res.status(400).json({ error: 'Event is full' });
@@ -851,14 +928,16 @@ app.get('/api/events/:id/rsvp', requireAuth, asyncHandler(async (req, res) => {
     const result = await pool.query('SELECT * FROM events WHERE id = $1', [req.params.id]);
     event = result.rows[0];
   } else {
-    event = dataStore.events.find(e => e.id === req.params.id);
+    event = dataStore.events.find((e) => e.id === req.params.id);
   }
   if (!event) return res.status(404).json({ error: 'Event not found' });
   const attendees = event.attendees || [];
   res.json({ attending: attendees.includes(req.user.id) });
 }));
 
-// ===== USER PROFILE API =====
+// =====================================================================
+// USER PROFILE API
+// =====================================================================
 app.get('/api/user', requireAuth, (req, res) => {
   const { password: _, ...user } = req.user;
   res.json({ user });
@@ -870,7 +949,7 @@ app.put('/api/user', requireAuth, asyncHandler(async (req, res) => {
   if (name) updates.name = name;
   if (email) updates.email = email;
   if (bio !== undefined) updates.bio = bio;
-  if (skills) updates.skills = Array.isArray(skills) ? skills : skills.split(',').map(s => s.trim()).filter(s => s);
+  if (skills) updates.skills = Array.isArray(skills) ? skills : skills.split(',').map((s) => s.trim()).filter((s) => s);
 
   if (useDatabase) {
     const setClause = Object.keys(updates).map((key, i) => `${key} = $${i + 1}`).join(', ');
@@ -894,7 +973,7 @@ app.get('/api/user/events/attending', requireAuth, asyncHandler(async (req, res)
     const result = await pool.query('SELECT * FROM events WHERE id = ANY($1)', [userEvents]);
     events = result.rows;
   } else {
-    events = dataStore.events.filter(e => req.user.eventsAttending.includes(e.id));
+    events = dataStore.events.filter((e) => req.user.eventsAttending.includes(e.id));
   }
   res.json({ events });
 }));
@@ -905,19 +984,21 @@ app.get('/api/user/events/hosting', requireAuth, asyncHandler(async (req, res) =
     const result = await pool.query('SELECT * FROM events WHERE organizer_id = $1', [req.user.id]);
     events = result.rows;
   } else {
-    events = dataStore.events.filter(e => e.organizer.id === req.user.id);
+    events = dataStore.events.filter((e) => e.organizer.id === req.user.id);
   }
   res.json({ events });
 }));
 
-// ===== ADMIN API =====
+// =====================================================================
+// ADMIN API
+// =====================================================================
 app.get('/api/admin/users', requireAuth, requireRole(['admin']), asyncHandler(async (req, res) => {
   let users;
   if (useDatabase) {
     const result = await pool.query('SELECT id, name, email, role, avatar, initials_color, bio, skills, joined_date FROM users');
     users = result.rows;
   } else {
-    users = dataStore.users.map(u => { const { password: _, ...user } = u; return user; });
+    users = dataStore.users.map((u) => { const { password: _, ...user } = u; return user; });
   }
   res.json({ users });
 }));
@@ -925,9 +1006,9 @@ app.get('/api/admin/users', requireAuth, requireRole(['admin']), asyncHandler(as
 app.delete('/api/admin/users', requireAuth, requireRole(['admin']), asyncHandler(async (req, res) => {
   if (useDatabase) await pool.query("DELETE FROM users WHERE role != 'admin'");
   else {
-    const removedIds = dataStore.users.filter(u => u.role !== 'admin').map(u => u.id);
-    dataStore.users = dataStore.users.filter(u => u.role === 'admin');
-    dataStore.events = dataStore.events.filter(e => !removedIds.includes(e.organizer?.id));
+    const removedIds = dataStore.users.filter((u) => u.role !== 'admin').map((u) => u.id);
+    dataStore.users = dataStore.users.filter((u) => u.role === 'admin');
+    dataStore.events = dataStore.events.filter((e) => !removedIds.includes(e.organizer?.id));
   }
   res.json({ message: 'All non-admin users deleted' });
 }));
@@ -963,13 +1044,14 @@ app.get('/api/admin/stats', requireAuth, requireRole(['admin']), asyncHandler(as
     };
   } else {
     stats = {
-      totalUsers: dataStore.users.length, totalEvents: dataStore.events.length,
+      totalUsers: dataStore.users.length,
+      totalEvents: dataStore.events.length,
       totalAttendees: dataStore.events.reduce((sum, e) => sum + e.attendees.length, 0),
-      participants: dataStore.users.filter(u => u.role === 'participant').length,
-      organizers: dataStore.users.filter(u => u.role === 'organizer').length,
-      admins: dataStore.users.filter(u => u.role === 'admin').length,
-      upcomingEvents: dataStore.events.filter(e => e.date >= now).length,
-      pastEvents: dataStore.events.filter(e => e.date < now).length,
+      participants: dataStore.users.filter((u) => u.role === 'participant').length,
+      organizers: dataStore.users.filter((u) => u.role === 'organizer').length,
+      admins: dataStore.users.filter((u) => u.role === 'admin').length,
+      upcomingEvents: dataStore.events.filter((e) => e.date >= now).length,
+      pastEvents: dataStore.events.filter((e) => e.date < now).length,
     };
   }
   res.json(stats);
@@ -979,7 +1061,7 @@ app.delete('/api/admin/users/:id', requireAuth, requireRole(['admin']), asyncHan
   if (req.params.id === req.user.id) return res.status(400).json({ error: 'Cannot delete yourself' });
   if (useDatabase) await pool.query('DELETE FROM users WHERE id = $1', [req.params.id]);
   else {
-    const idx = dataStore.users.findIndex(u => u.id === req.params.id);
+    const idx = dataStore.users.findIndex((u) => u.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'User not found' });
     dataStore.users.splice(idx, 1);
   }
@@ -989,14 +1071,16 @@ app.delete('/api/admin/users/:id', requireAuth, requireRole(['admin']), asyncHan
 app.delete('/api/admin/events/:id', requireAuth, requireRole(['admin']), asyncHandler(async (req, res) => {
   if (useDatabase) await pool.query('DELETE FROM events WHERE id = $1', [req.params.id]);
   else {
-    const idx = dataStore.events.findIndex(e => e.id === req.params.id);
+    const idx = dataStore.events.findIndex((e) => e.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'Event not found' });
     dataStore.events.splice(idx, 1);
   }
   res.json({ message: 'Event deleted' });
 }));
 
-// ===== ATTENDANCE ENDPOINTS =====
+// =====================================================================
+// ATTENDANCE ENDPOINTS
+// =====================================================================
 app.post('/api/events/:id/attendance', requireAuth, requireRole(['organizer', 'admin']), asyncHandler(async (req, res) => {
   const { userId, status = 'present' } = req.body;
   const eventId = req.params.id;
@@ -1007,7 +1091,7 @@ app.post('/api/events/:id/attendance', requireAuth, requireRole(['organizer', 'a
     const result = await pool.query('SELECT * FROM events WHERE id = $1', [eventId]);
     event = result.rows[0];
   } else {
-    event = dataStore.events.find(e => e.id === eventId);
+    event = dataStore.events.find((e) => e.id === eventId);
   }
   if (!event) return res.status(404).json({ error: 'Event not found' });
   if (event.organizer_id !== req.user.id && req.user.role !== 'admin') {
@@ -1027,7 +1111,7 @@ app.post('/api/events/:id/attendance', requireAuth, requireRole(['organizer', 'a
       [userId, eventId]
     );
   } else {
-    const existing = dataStore.attendance.find(a => a.event_id === eventId && a.user_id === userId);
+    const existing = dataStore.attendance.find((a) => a.event_id === eventId && a.user_id === userId);
     if (existing) {
       existing.status = status;
       existing.marked_at = new Date().toISOString();
@@ -1044,7 +1128,7 @@ app.post('/api/events/:id/attendance', requireAuth, requireRole(['organizer', 'a
     const r = await pool.query('SELECT name, email FROM users WHERE id = $1', [userId]);
     attendee = r.rows[0];
   } else {
-    attendee = dataStore.users.find(u => u.id === userId);
+    attendee = dataStore.users.find((u) => u.id === userId);
   }
   if (attendee) {
     const subject = `Attendance Marked: ${event.title}`;
@@ -1063,7 +1147,7 @@ app.delete('/api/events/:id/attendance/:userId', requireAuth, requireRole(['orga
     const result = await pool.query('SELECT * FROM events WHERE id = $1', [eventId]);
     event = result.rows[0];
   } else {
-    event = dataStore.events.find(e => e.id === eventId);
+    event = dataStore.events.find((e) => e.id === eventId);
   }
   if (!event) return res.status(404).json({ error: 'Event not found' });
   if (event.organizer_id !== req.user.id && req.user.role !== 'admin') return res.status(403).json({ error: 'Forbidden' });
@@ -1072,8 +1156,8 @@ app.delete('/api/events/:id/attendance/:userId', requireAuth, requireRole(['orga
     await pool.query('DELETE FROM attendance_records WHERE event_id = $1 AND user_id = $2', [eventId, userId]);
     await pool.query('UPDATE events SET attendance = array_remove(attendance, $1) WHERE id = $2', [userId, eventId]);
   } else {
-    dataStore.attendance = dataStore.attendance.filter(a => !(a.event_id === eventId && a.user_id === userId));
-    if (event.attendance) event.attendance = event.attendance.filter(id => id !== userId);
+    dataStore.attendance = dataStore.attendance.filter((a) => !(a.event_id === eventId && a.user_id === userId));
+    if (event.attendance) event.attendance = event.attendance.filter((id) => id !== userId);
   }
   res.json({ message: 'Attendance removed' });
 }));
@@ -1085,13 +1169,15 @@ app.get('/api/events/:id/attendance', requireAuth, requireRole(['organizer', 'ad
     const result = await pool.query(
       `SELECT a.*, u.name, u.email, u.avatar, u.initials_color
        FROM attendance_records a JOIN users u ON a.user_id = u.id
-       WHERE a.event_id = $1 ORDER BY a.marked_at DESC`, [eventId]);
+       WHERE a.event_id = $1 ORDER BY a.marked_at DESC`,
+      [eventId]
+    );
     records = result.rows;
   } else {
     records = dataStore.attendance
-      .filter(a => a.event_id === eventId)
-      .map(a => {
-        const u = dataStore.users.find(user => user.id === a.user_id);
+      .filter((a) => a.event_id === eventId)
+      .map((a) => {
+        const u = dataStore.users.find((user) => user.id === a.user_id);
         return { ...a, name: u?.name, email: u?.email, avatar: u?.avatar, initials_color: u?.initialsColor };
       });
   }
@@ -1104,20 +1190,24 @@ app.get('/api/user/attendance', requireAuth, asyncHandler(async (req, res) => {
     const result = await pool.query(
       `SELECT a.*, e.title as event_title, e.date as event_date, e.location as event_location
        FROM attendance_records a JOIN events e ON a.event_id = e.id
-       WHERE a.user_id = $1 ORDER BY e.date DESC`, [req.user.id]);
+       WHERE a.user_id = $1 ORDER BY e.date DESC`,
+      [req.user.id]
+    );
     records = result.rows;
   } else {
     records = dataStore.attendance
-      .filter(a => a.user_id === req.user.id)
-      .map(a => {
-        const e = dataStore.events.find(ev => ev.id === a.event_id);
+      .filter((a) => a.user_id === req.user.id)
+      .map((a) => {
+        const e = dataStore.events.find((ev) => ev.id === a.event_id);
         return { ...a, event_title: e?.title, event_date: e?.date, event_location: e?.location };
       });
   }
   res.json({ attendance: records });
 }));
 
-// ===== NOTIFICATION ENDPOINTS =====
+// =====================================================================
+// NOTIFICATION ENDPOINTS
+// =====================================================================
 app.post('/api/notifications/send', requireAuth, requireRole(['organizer', 'admin']), asyncHandler(async (req, res) => {
   const { eventId, subject, message, type = 'announcement' } = req.body;
   if (!eventId || !subject || !message) return res.status(400).json({ error: 'eventId, subject, and message are required' });
@@ -1127,7 +1217,7 @@ app.post('/api/notifications/send', requireAuth, requireRole(['organizer', 'admi
     const result = await pool.query('SELECT * FROM events WHERE id = $1', [eventId]);
     event = result.rows[0];
   } else {
-    event = dataStore.events.find(e => e.id === eventId);
+    event = dataStore.events.find((e) => e.id === eventId);
   }
   if (!event) return res.status(404).json({ error: 'Event not found' });
   if (event.organizer_id !== req.user.id && req.user.role !== 'admin') return res.status(403).json({ error: 'Forbidden' });
@@ -1140,12 +1230,12 @@ app.post('/api/notifications/send', requireAuth, requireRole(['organizer', 'admi
       const r = await pool.query('SELECT id, name, email FROM users WHERE id = $1', [attendeeId]);
       attendee = r.rows[0];
     } else {
-      attendee = dataStore.users.find(u => u.id === attendeeId);
+      attendee = dataStore.users.find((u) => u.id === attendeeId);
     }
     if (!attendee) continue;
     const html = `<h2>${subject}</h2><p>Hi ${attendee.name},</p><p>${message.replace(/\n/g, '<br>')}</p><p><em>Event: ${event.title} | ${event.date} | ${event.location}</em></p>`;
     const emailResult = await sendEmail({ to: attendee.email, subject, html });
-    const notifId = await logNotification({ eventId, recipientEmail: attendee.email, recipientId: attendee.id, subject, body: message, type, status: emailResult.success ? 'sent' : 'failed' });
+    await logNotification({ eventId, recipientEmail: attendee.email, recipientId: attendee.id, subject, body: message, type, status: emailResult.success ? 'sent' : 'failed' });
     results.push({ userId: attendee.id, email: attendee.email, sent: emailResult.success });
   }
   res.json({ message: 'Notifications sent', count: results.length, results });
@@ -1156,18 +1246,23 @@ app.get('/api/notifications', requireAuth, requireRole(['organizer', 'admin']), 
   if (useDatabase) {
     const result = await pool.query(
       `SELECT n.*, e.title as event_title FROM notifications n
-       LEFT JOIN events e ON n.event_id = e.id ORDER BY n.sent_at DESC LIMIT 100`);
+       LEFT JOIN events e ON n.event_id = e.id ORDER BY n.sent_at DESC LIMIT 100`
+    );
     notifications = result.rows;
   } else {
-    notifications = dataStore.notifications.map(n => {
-      const e = dataStore.events.find(ev => ev.id === n.event_id);
-      return { ...n, event_title: e?.title };
-    }).reverse();
+    notifications = dataStore.notifications
+      .map((n) => {
+        const e = dataStore.events.find((ev) => ev.id === n.event_id);
+        return { ...n, event_title: e?.title };
+      })
+      .reverse();
   }
   res.json({ notifications });
 }));
 
-// ===== REPORTING ENDPOINTS =====
+// =====================================================================
+// REPORTING ENDPOINTS
+// =====================================================================
 app.get('/api/reports/attendance/:eventId', requireAuth, requireRole(['organizer', 'admin']), asyncHandler(async (req, res) => {
   const eventId = req.params.eventId;
   let event;
@@ -1175,7 +1270,7 @@ app.get('/api/reports/attendance/:eventId', requireAuth, requireRole(['organizer
     const result = await pool.query('SELECT * FROM events WHERE id = $1', [eventId]);
     event = result.rows[0];
   } else {
-    event = dataStore.events.find(e => e.id === eventId);
+    event = dataStore.events.find((e) => e.id === eventId);
   }
   if (!event) return res.status(404).json({ error: 'Event not found' });
 
@@ -1185,22 +1280,25 @@ app.get('/api/reports/attendance/:eventId', requireAuth, requireRole(['organizer
     const result = await pool.query('SELECT user_id, status FROM attendance_records WHERE event_id = $1', [eventId]);
     attendanceRecords = result.rows;
   } else {
-    attendanceRecords = dataStore.attendance.filter(a => a.event_id === eventId);
+    attendanceRecords = dataStore.attendance.filter((a) => a.event_id === eventId);
   }
 
-  const attendedIds = new Set(attendanceRecords.map(a => a.user_id));
-  const presentCount = attendanceRecords.filter(a => a.status === 'present').length;
-  const absentCount = attendanceRecords.filter(a => a.status === 'absent').length;
+  const attendedIds = new Set(attendanceRecords.map((a) => a.user_id));
+  const presentCount = attendanceRecords.filter((a) => a.status === 'present').length;
+  const absentCount = attendanceRecords.filter((a) => a.status === 'absent').length;
   const noShowCount = attendees.length - attendedIds.size;
 
   res.json({
     event: { id: event.id, title: event.title, date: event.date, location: event.location, capacity: event.capacity },
     summary: {
-      registered: attendees.length, present: presentCount, absent: absentCount, noShow: noShowCount,
+      registered: attendees.length,
+      present: presentCount,
+      absent: absentCount,
+      noShow: noShowCount,
       attendanceRate: attendees.length > 0 ? Math.round((presentCount / attendees.length) * 100) : 0,
     },
-    attendees: attendees.map(id => {
-      const record = attendanceRecords.find(a => a.user_id === id);
+    attendees: attendees.map((id) => {
+      const record = attendanceRecords.find((a) => a.user_id === id);
       return { userId: id, status: record ? record.status : 'unmarked' };
     }),
   });
@@ -1219,7 +1317,8 @@ app.get('/api/reports/platform', requireAuth, requireRole(['admin']), asyncHandl
     const totalAttendees = await pool.query('SELECT COALESCE(SUM(array_length(attendees, 1)), 0) as total FROM events');
     const totalAttendance = await pool.query('SELECT COUNT(*) as total FROM attendance_records WHERE status = $1', ['present']);
     const topEvents = await pool.query(
-      `SELECT id, title, date, array_length(attendees, 1) as registrations FROM events ORDER BY array_length(attendees, 1) DESC NULLS LAST LIMIT 5`);
+      `SELECT id, title, date, array_length(attendees, 1) as registrations FROM events ORDER BY array_length(attendees, 1) DESC NULLS LAST LIMIT 5`
+    );
     const categoryBreakdown = await pool.query(`SELECT category, COUNT(*) as count FROM events GROUP BY category ORDER BY count DESC`);
     report = {
       totalEvents: parseInt(totalEvents.rows[0].total), upcomingEvents: parseInt(upcomingEvents.rows[0].total),
@@ -1233,17 +1332,26 @@ app.get('/api/reports/platform', requireAuth, requireRole(['admin']), asyncHandl
     const users = dataStore.users;
     const attendance = dataStore.attendance;
     report = {
-      totalEvents: events.length, upcomingEvents: events.filter(e => e.date >= now).length,
-      pastEvents: events.filter(e => e.date < now).length, totalUsers: users.length,
-      totalParticipants: users.filter(u => u.role === 'participant').length,
-      totalOrganizers: users.filter(u => u.role === 'organizer').length,
+      totalEvents: events.length,
+      upcomingEvents: events.filter((e) => e.date >= now).length,
+      pastEvents: events.filter((e) => e.date < now).length,
+      totalUsers: users.length,
+      totalParticipants: users.filter((u) => u.role === 'participant').length,
+      totalOrganizers: users.filter((u) => u.role === 'organizer').length,
       totalRegistrations: events.reduce((sum, e) => sum + (e.attendees?.length || 0), 0),
-      totalAttendanceMarked: attendance.filter(a => a.status === 'present').length,
-      topEvents: [...events].sort((a, b) => (b.attendees?.length || 0) - (a.attendees?.length || 0)).slice(0, 5).map(e => ({
-        id: e.id, title: e.title, date: e.date, registrations: e.attendees?.length || 0
-      })),
-      categoryBreakdown: Object.entries(events.reduce((acc, e) => { acc[e.category] = (acc[e.category] || 0) + 1; return acc; }, {}))
-        .map(([category, count]) => ({ category, count })).sort((a, b) => b.count - a.count),
+      totalAttendanceMarked: attendance.filter((a) => a.status === 'present').length,
+      topEvents: [...events]
+        .sort((a, b) => (b.attendees?.length || 0) - (a.attendees?.length || 0))
+        .slice(0, 5)
+        .map((e) => ({ id: e.id, title: e.title, date: e.date, registrations: e.attendees?.length || 0 })),
+      categoryBreakdown: Object.entries(
+        events.reduce((acc, e) => {
+          acc[e.category] = (acc[e.category] || 0) + 1;
+          return acc;
+        }, {})
+      )
+        .map(([category, count]) => ({ category, count }))
+        .sort((a, b) => b.count - a.count),
     };
   }
   res.json(report);
@@ -1256,14 +1364,14 @@ app.get('/api/reports/organizer', requireAuth, requireRole(['organizer', 'admin'
     const result = await pool.query('SELECT * FROM events WHERE organizer_id = $1 ORDER BY date DESC', [organizerId]);
     events = result.rows;
   } else {
-    events = dataStore.events.filter(e => e.organizer?.id === organizerId || e.organizer_id === organizerId);
+    events = dataStore.events.filter((e) => e.organizer?.id === organizerId || e.organizer_id === organizerId);
   }
 
-  const eventReports = events.map(event => {
+  const eventReports = events.map((event) => {
     const registered = event.attendees?.length || 0;
     let present = 0;
     if (!useDatabase) {
-      present = dataStore.attendance.filter(a => a.event_id === event.id && a.status === 'present').length;
+      present = dataStore.attendance.filter((a) => a.event_id === event.id && a.status === 'present').length;
     }
     return { id: event.id, title: event.title, date: event.date, registered, present, rate: registered > 0 ? Math.round((present / registered) * 100) : 0 };
   });
@@ -1294,24 +1402,26 @@ app.get('/api/reports/attendance/:eventId/csv', requireAuth, requireRole(['organ
       attendanceRecords = ar.rows;
     }
   } else {
-    event = dataStore.events.find(e => e.id === eventId);
+    event = dataStore.events.find((e) => e.id === eventId);
     if (event) {
-      attendeeDetails = (event.attendees || []).map(id => {
-        const u = dataStore.users.find(user => user.id === id);
-        return u ? { id: u.id, name: u.name, email: u.email } : null;
-      }).filter(Boolean);
-      attendanceRecords = dataStore.attendance.filter(a => a.event_id === eventId);
+      attendeeDetails = (event.attendees || [])
+        .map((id) => {
+          const u = dataStore.users.find((user) => user.id === id);
+          return u ? { id: u.id, name: u.name, email: u.email } : null;
+        })
+        .filter(Boolean);
+      attendanceRecords = dataStore.attendance.filter((a) => a.event_id === eventId);
     }
   }
 
   if (!event) return res.status(404).json({ error: 'Event not found' });
-  const rows = attendeeDetails.map(u => {
-    const record = attendanceRecords.find(a => a.user_id === u.id);
+  const rows = attendeeDetails.map((u) => {
+    const record = attendanceRecords.find((a) => a.user_id === u.id);
     return { name: u.name, email: u.email, status: record ? record.status : 'Not marked', marked_at: record ? record.marked_at : '' };
   });
 
   const csvHeader = 'Name,Email,Attendance Status,Marked At\n';
-  const csvBody = rows.map(r => `"${r.name}","${r.email}","${r.status}","${r.marked_at || ''}"`).join('\n');
+  const csvBody = rows.map((r) => `"${r.name}","${r.email}","${r.status}","${r.marked_at || ''}"`).join('\n');
   const csv = csvHeader + csvBody;
 
   res.setHeader('Content-Type', 'text/csv');
@@ -1319,19 +1429,26 @@ app.get('/api/reports/attendance/:eventId/csv', requireAuth, requireRole(['organ
   res.send(csv);
 }));
 
-// ===== SPA FALLBACK =====
+// =====================================================================
+// SPA FALLBACK
+// =====================================================================
 app.get('*', (req, res) => {
   if (req.path.startsWith('/api')) return res.status(404).json({ error: 'API endpoint not found' });
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// ===== GLOBAL ERROR HANDLER =====
+// =====================================================================
+// GLOBAL ERROR HANDLER
+// =====================================================================
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
   if (res.headersSent) return next(err);
   res.status(500).json({ error: 'Internal server error' });
 });
 
+// =====================================================================
+// START SERVER
+// =====================================================================
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n  TechMeetHub server running on http://localhost:${PORT}\n`);
   console.log(`  Demo accounts (password: "password"):`);
