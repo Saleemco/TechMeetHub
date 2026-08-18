@@ -736,14 +736,77 @@ app.get('/api/stats', asyncHandler(async (req, res) => {
   res.json({ totalEvents, totalAttendees, totalUsers, totalOrganizers });
 }));
 
+// ===== VENUE CONFLICT DETECTION =====
+function timeToMinutes(t) {
+  if (!t) return null;
+  const [h, m] = t.split(':').map(Number);
+  if (Number.isNaN(h)) return null;
+  return h * 60 + (Number.isNaN(m) ? 0 : m);
+}
+
+function minutesToTime(mins) {
+  const wrapped = ((mins % 1440) + 1440) % 1440;
+  const h = Math.floor(wrapped / 60);
+  const m = wrapped % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
+// If no end time is given, assume a 2-hour block so a conflict check has something to compare.
+function computeDefaultEndTime(time) {
+  const start = timeToMinutes(time);
+  if (start === null) return '';
+  return minutesToTime(start + 120);
+}
+
+function rangesOverlap(startA, endA, startB, endB) {
+  const aStart = timeToMinutes(startA);
+  const bStart = timeToMinutes(startB);
+  if (aStart === null || bStart === null) return false;
+  const aEnd = timeToMinutes(endA) ?? aStart + 1;
+  const bEnd = timeToMinutes(endB) ?? bStart + 1;
+  return aStart < bEnd && bStart < aEnd;
+}
+
+// Looks for another event at the same venue, on the same date, whose time range overlaps.
+async function findVenueConflict({ location, date, time, endTime, excludeEventId }) {
+  if (!location || !date || !time) return null;
+  let candidates = [];
+  if (useDatabase) {
+    const result = await pool.query(
+      'SELECT id, title, time, end_time FROM events WHERE location = $1 AND date = $2 AND id != $3',
+      [location, date, excludeEventId || '']
+    );
+    candidates = result.rows.map((r) => ({ id: r.id, title: r.title, time: r.time, endTime: r.end_time }));
+  } else {
+    candidates = dataStore.events
+      .filter((e) => e.location === location && e.date === date && e.id !== excludeEventId)
+      .map((e) => ({ id: e.id, title: e.title, time: e.time, endTime: e.endTime }));
+  }
+  return candidates.find((e) => rangesOverlap(time, endTime, e.time, e.endTime)) || null;
+}
+
 // ===== PROTECTED EVENTS API =====
 app.post('/api/events', requireAuth, requireRole(['organizer', 'admin']), asyncHandler(async (req, res) => {
-  const { title, category, date, time, location, capacity, description, tags } = req.body;
+  const { title, category, date, time, endTime, location, capacity, description, tags } = req.body;
   if (!title || !category || !date || !location || !capacity) return res.status(400).json({ error: 'Missing required fields' });
+
+  const trimmedLocation = location.trim();
+  const finalEndTime = endTime || computeDefaultEndTime(time);
+
+  if (time && finalEndTime && timeToMinutes(finalEndTime) <= timeToMinutes(time)) {
+    return res.status(400).json({ error: 'End time must be after start time' });
+  }
+
+  const conflict = await findVenueConflict({ location: trimmedLocation, date, time, endTime: finalEndTime });
+  if (conflict) {
+    return res.status(409).json({
+      error: `Venue conflict: "${trimmedLocation}" is already booked for "${conflict.title}" on ${date} from ${conflict.time} to ${conflict.endTime || 'TBD'}.`,
+    });
+  }
 
   const newEvent = {
     id: 'evt-' + Date.now(), title: title.trim(), description: description || '', date,
-    time: time || '', location: location.trim(), category,
+    time: time || '', endTime: finalEndTime, location: trimmedLocation, category,
     image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&h=400&fit=crop',
     organizer: { id: req.user.id, name: req.user.name, avatar: req.user.avatar, initialsColor: req.user.initialsColor },
     attendees: [], attendance: [], capacity: parseInt(capacity, 10),
@@ -753,11 +816,11 @@ app.post('/api/events', requireAuth, requireRole(['organizer', 'admin']), asyncH
 
   if (useDatabase) {
     await pool.query(
-      `INSERT INTO events (id, title, description, date, time, location, category, image, 
+      `INSERT INTO events (id, title, description, date, time, end_time, location, category, image, 
         organizer_id, organizer_name, organizer_avatar, organizer_initials_color, attendees, attendance, capacity, tags, speakers, agenda, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)`,
       [
-        newEvent.id, newEvent.title, newEvent.description, newEvent.date, newEvent.time,
+        newEvent.id, newEvent.title, newEvent.description, newEvent.date, newEvent.time, newEvent.endTime,
         newEvent.location, newEvent.category, newEvent.image,
         newEvent.organizer.id, newEvent.organizer.name, newEvent.organizer.avatar, newEvent.organizer.initialsColor,
         newEvent.attendees, newEvent.attendance, newEvent.capacity, newEvent.tags,
@@ -782,19 +845,39 @@ app.put('/api/events/:id', requireAuth, asyncHandler(async (req, res) => {
   if (!event) return res.status(404).json({ error: 'Event not found' });
   if (event.organizer_id !== req.user.id && req.user.role !== 'admin') return res.status(403).json({ error: 'You can only edit your own events' });
 
-  const { title, description, date, time, location, category, capacity, tags } = req.body;
+  const { title, description, date, time, endTime, location, category, capacity, tags } = req.body;
+
+  const existingEndTime = event.end_time !== undefined ? event.end_time : event.endTime;
+  const mergedDate = date || event.date;
+  const mergedTime = time || event.time;
+  const mergedLocation = location ? location.trim() : event.location;
+  const mergedEndTime = endTime || (time ? computeDefaultEndTime(time) : existingEndTime);
+
+  if (mergedTime && mergedEndTime && timeToMinutes(mergedEndTime) <= timeToMinutes(mergedTime)) {
+    return res.status(400).json({ error: 'End time must be after start time' });
+  }
+
+  const conflict = await findVenueConflict({
+    location: mergedLocation, date: mergedDate, time: mergedTime, endTime: mergedEndTime, excludeEventId: req.params.id,
+  });
+  if (conflict) {
+    return res.status(409).json({
+      error: `Venue conflict: "${mergedLocation}" is already booked for "${conflict.title}" on ${mergedDate} from ${conflict.time} to ${conflict.endTime || 'TBD'}.`,
+    });
+  }
+
   if (useDatabase) {
     await pool.query(
       `UPDATE events SET title = COALESCE($1, title), description = COALESCE($2, description), date = COALESCE($3, date),
-        time = COALESCE($4, time), location = COALESCE($5, location), category = COALESCE($6, category),
-        capacity = COALESCE($7, capacity), tags = COALESCE($8, tags) WHERE id = $9`,
-      [title, description, date, time, location, category, capacity, tags, req.params.id]
+        time = COALESCE($4, time), end_time = COALESCE($5, end_time), location = COALESCE($6, location), category = COALESCE($7, category),
+        capacity = COALESCE($8, capacity), tags = COALESCE($9, tags) WHERE id = $10`,
+      [title, description, date, time, endTime, location, category, capacity, tags, req.params.id]
     );
     const updatedResult = await pool.query('SELECT * FROM events WHERE id = $1', [req.params.id]);
     event = updatedResult.rows[0];
   } else {
     const idx = dataStore.events.findIndex(e => e.id === req.params.id);
-    dataStore.events[idx] = { ...event, ...req.body };
+    dataStore.events[idx] = { ...event, ...req.body, endTime: mergedEndTime };
     event = dataStore.events[idx];
   }
   res.json({ event });
