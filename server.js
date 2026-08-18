@@ -4,7 +4,6 @@ const cors = require('cors');
 const path = require('path');
 const crypto = require('crypto');
 const { Pool } = require('pg');
-const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -251,27 +250,17 @@ console.log(`   👤 ${dataStore.users.length} users (1 admin, 5 organizers, 4 p
 console.log(`   📅 ${dataStore.events.length} events (5 per organizer)`);
 console.log(`   👥 Each event has 4 participants registered`);
 
-// ===== EMAIL TRANSPORTER (FIXED) =====
-const EMAIL_HOST = process.env.EMAIL_HOST || '';
-const EMAIL_USER = process.env.EMAIL_USER || '';
-const EMAIL_PASS = process.env.EMAIL_PASS || '';
-const emailEnabled = !!(EMAIL_HOST && EMAIL_USER && EMAIL_PASS);
+// ===== EMAIL (BREVO) =====
+const BREVO_API_KEY = process.env.BREVO_API_KEY || '';
+const EMAIL_FROM_ADDRESS = process.env.EMAIL_FROM_ADDRESS || 'noreply@techmeethub.dev';
+const EMAIL_FROM_NAME = process.env.EMAIL_FROM_NAME || 'TechMeetHub';
+const emailEnabled = !!BREVO_API_KEY;
 
-let emailTransporter = null;
 if (emailEnabled) {
-  emailTransporter = nodemailer.createTransport({
-    host: EMAIL_HOST,
-    port: parseInt(process.env.EMAIL_PORT || '587'),
-    secure: false,
-    connectionTimeout: 5000,
-    greetingTimeout: 5000,
-    socketTimeout: 5000,
-    auth: { user: EMAIL_USER, pass: EMAIL_PASS },
-  });
-  console.log('✅ Email transporter ready for:', EMAIL_HOST);
+  console.log(`✅ Brevo email ready — sending as "${EMAIL_FROM_NAME}" <${EMAIL_FROM_ADDRESS}>`);
 } else {
   console.log('⚠️  Email not configured. Notifications will log to console only.');
-  console.log('   Set EMAIL_HOST, EMAIL_USER, EMAIL_PASS env vars to enable real email.');
+  console.log('   Set BREVO_API_KEY (and optionally EMAIL_FROM_ADDRESS, EMAIL_FROM_NAME) to enable real email.');
 }
 
 // ===== DATABASE CONNECTION =====
@@ -465,9 +454,9 @@ async function seedDatabase() {
   }
 }
 
-// ===== EMAIL HELPERS (FIXED) =====
-async function sendEmail({ to, subject, html, text }) {
-  if (!emailEnabled || !emailTransporter) {
+// ===== EMAIL HELPERS (BREVO) =====
+async function sendEmail({ to, toName, subject, html, text }) {
+  if (!emailEnabled) {
     console.log('=== EMAIL (console fallback) ===');
     console.log('To:', to);
     console.log('Subject:', subject);
@@ -475,14 +464,32 @@ async function sendEmail({ to, subject, html, text }) {
     return { success: true, messageId: 'console-' + Date.now(), logged: true };
   }
 
-  const mailOptions = { 
-    from: process.env.EMAIL_FROM || 'TechMeetHub <noreply@techmeethub.dev>', 
-    to, subject, html, text 
-  };
   try {
-    const info = await emailTransporter.sendMail(mailOptions);
-    console.log('📧 Email sent:', info.messageId);
-    return { success: true, messageId: info.messageId };
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        'api-key': BREVO_API_KEY,
+      },
+      body: JSON.stringify({
+        sender: { name: EMAIL_FROM_NAME, email: EMAIL_FROM_ADDRESS },
+        to: [{ email: to, name: toName || undefined }],
+        subject,
+        htmlContent: html,
+        ...(text ? { textContent: text } : {}),
+      }),
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      console.error('📧 Brevo email send failed:', response.status, data);
+      return { success: false, error: data.message || `Brevo API error (${response.status})` };
+    }
+
+    console.log('📧 Email sent via Brevo:', data.messageId);
+    return { success: true, messageId: data.messageId };
   } catch (err) {
     console.error('📧 Email send failed:', err.message);
     return { success: false, error: err.message };
@@ -1049,7 +1056,7 @@ app.post('/api/events/:id/attendance', requireAuth, requireRole(['organizer', 'a
   if (attendee) {
     const subject = `Attendance Marked: ${event.title}`;
     const html = `<h2>Attendance Confirmation</h2><p>Hi ${attendee.name},</p><p>Your attendance at <strong>${event.title}</strong> on ${event.date} has been marked as <strong>${status}</strong>.</p><p>Thank you for attending!</p>`;
-    await sendEmail({ to: attendee.email, subject, html });
+    await sendEmail({ to: attendee.email, toName: attendee.name, subject, html });
     await logNotification({ eventId, recipientEmail: attendee.email, recipientId: userId, subject, body: html, type: 'attendance', status: 'sent' });
   }
   res.json({ message: 'Attendance marked', userId, status });
@@ -1144,7 +1151,7 @@ app.post('/api/notifications/send', requireAuth, requireRole(['organizer', 'admi
     }
     if (!attendee) continue;
     const html = `<h2>${subject}</h2><p>Hi ${attendee.name},</p><p>${message.replace(/\n/g, '<br>')}</p><p><em>Event: ${event.title} | ${event.date} | ${event.location}</em></p>`;
-    const emailResult = await sendEmail({ to: attendee.email, subject, html });
+    const emailResult = await sendEmail({ to: attendee.email, toName: attendee.name, subject, html });
     const notifId = await logNotification({ eventId, recipientEmail: attendee.email, recipientId: attendee.id, subject, body: message, type, status: emailResult.success ? 'sent' : 'failed' });
     results.push({ userId: attendee.id, email: attendee.email, sent: emailResult.success });
   }
