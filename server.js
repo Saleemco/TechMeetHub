@@ -748,7 +748,7 @@ app.post('/api/events', requireAuth, requireRole(['organizer', 'admin']), asyncH
     await pool.query(
       `INSERT INTO events (id, title, description, date, time, location, category, image, 
         organizer_id, organizer_name, organizer_avatar, organizer_initials_color, attendees, attendance, capacity, tags, speakers, agenda, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
       [
         newEvent.id, newEvent.title, newEvent.description, newEvent.date, newEvent.time,
         newEvent.location, newEvent.category, newEvent.image,
